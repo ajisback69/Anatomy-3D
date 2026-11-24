@@ -18,7 +18,7 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 ## Publishing
 `python tools/make_artifact.py <bone>` builds `dist/<bone>/`. Publish those files as a claude.ai artifact (index.html, content.js, data/*, viewer/*).
 
-The sternum artifact is https://claude.ai/artifact/XnBUeNz5TYhtDxsg5qiFbs (slug f94115fd-a467-4978-9aa8-6d1362b72586). It still uses the old flat layout (index.html, core.js, layers.js). Republish it in the new layout with mode "replace".
+The sternum artifact is https://claude.ai/artifact/XnBUeNz5TYhtDxsg5qiFbs (slug f94115fd-a467-4978-9aa8-6d1362b72586). It is published in this layout (version 1795546583-8cd5). To update it, first call get_artifact for the live version.
 
 ## Local test
 Serve with `python -m http.server`, because ES modules do not load from file://.
