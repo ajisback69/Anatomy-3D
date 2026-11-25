@@ -25,7 +25,7 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 ## Publishing
 `python tools/make_artifact.py <bone>` builds `dist/<bone>/`. Publish those files as a claude.ai artifact (index.html, content.js, data/*, viewer/*).
 
-The sternum artifact is https://claude.ai/artifact/XnBUeNz5TYhtDxsg5qiFbs (slug f94115fd-a467-4978-9aa8-6d1362b72586). It is published in this layout (version 1795546583-8cd5). To update it, first call get_artifact for the live version.
+The sternum artifact is https://claude.ai/artifact/XnBUeNz5TYhtDxsg5qiFbs (slug f94115fd-a467-4978-9aa8-6d1362b72586). It is published in this layout. To update it, first call get_artifact for the live version.
 
 Ribs artifact: https://claude.ai/artifact/SRsCNGFiPpn9oT47duJaNU (slug cded4058-688d-4861-9dd2-176acf0347e9).
 After changing viewer.js, republish viewer/viewer.js to every bone artifact.
