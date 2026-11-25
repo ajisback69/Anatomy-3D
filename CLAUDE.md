@@ -26,6 +26,8 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 - Multi-specimen pages, e.g. ribs (first, second, typical, tenth, eleventh, twelfth): an inline loader picks `data/<spec>-core.js` from `#spec`. `content.js` picks `window.BONE` from `window.SPEC`. Elements carry `data-only="spec1 spec2"`; the ones not for the current spec are removed before the viewer runs.
 - Which-number trainer (mode `which`): `BONE.whichSrc` (e.g. data/which.js, window.WHICH.items with `k`), plus whichNames, whichRules, whichQ, whichHint, whichView, whichDist. Built by `build_which()` in pipeline/vertebrae.py.
 - `pipeline/vertebrae.py`: specs typical (T6), first, ninth, tenth, eleventh, twelfth. Parts 1–6 (body, pedicle, lamina, TP, spinous, articular). Facets come from rib contact.
+- Organs (heart): the main mesh is still `group:'bone'` with `p` (chamber; +10 = inner wall), `r` (outer surface) and `t` (coronary territory). Mode options: `paint` ('parts'|'reg'|'terr'), `boneOp` (opacity), `cut`/`cuts` with `BONE.cuts[k] = {n, o, view}` (clipping plane, keep n·x >= o; slider in the legend), `clipLayers`, `legend` (STR list), `markers`. Landmarks may carry `cut` (shown only with that cut). `relLabels` entries can name a mode as 3rd item. `BONE.MK` overrides the marker legend; extra types `open`, `node`.
+- `pipeline/heart.py`: voxelises the wall (FMA7274) plus great vessels; the two closed cavities are split at the AV annulus plane into RA/RV/LA/LV; auricles by morphological opening. Epicardium = surface facing the outside space. Surfaces by visibility (front/below/behind/left). Exports cuts, measurements (`meas`) and Datta's surface marking fitted to this subject's cartilages. Cache in `.cache/`.
 - `pipeline/ribs.py`: `python pipeline/ribs.py [spec ...]`. Each spec has `kind` and `tub` (False for 11th and 12th, which have no neck or tubercle). `cart` may be None, in which case the pointed tip is used as the anterior end.
 
 ## Publishing
@@ -35,6 +37,7 @@ The sternum artifact is https://claude.ai/artifact/XnBUeNz5TYhtDxsg5qiFbs (slug 
 
 Ribs artifact: https://claude.ai/artifact/SRsCNGFiPpn9oT47duJaNU (slug cded4058-688d-4861-9dd2-176acf0347e9).
 Thoracic vertebrae artifact: https://claude.ai/artifact/JZzGKA4ncTSYL6WYPtWCqD (slug 8e4672b4-5ef1-4821-9513-3a4454223130).
+Heart artifact: https://claude.ai/artifact/Ud6Pob99Wuam16tt4UbXM4 (slug dfb0d7db-7429-46c9-b24f-4f92cdba1ce3). Text from Datta pp. 58–86 and 342–343.
 After changing viewer.js, republish viewer/viewer.js to every bone artifact.
 
 ## Local test

@@ -1,0 +1,86 @@
+# হার্ট: BodyParts3D-এ যা মেশ হিসেবে আছে
+FMA7274 wall of heart
+FMA7234 tricuspid valve
+FMA7235 mitral valve
+FMA7246 pulmonary valve
+FMA7260 anterior papillary muscle of right ventricle
+FMA7261 posterior papillary muscle of right ventricle
+FMA7262 septal papillary muscle of right ventricle
+FMA7266 posterior papillary muscle of left ventricle
+FMA9352nsn papillary muscle of left ventricle, nsn
+FMA3736 ascending aorta
+FMA3768 arch of aorta
+FMA4720 superior vena cava
+FMA10951 inferior vena cava
+FMA66326 pulmonary artery
+FMA66643 pulmonary vein
+FMA3802 trunk of right coronary artery
+FMA3818 marginal branch of right coronary artery
+FMA3840nsn posterior interventricular branch of right coronary artery, nsn
+FMA76994 right posterolateral branch of right coronary artery
+FMA71669 set of interventricular septal branches of right coronary artery
+FMA4685 stem of left coronary artery
+FMA3862nsn anterior interventricular branch of left coronary artery, nsn
+FMA3895 circumflex branch of left coronary artery
+FMA71670 set of interventricular septal branches of left coronary artery
+FMA4706 coronary sinus
+FMA4707 great cardiac vein
+FMA4713 middle cardiac vein
+FMA71567 set of anterior cardiac veins
+FMA76751 set of posterior veins of left ventricle
+# প্রসঙ্গ: বুকের খাঁচা, ফুসফুস, ডায়াফ্রাম ইত্যাদি
+FMA7486
+FMA7487
+FMA7488
+FMA7875
+FMA7886
+FMA7913
+FMA7976
+FMA8070
+FMA8194
+FMA8248
+FMA8005
+FMA8031
+FMA8058
+FMA8167
+FMA8112
+FMA8221
+FMA8275
+FMA7857
+FMA7882
+FMA7909
+FMA7957
+FMA8066
+FMA8175
+FMA8229
+FMA7987
+FMA8012
+FMA8039
+FMA8148
+FMA8093
+FMA8202
+FMA8256
+FMA13322
+FMA13323
+FMA7333
+FMA7383
+FMA7337
+FMA7370
+FMA7371
+FMA13295
+FMA7131
+FMA7394
+FMA7409
+FMA3784
+FMA3932nsn
+FMA4058
+FMA4694
+FMA4751
+FMA4761
+FMA71194
+FMA71195
+FMA9945
+FMA9968
+FMA9991
+FMA9922
+FMA9248

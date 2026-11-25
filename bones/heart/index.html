@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>হার্ট 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+table.cmp{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.1);vertical-align:top}
+table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chips span{background:rgba(0,0,0,.06);border-radius:8px;padding:3px 9px;font-size:14px}
+</style>
+<script src="data/core.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+
+<section class="band stage">
+ <div class="wrap">
+  <h1>হার্ট <span style="font-weight:500;opacity:.8">· The Heart</span></h1>
+  <p class="lead">আসল মানুষের স্ক্যান থেকে নেওয়া হার্ট। চারটা প্রকোষ্ঠ, পৃষ্ঠ, ভাল্‌ভ আর রক্তনালী সব মেশ থেকে মাপা। প্রকোষ্ঠ কেটে ভেতরটা দেখুন, আর বুকের দেয়ালে বইয়ের সারফেস মার্কিং মিলিয়ে নিন। লেখা A.K. Datta অনুযায়ী।</p>
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="false">প্রকোষ্ঠ</button>
+     <button class="btn" data-mode="lm" aria-pressed="true">বাইরের গঠন</button>
+     <button class="btn" data-mode="face" aria-pressed="false">পৃষ্ঠ</button>
+     <button class="btn" data-mode="int" aria-pressed="false">ভেতরটা</button>
+     <button class="btn" data-mode="valve" aria-pressed="false">ভাল্‌ভ</button>
+     <button class="btn" data-mode="cor" aria-pressed="false">রক্তনালী</button>
+     <button class="btn" data-mode="cond" aria-pressed="false">Conducting</button>
+     <button class="btn" data-mode="rel" aria-pressed="false">রিলেশন</button>
+     <button class="btn" data-mode="surf" aria-pressed="false">সারফেস মার্কিং</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="left">বাঁ থেকে</button>
+     <button class="btn" data-view="right">ডান থেকে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="great"><i class="dot" style="background:#6c63d9"></i>বড় রক্তনালী</label>
+     <label class="tog"><input type="checkbox" data-layer="artery"><i class="dot" style="background:#e0443e"></i>করোনারি ধমনী</label>
+     <label class="tog"><input type="checkbox" data-layer="vein"><i class="dot" style="background:#4a78e0"></i>কার্ডিয়াক ভেইন</label>
+     <label class="tog"><input type="checkbox" data-layer="valve"><i class="dot" style="background:#f3e3b0"></i>ভাল্‌ভ ও প্যাপিলারি</label>
+     <label class="tog"><input type="checkbox" data-layer="cond"><i class="dot" style="background:#ffd43b"></i>Conducting</label>
+     <label class="tog"><input type="checkbox" data-layer="ctx"><i class="dot" style="background:#e9e1cf"></i>বুকের খাঁচা</label>
+     <label class="tog"><input type="checkbox" data-layer="organ"><i class="dot" style="background:#f0b8b2"></i>ফুসফুস ইত্যাদি</label>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#3b82d6"></i>ডায়াফ্রাম</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>কশেরুকা</label>
+     <label class="tog"><input type="checkbox" data-layer="mark"><i class="dot" style="background:#ff8a3d"></i>সারফেস মার্কিং</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+ <a href="#s-gen">সাধারণ</a><a href="#s-ext">বাইরের গঠন</a><a href="#s-cham">প্রকোষ্ঠ</a><a href="#s-sept">সেপ্টাম ও কঙ্কাল</a><a href="#s-cond">Conducting</a><a href="#s-blood">রক্ত সরবরাহ</a><a href="#s-nerve">নার্ভ</a><a href="#s-surf">সারফেস ও শব্দ</a><a href="#s-dev">ডেভেলপমেন্ট</a><a href="#s-clin">ক্লিনিক্যাল</a><a href="#s-viva">ভাইভা</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+
+<section class="band sec" id="s-gen"><div class="wrap two">
+ <div>
+  <h2>সাধারণ কথা</h2>
+  <ul>
+   <li><b>কী:</b> ফাঁপা, শঙ্কুর মতো পেশির অঙ্গ; middle mediastinum-এ, pericardium-এ ঢাকা। নিজের মুঠির মতো বড়।</li>
+   <li><b>চার প্রকোষ্ঠ:</b> দুই অলিন্দ (atria) আর দুই নিলয় (ventricles)। অলিন্দ দুটো interatrial septum দিয়ে, নিলয় দুটো interventricular septum দিয়ে আলাদা।</li>
+   <li><b>ডান হার্ট:</b> SVC, IVC আর coronary sinus থেকে অক্সিজেনবিহীন রক্ত RA-তে → RV → pulmonary trunk → ফুসফুস।</li>
+   <li><b>বাম হার্ট:</b> চারটা pulmonary vein থেকে অক্সিজেনযুক্ত রক্ত LA-তে → LV → ascending aorta → সারা শরীর।</li>
+   <li><b>ওজন:</b> পুরুষ ২৮০–৩৪০ গ্রাম, নারী ২৩০–২৮০ গ্রাম।</li>
+   <li><b>দেয়াল:</b> বাইরে থেকে epicardium (serous pericardium-এর visceral স্তর), myocardium, endocardium।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৫৮–৫৯, ৭০</p>
+ </div>
+ <div>
+  <h2>মাপ: বই বনাম এই স্ক্যান</h2>
+  <table class="cmp"><thead><tr><th>কী</th><th>Datta</th><th>স্ক্যানে</th></tr></thead><tbody id="tbl-meas"></tbody></table>
+  <p class="note">স্ক্যান একজন প্রাপ্তবয়স্ক পুরুষের, শোয়া অবস্থায়। দেয়ালের পুরুত্ব আর orifice-এর পরিধি বইয়ের সাথে ভালো মেলে। পুরো হার্টের মাপে auricle আর বড় রক্তনালীর গোড়া ধরা আছে, তাই একটু বড়।</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-ext"><div class="wrap two">
+ <div>
+  <h2>বাইরের গঠন</h2>
+  <p>একটা <b>apex</b>, একটা <b>base</b>, তিনটা <b>পৃষ্ঠ</b> (sternocostal, diaphragmatic, left) আর তিনটা <b>বর্ডার</b> (right, inferior, left)।</p>
+  <ul>
+   <li><b>Apex:</b> শুধু LV; বাম ৫ম intercostal space, মধ্যরেখা থেকে প্রায় ৯ সেমি।</li>
+   <li><b>Base:</b> শুধু দুই অলিন্দ; শোয়া অবস্থায় T5–T8-এর সামনে, দাঁড়ালে আরও নিচে।</li>
+   <li><b>ডান বর্ডার:</b> শুধু RA। <b>নিচের বর্ডার</b> (margo acutus): ধারালো, মূলত RV। <b>বাম বর্ডার</b> (margo obtusus): অস্পষ্ট, মূলত LV।</li>
+   <li><b>খাঁজ:</b> C আকারের AV (coronary) groove, anterior আর posterior interventricular groove, interatrial groove, sulcus terminalis। তিনটা খাঁজের মিলন <b>crux</b>।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৫৯–৬১</p>
+ </div>
+ <div>
+  <h2>২/৩ আর ১/৩ নিয়ম: স্ক্যানে মেলে?</h2>
+  <table class="cmp"><thead><tr><th>পৃষ্ঠ</th><th>Datta</th><th>স্ক্যানে (সেই দিক থেকে দেখে)</th></tr></thead><tbody id="tbl-frac"></tbody></table>
+  <p class="note">Base আর diaphragmatic পৃষ্ঠে বইয়ের ভাগ মিলেছে। সামনে থেকে এই মানুষের LV বইয়ের চেয়ে কম দেখা যায়: হার্টের ঘোরানো মানুষে মানুষে কিছুটা আলাদা হয়। "পৃষ্ঠ" মোডে রং দেখে নিজে মিলিয়ে নিন।</p>
+  <div class="chips"><span>শুধু LV: apex</span><span>শুধু দুই অলিন্দ: base</span><span>শুধু RA: ডান বর্ডার</span><span>শুধু দুই নিলয়: diaphragmatic পৃষ্ঠ</span></div>
+  <p class="ref">Datta I, পৃ. ৬১ ("Some points for observation")</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-cham"><div class="wrap two">
+ <div>
+  <h2>ডান অলিন্দ (Right atrium)</h2>
+  <p><b>বাইরে:</b> right auricle; ডান বর্ডার ধরে sulcus terminalis। SVC-র মুখ ৩য় ডান costal cartilage-এর পেছনে, IVC-র মুখ ৬ষ্ঠ-এর পেছনে।</p>
+  <p><b>ভেতরে দুই অংশ, মাঝে crista terminalis:</b></p>
+  <ul>
+   <li><b>Sinus venarum</b> (পেছনে, মসৃণ): SVC-র মুখ (ভাল্‌ভ নেই), IVC-র মুখ (Eustachian valve), coronary sinus-এর মুখ (Thebesian valve), foramina venarum minimarum।</li>
+   <li><b>Atrium proper</b> (সামনে, খসখসে): musculi pectinati, auricle, tricuspid orifice ঘিরে vestibule।</li>
+   <li><b>Septum-এ:</b> fossa ovalis, limbus fossa ovalis, triangle of Koch (AV node), torus aorticus।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৬১–৬৩</p>
+  <h2>ডান নিলয় (Right ventricle)</h2>
+  <ul>
+   <li><b>Inflow</b> (খসখসে): tricuspid orifice আর ভাল্‌ভ; trabeculae carneae (ridge, bridge, papillary muscle); septomarginal trabecula (moderator band)।</li>
+   <li><b>Outflow</b> (মসৃণ): infundibulum বা conus arteriosus → pulmonary orifice (৩টা cusp, ২টা সামনে)।</li>
+   <li>মাঝে <b>supraventricular crest</b>। Inflow থেকে outflow-এ রক্ত স্থূলকোণে বাঁক নেয়।</li>
+   <li>Papillary: anterior, posterior (আর কখনো septal)।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৬৩–৬৫</p>
+ </div>
+ <div>
+  <h2>বাম অলিন্দ (Left atrium)</h2>
+  <ul>
+   <li>RA-র পেছনে-বাঁয়ে; base-এর ২/৩; পেছনের পৃষ্ঠ oblique sinus-এর সামনের দেয়াল।</li>
+   <li>ভেতর প্রায় সবটা মসৃণ; শুধু left auricle-এ musculi pectinati।</li>
+   <li>পেছনের দেয়ালে চারটা pulmonary vein; সামনে mitral orifice।</li>
+   <li>Septum-এ semilunar fold (septum primum) আর তার উপরে lunate impression।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৬৫–৬৬</p>
+  <h2>বাম নিলয় (Left ventricle)</h2>
+  <ul>
+   <li>শঙ্কু আকার, কাটলে গোল; দেয়াল ৮–১২ মিমি (RV-র তিন গুণ)।</li>
+   <li><b>Inflow:</b> mitral orifice (পরিধি ৭–৯ সেমি) আর ভাল্‌ভ (anterior ও posterior leaflet), দুটো papillary muscle; trabeculae RV-র চেয়ে বেশি।</li>
+   <li><b>Outflow:</b> aortic vestibule (মসৃণ, বেশিরভাগ fibrous) → aortic orifice (৩টা cusp, ১টা সামনে)।</li>
+   <li>Inflow আর outflow খুব কাছে, তীক্ষ্ণ কোণে; মাঝে mitral-এর anterior leaflet আর subaortic curtain।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৬৬–৬৮</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-sept"><div class="wrap two">
+ <div>
+  <h2>সেপ্টাম</h2>
+  <p><b>Interatrial septum:</b> তির্যকভাবে বসানো, তাই RA সামনে-ডানে আর LA পেছনে-বাঁয়ে। ডানে fossa ovalis, limbus, AV node; বাঁয়ে semilunar fold। প্রায় ২৫% মানুষে foramen ovale শুধু কাজে বন্ধ, গঠনে খোলা (probe patency)।</p>
+  <p><b>Interventricular septum:</b> তির্যক, RV-র দিকে উত্তল। বড় <b>muscular</b> অংশ সামনে-নিচে; ছোট <b>membranous</b> অংশ পেছনে-উপরে। Tricuspid-এর septal leaflet membranous অংশ পার হয়, তাই এর পেছনের অংশ RA আর LV-র aortic vestibule-কে আলাদা করে: <b>atrio-ventricular septum</b>।</p>
+  <p class="ref">Datta I, পৃ. ৬৮–৭০</p>
+ </div>
+ <div>
+  <h2>হার্টের কঙ্কাল (Fibrous skeleton)</h2>
+  <ul>
+   <li>চারটা fibrous ring: দুই AV, pulmonary আর aortic orifice ঘিরে।</li>
+   <li>Pulmonary ring aortic ring-এর উপরে-সামনে, দুটো সমকোণে; মাঝে <b>tendon of infundibulum</b>।</li>
+   <li>Aortic ring মাঝখানে; mitral আর tricuspid ring-এর সাথে <b>right fibrous trigone</b> (central fibrous body) আর <b>left fibrous trigone</b> দিয়ে জোড়া।</li>
+   <li>কাজ: পেশি আর ভাল্‌ভের ভর, aorta আর pulmonary trunk-এর গোড়া; আর অলিন্দ-নিলয়ের পেশি আলাদা রাখা, তাই conducting system দরকার। ভাল্‌ভ বদলের অপারেশনে সেলাই এখানে ধরে রাখে।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৭০–৭২ (স্ক্যানে এই কঙ্কাল আলাদা মেশ হিসেবে নেই)</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-cond"><div class="wrap two">
+ <div>
+  <h2>Conducting system</h2>
+  <ol>
+   <li><b>SA node</b> (পেসমেকার): SVC আর right auricle-এর মাঝের খাঁজ থেকে crista terminalis-এর উপর পর্যন্ত; ১০–২০ মিমি; nodal artery বেশিরভাগে RCA থেকে।</li>
+   <li><b>Internodal tracts</b> (James): anterior (Bachmann), middle (Wenckebach), posterior (Thorel)।</li>
+   <li><b>AV node:</b> triangle of Koch-এ, coronary sinus-এর মুখের ঠিক উপরে; এখানে impulse দেরি করে।</li>
+   <li><b>AV bundle (His):</b> right fibrous trigone ফুঁড়ে membranous septum ধরে muscular septum-এর চূড়ায় ভাগ হয়।</li>
+   <li><b>Right branch:</b> moderator band দিয়ে anterior papillary-তে। <b>Left branch:</b> membranous অংশ ফুঁড়ে বাম পাশে, দুই ভাগে দুই papillary-তে।</li>
+   <li><b>Purkinje plexus:</b> endocardium-এর নিচে; উত্তেজনা endocardium থেকে epicardium-এ, apex থেকে base-এ।</li>
+  </ol>
+  <p class="ref">Datta I, পৃ. ৭৩–৭৪</p>
+ </div>
+ <div>
+  <h2>মডেলে কী আসল, কী স্কিম্যাটিক</h2>
+  <p>Conducting system, moderator band, chordae tendineae আর aortic valve স্ক্যানে নেই। এগুলো বইয়ের বর্ণনা অনুযায়ী মাপা জায়গায় বসানো: SA node SVC-র মুখের সামনে-ডানে, AV node coronary sinus-এর মুখ আর tricuspid-এর septal অংশের মাঝে, শাখাগুলো আসল septum আর papillary muscle-এর গোড়া ধরে।</p>
+  <p class="note">হলুদ অংশে ট্যাপ করলে বিবরণ আসবে। দেয়াল স্বচ্ছ করা আছে।</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-blood"><div class="wrap two">
+ <div>
+  <h2>ধমনী</h2>
+  <p><b>RCA:</b> anterior aortic sinus → pulmonary trunk আর right auricle-এর মাঝে → ডান AV groove → inferior border ঘুরে → পেছনের AV groove-এ crux।</p>
+  <div class="chips"><span>Right conus</span><span>Right marginal</span><span>Atrial rami (SA nodal ৬৫%)</span><span>Posterior IV (৭০%-এ)</span><span>AV nodal (৮০–৯০%)</span></div>
+  <p><b>LCA:</b> left posterior aortic sinus → pulmonary trunk-এর পেছন দিয়ে → pulmonary trunk আর left auricle-এর মাঝে LAD আর circumflex-এ ভাগ।</p>
+  <div class="chips"><span>LAD: diagonal, left conus, septal</span><span>Circumflex: left marginal, SA nodal (৩৫%)</span></div>
+  <p><b>সরবরাহ:</b> RCA → পুরো RA, RV-র বেশিরভাগ, septum-এর পেছনের ১/৩, দুই node। LCA → LA, LV-র বেশিরভাগ, septum-এর সামনের ২/৩।</p>
+  <p><b>Dominance:</b> posterior IV branch যার থেকে আসে। বেশিরভাগ মানুষ right dominant।</p>
+  <p class="ref">Datta I, পৃ. ৭৪–৭৬</p>
+ </div>
+ <div>
+  <h2>শিরা</h2>
+  <ul>
+   <li><b>Coronary sinus</b> (৬০%): পেছনের AV groove; মুখ RA-তে।</li>
+   <li>এর শাখা: great cardiac (anterior IV groove), middle cardiac (posterior IV groove), small cardiac (ডান AV groove), posterior vein of LV, oblique vein of LA (ভাল্‌ভ নেই)।</li>
+   <li><b>সরাসরি প্রকোষ্ঠে:</b> anterior cardiac veins (RA-তে), venae cordis minimi (Thebesian)।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৭৯–৮০</p>
+  <h2>মডেলে</h2>
+  <p>"রক্তনালী" মোডে দেয়ালের রং দেখায় কোন ধমনীর এলাকা: হলুদ RCA, লাল LAD, বেগুনি circumflex। এটা প্রতিটা বিন্দুর সবচেয়ে কাছের ধমনী দেখে আনুমানিক। Small cardiac vein স্ক্যানে নেই, স্কিম্যাটিক।</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-nerve"><div class="wrap two">
+ <div>
+  <h2>নার্ভ সরবরাহ</h2>
+  <ul>
+   <li><b>Superficial cardiac plexus:</b> aortic arch-এর নিচে, ডান pulmonary artery-র সামনে; ligamentum arteriosum-এর ডানে ছোট একটা cardiac ganglion। গঠন: বাম sympathetic trunk-এর superior cervical cardiac শাখা + বাম vagus-এর নিচের cervical cardiac শাখা।</li>
+   <li><b>Deep cardiac plexus:</b> tracheal bifurcation-এর সামনে, aortic arch-এর পেছনে। বাকি সব cardiac শাখা।</li>
+   <li>Atria আর conducting system: sympathetic + parasympathetic; ventricle-এর পেশি: শুধু sympathetic।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৮০–৮২</p>
+ </div>
+ <div>
+  <h2>কাজ ও ব্যথা</h2>
+  <ul>
+   <li><b>Sympathetic</b> (T1–T4/5): হার্ট রেট আর output বাড়ায়; ব্যথার অনুভূতি বয়ে নেয়।</li>
+   <li><b>Vagus:</b> হার্ট রেট কমায়; afferent reflex-এ।</li>
+   <li><b>Referred pain:</b> বুকের মাঝে, বাম বাহুর ভেতরের দিকে (T1–T2), কখনো ঘাড়ে বা epigastrium-এ।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৮১–৮২</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-surf"><div class="wrap two">
+ <div>
+  <h2>সারফেস মার্কিং</h2>
+  <ul>
+   <li><b>ডান বর্ডার:</b> ডান ৩য় costal cartilage-এর উপরের কিনারা (স্টার্নাম থেকে ১.২ সেমি) → ডান ৪র্থ space (মধ্যরেখা থেকে ৩.৭ সেমি) → ডান ৬ষ্ঠ costal cartilage।</li>
+   <li><b>নিচের বর্ডার:</b> ডান ৬ষ্ঠ costal cartilage → xiphisternal joint → apex beat।</li>
+   <li><b>বাম বর্ডার:</b> বাম ২য় costal cartilage-এর নিচের কিনারা (স্টার্নাম থেকে ১.২ সেমি) → apex beat।</li>
+   <li><b>উপরের বর্ডার:</b> ডান আর বাম বর্ডারের উপরের মাথা যোগ করে।</li>
+   <li><b>Orifice:</b> pulmonary (বাম ৩য় cartilage), aortic (বাম ৩য় space-এর ভেতরের মাথা), mitral (বাম ৪র্থ cartilage), tricuspid (মধ্যরেখা, ৪র্থ cartilage থেকে নিচে)।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৩৪২–৩৪৩</p>
+ </div>
+ <div>
+  <h2>হার্টের শব্দ ও শোনার জায়গা</h2>
+  <ul>
+   <li><b>প্রথম শব্দ (lub):</b> systole-এর শুরুতে AV ভাল্‌ভ বন্ধ হওয়া।</li>
+   <li><b>দ্বিতীয় শব্দ (dup):</b> systole-এর শেষে aortic আর pulmonary ভাল্‌ভ বন্ধ হওয়া।</li>
+   <li>চার ভাল্‌ভ স্টার্নামের পেছনে খুব কাছাকাছি, তাই শব্দ শোনা হয় রক্তের প্রবাহের দিকে: <b>Aortic</b> ডান ২য় space, <b>Pulmonary</b> বাম ২য় space, <b>Tricuspid</b> বাম ৫ম space স্টার্নামের পাশে, <b>Mitral</b> বাম ৫ম space apex-এ।</li>
+   <li><b>X-ray (PA):</b> ডান ছায়া উপর থেকে: right brachiocephalic vein, SVC, RA, IVC। বাম ছায়া: aortic knuckle, pulmonary trunk, left auricle, LV।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৮৫–৮৬</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-dev"><div class="wrap two">
+ <div>
+  <h2>ডেভেলপমেন্ট (সংক্ষেপে)</h2>
+  <ul>
+   <li>দুটো endothelial tube জুড়ে একটা নল; ভাঁজে পাঁচ ভাগ: sinus venosus, primitive atrium, primitive ventricle, bulbus cordis, truncus arteriosus।</li>
+   <li><b>RA:</b> মসৃণ অংশ sinus venosus-এর ডান শিং থেকে, খসখসে অংশ primitive atrium থেকে। Crista terminalis ডান venous valve-এর অবশেষ।</li>
+   <li><b>LA:</b> pulmonary vein-গুলোর মাঝের দেয়াল একক pulmonary vein থেকে, বাকিটা primitive atrium থেকে।</li>
+   <li><b>Coronary sinus:</b> sinus venosus-এর বাম শিং আর বডি থেকে।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৬৩, ৬৬, ৮০, ৮৩–৮৪</p>
+ </div>
+ <div>
+  <h2>সেপ্টাম কীভাবে হয়</h2>
+  <ul>
+   <li><b>Interatrial septum:</b> septum primum + septum intermedium + septum secundum। দুটোর মাঝে foramen ovale; জন্মের পর প্রথমে কাজে, পরে গঠনে বন্ধ। Fossa-র মেঝে septum primum, limbus septum secundum।</li>
+   <li><b>Interventricular septum:</b> ventricular septum proper + proximal bulbar septum + septum intermedium-এর ডান অংশ (এটাই membranous অংশ)।</li>
+   <li>প্রতিটা নিলয়ের খসখসে অংশ primitive ventricle থেকে, মসৃণ বের হওয়ার অংশ (infundibulum, aortic vestibule) bulbus cordis থেকে।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৬৮–৭০, ৮৪</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-clin"><div class="wrap two">
+ <div>
+  <h2>ক্লিনিক্যাল</h2>
+  <ul>
+   <li><b>Ischaemic heart disease:</b> ব্লক বেশি LAD-এ (৪০–৫০%), তারপর RCA (৩০–৪০%), circumflex (১৫–২০%); সাধারণত প্রথম ২ সেমিতে।</li>
+   <li><b>Angina:</b> পরিশ্রমে বুকে চাপ ধরা ব্যথা, বিশ্রামে কমে; বাম বাহুতে যেতে পারে।</li>
+   <li><b>চিকিৎসা:</b> angiography, angioplasty ও stent, bypass graft (saphenous vein বা internal mammary artery)।</li>
+   <li><b>Left dominance:</b> পুরো LV আর septum এক ধমনীর উপর নির্ভর, তাই ঝুঁকি বেশি।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৭৬, ৭৮–৭৯</p>
+ </div>
+ <div>
+  <h2>আরও</h2>
+  <ul>
+   <li><b>Auricle-এ thrombus:</b> ডান থেকে pulmonary embolism, বাম থেকে মস্তিষ্ক বা কিডনিতে।</li>
+   <li><b>Mitral stenosis:</b> বড় LA oesophagus চেপে গিলতে কষ্ট।</li>
+   <li><b>ASD:</b> probe patency (স্বাভাবিক ধরা হয়), persistent ostium secundum বা primum। <b>VSD:</b> সাধারণত membranous অংশে; Fallot's tetralogy-তে pulmonary stenosis, overriding aorta, VSD, RV hypertrophy।</li>
+   <li><b>ভাল্‌ভ অপারেশন:</b> circumflex mitral annulus-এর কাছে, আঘাত লাগতে পারে।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ৬০, ৬৩, ৬৫, ৬৮, ৭০, ৭৬</p>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-viva"><div class="wrap">
+ <h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>Apex কোথায়, কী দিয়ে তৈরি?</summary><p>শুধু LV; বাম ৫ম intercostal space, মধ্যরেখা থেকে প্রায় ৯ সেমি। (পৃ. ৫৯)</p></details>
+ <details><summary>Base কী দিয়ে তৈরি?</summary><p>শুধু দুই অলিন্দ: LA ২/৩, RA ১/৩। (পৃ. ৫৯)</p></details>
+ <details><summary>Sternocostal পৃষ্ঠ কী কী দিয়ে?</summary><p>RA ও তার auricle, left auricle-এর একটু, RV (২/৩), LV (১/৩)। (পৃ. ৬০)</p></details>
+ <details><summary>Crux of the heart কী?</summary><p>Interatrial, posterior interventricular আর পেছনের AV groove-এর মিলনস্থল। (পৃ. ৬১)</p></details>
+ <details><summary>Crista terminalis কী, বাইরে কী?</summary><p>RA-র ভেতরে মসৃণ পেশির উঁচু রেখা, sinus venarum আর atrium proper-কে আলাদা করে; বাইরে sulcus terminalis; ডান venous valve-এর অবশেষ। (পৃ. ৬২)</p></details>
+ <details><summary>Triangle of Koch-এর সীমানা?</summary><p>সামনে tricuspid-এর septal leaflet-এর গোড়া, পেছনে coronary sinus-এর মুখ, উপরে tendon of Todaro; ভেতরে AV node। (পৃ. ৬৩, ৭৩)</p></details>
+ <details><summary>Moderator band কেন গুরুত্বপূর্ণ?</summary><p>AV bundle-এর right branch বহন করে, RV বেশি ফুলে যাওয়া ঠেকায়। (পৃ. ৬৫)</p></details>
+ <details><summary>RV কাটলে অর্ধচন্দ্র কেন?</summary><p>Septum RV-র দিকে উত্তল। (পৃ. ৬৩, ৬৮)</p></details>
+ <details><summary>RCA আর LCA কোন sinus থেকে?</summary><p>RCA anterior aortic sinus, LCA left posterior aortic sinus থেকে; right posterior sinus non-coronary। (পৃ. ৬৭)</p></details>
+ <details><summary>Coronary dominance কী?</summary><p>Posterior IV branch যে ধমনী থেকে আসে; বেশিরভাগ right dominant। (পৃ. ৭৬)</p></details>
+ <details><summary>Coronary sinus কোথায় খোলে, কী কী শাখা?</summary><p>RA-তে IVC-র মুখ আর tricuspid orifice-এর মাঝে। শাখা: great, middle, small cardiac, posterior vein of LV, oblique vein of LA। (পৃ. ৭৯–৮০)</p></details>
+ <details><summary>হার্টের শব্দ কোথায় শোনেন?</summary><p>Aortic ডান ২য়, pulmonary বাম ২য়, tricuspid বাম ৫ম স্টার্নামের পাশে, mitral বাম ৫ম apex-এ। (পৃ. ৮৬)</p></details>
+</div></section>
+
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i>, Part-I, Chapter 6: The Heart, পৃ. ৫৮–৮৬; Surface Anatomy, পৃ. ৩৪২–৩৪৩।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে। প্রকোষ্ঠের সীমানা, পৃষ্ঠ, দেয়ালের পুরুত্ব, orifice-এর পরিধি আর ল্যান্ডমার্ক মেশ থেকে মাপা। স্কিম্যাটিক: aortic valve, chordae tendineae, moderator band, conducting system, small cardiac vein। Crista terminalis, limbus, torus aorticus আর membranous septum-এর মার্ক দেয়ালের আকার থেকে আনুমানিক। Pericardium এই পেজে নেই।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>
