@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="../../viewer/viewer.css">
 <script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+<style>.ref{font-size:13px;color:var(--mute);margin-top:6px}</style>
 </head>
 <body>
 
@@ -61,139 +62,174 @@
 <section class="band sec" id="hold"><div class="wrap two">
  <div>
   <h2>হাড়টা হাতে নিয়ে কীভাবে ধরবেন</h2>
-  <p>স্টার্নাম একটি <b>unpaired, flat bone</b>। এটা বুকের সামনের দেয়ালের ঠিক মাঝখানে থাকে, তাই এর কোনো ডান-বাম নেই। শুধু উপর-নিচ আর সামনে-পেছন ঠিক করলেই অ্যানাটমিক্যাল পজিশন হয়ে যায়।</p>
+  <p>স্টার্নাম একটা <b>লম্বা, চ্যাপ্টা (flat) হাড়</b>, বুকের সামনের দেয়ালের মাঝখানে থাকে। তিন অংশ, উপর থেকে নিচে: manubrium, body আর xiphoid process। স্টার্নাম জোড়াহীন, তাই এর ডান-বাম নেই; শুধু উপর-নিচ আর সামনে-পেছন ঠিক করতে হয়।</p>
   <ol class="steps">
-   <li><b>উপর-নিচ:</b> সবচেয়ে চওড়া ও মোটা অংশ, অর্থাৎ <span class="en">manubrium</span>, উপরে রাখুন। সরু, পাতলা <span class="en">xiphoid process</span> থাকবে নিচে।</li>
-   <li><b>সামনে-পেছন:</b> উত্তল ও খসখসে পৃষ্ঠ (<span class="en">anterior surface</span>) সামনে থাকবে। অবতল ও মসৃণ পৃষ্ঠ (<span class="en">posterior surface</span>) থাকবে পেছনে, হৃৎপিণ্ডের দিকে।</li>
-   <li><b>মিলিয়ে নিন:</b> উপরের বর্ডারের মাঝখানের খাঁজ <span class="en">jugular notch</span>। তার দুপাশের ডিম্বাকার খাঁজ দুটো <span class="en">clavicular notch</span>, যেগুলো উপর-পেছন-পাশের দিকে মুখ করে থাকে।</li>
-   <li><b>হেলানো:</b> শরীরে স্টার্নাম পুরো খাড়া থাকে না। নিচের প্রান্ত একটু সামনের দিকে হেলে থাকে। মডেলটা শরীরে যেভাবে থাকে সেভাবেই রাখা আছে, তাই পাশ থেকে দেখলে এই হেলানোটা বোঝা যায়।</li>
+   <li><b>উপর-নিচ:</b> চওড়া, মোটা manubrium উপরে; সবচেয়ে ছোট xiphoid নিচে।</li>
+   <li><b>সামনে-পেছন:</b> manubrium-এর পাশাপাশি উত্তল anterior surface সামনে; সামান্য অবতল posterior surface পেছনে।</li>
+   <li><b>মিলিয়ে নিন:</b> উপরের বর্ডারের মাঝে jugular notch, দুপাশে ডিম্বাকার clavicular notch।</li>
+   <li><b>হেলানো:</b> manubrium-এর anterior surface নিচে-সামনে হেলানো, আর body-র সামনের পৃষ্ঠ একটু উপরে মুখ করা। মডেলটা শরীরে যেভাবে থাকে সেভাবেই রাখা।</li>
   </ol>
+  <p class="ref">Datta I, পৃ. ১৪–১৫</p>
   <div class="bar"><button class="btn" id="holdBtn" style="color:var(--ink);border-color:var(--line);background:var(--card)">মডেলকে অ্যানাটমিক্যাল পজিশনে আনুন</button></div>
  </div>
  <div class="card">
   <h3 style="margin-top:0">এই মডেলের মাপ (মিলিমিটার)</h3>
   <div class="stat" id="dims"></div>
-  <p><b>Hyrtl's law দিয়ে লিঙ্গ নির্ণয়:</b> পুরুষে body-র দৈর্ঘ্য manubrium-এর দৈর্ঘ্যের দ্বিগুণের বেশি হয়, নারীতে সাধারণত দ্বিগুণের কম।</p>
+  <p>Datta অনুযায়ী body-র দৈর্ঘ্য manubrium-এর মোটামুটি দ্বিগুণ (পৃ. ১৫)।</p>
+  <p><b>Hyrtl's law</b> (সাধারণ বই থেকে, Datta-তে নেই): পুরুষে body manubrium-এর দ্বিগুণের বেশি, নারীতে সাধারণত কম।</p>
   <p id="hyrtl" class="note"></p>
  </div>
 </div></section>
 
 <section class="band sec" id="features"><div class="wrap">
  <h2>তিনটি অংশ ও তাদের ফিচার</h2>
+ <p>Upper seven pair রিব আর তাদের cartilage দিয়ে স্টার্নাম থোরাসিক কশেরুকার সাথে যুক্ত। Manubrium দুপাশে clavicle-এর সাথে জোড়া লাগে আর হাতের ভার নেয়। তাই স্টার্নাম axial আর appendicular skeleton-এর সংযোগস্থলে। (Datta I, পৃ. ১৪)</p>
  <div class="two">
-  <div class="card"><h3 style="margin-top:0">Manubrium sterni</h3><ul>
-   <li>চতুর্ভুজাকার, সবচেয়ে চওড়া ও মোটা অংশ। T3 ও T4 কশেরুকার সামনে থাকে।</li>
-   <li><b>Superior border:</b> মাঝখানে jugular (suprasternal) notch, দুপাশে clavicular notch।</li>
-   <li><b>Lateral border:</b> উপরে 1st costal notch, নিচের কোনায় 2nd costal notch-এর উপরের অর্ধেক (demifacet)।</li>
-   <li><b>Inferior border:</b> body-র সাথে manubriosternal joint তৈরি করে।</li>
-   <li><b>Anterior surface:</b> উত্তল। Pectoralis major আর sternocleidomastoid-এর sternal head এখানে লাগে।</li>
-   <li><b>Posterior surface:</b> অবতল। Sternohyoid আর sternothyroid এখানে লাগে।</li></ul></div>
-  <div class="card"><h3 style="margin-top:0">Body (Gladiolus / Mesosternum)</h3><ul>
-   <li>লম্বা, চ্যাপ্টা। নিচের দিকে একটু চওড়া হয়, তারপর সরু হয়ে যায়। চারটি sternebra জুড়ে তৈরি।</li>
-   <li><b>Anterior surface:</b> তিনটি transverse ridge থাকে, যেগুলো sternebra জোড়া লাগার দাগ। এগুলো 3য়, 4র্থ ও 5ম costal notch বরাবর থাকে।</li>
-   <li><b>Lateral border:</b> 2য়-র নিচের অর্ধেক থেকে 6ষ্ঠ costal notch পুরো, আর 7ম-র উপরের অংশ।</li>
-   <li><b>Posterior surface:</b> নিচের অংশে transversus thoracis (sternocostalis) লাগে।</li>
-   <li>মাঝে মাঝে body-তে জন্মগত ছিদ্র থাকে, যাকে <b>sternal foramen</b> বলে।</li></ul></div>
-  <div class="card"><h3 style="margin-top:0">Xiphoid process</h3><ul>
-   <li>সবচেয়ে ছোট ও পাতলা অংশ। আকার বদলায়: কখনো দুভাগ (bifid), কখনো ছিদ্রযুক্ত।</li>
-   <li>অল্প বয়সে কার্টিলেজ থাকে, প্রায় ৪০ বছর বয়সে হাড়ে পরিণত হয়ে body-র সাথে জুড়ে যায়।</li>
-   <li>উপরের কোনায় 7ম costal notch-এর নিচের অংশ থাকে।</li>
-   <li>Diaphragm, rectus abdominis, linea alba এখানে লাগে।</li></ul></div>
+  <div class="card"><h3 style="margin-top:0">Manubrium sterni (prosternum)</h3><ul>
+   <li>মোটামুটি চতুর্ভুজাকার; উপরে চওড়া ও মোটা। T3 আর T4-এর body-র সামনে।</li>
+   <li><b>Upper border:</b> মাঝে jugular (suprasternal) notch, দুপাশে clavicular notch।
+    <ul>
+     <li>Clavicular notch: articular disc রেখে clavicle-এর সাথে saddle আকারের synovial sternoclavicular joint। কিনারায় capsular, anterior ও posterior sternoclavicular ligament।</li>
+     <li>Jugular notch: interclavicular ligament। দুই কিনারায় deep cervical fascia-র investing layer, যা দুই স্তরে ভাগ হয়ে suprasternal space (of Burns) ঘিরে রাখে।</li>
+    </ul></li>
+   <li><b>Lower border:</b> সরু; body-র সাথে secondary cartilaginous manubriosternal joint।</li>
+   <li><b>Lateral border:</b>
+    <ul>
+     <li>উপরে 1st costal cartilage-এর গর্ত: primary cartilaginous জোড়া, সাধারণত ২৫ বছরের পর হাড়ে পরিণত হয়।</li>
+     <li>নিচে sternal angle-এর কাছে demifacet, body-র demifacet-এর সাথে মিলে 2nd cartilage নেয়।</li>
+     <li>দুই notch-এর মাঝের অংশ 1st intercostal space-এর সামনের প্রান্ত।</li>
+    </ul></li>
+   <li><b>Anterior surface:</b> নিচে-সামনে হেলানো; pectoralis major, তার উপরে sternocleidomastoid।</li>
+   <li><b>Posterior surface:</b> সামান্য অবতল, superior mediastinum-এর সামনের সীমানা; sternothyroid আর অল্প sternohyoid।</li></ul>
+   <p class="ref">Datta I, পৃ. ১৪</p></div>
+  <div class="card"><h3 style="margin-top:0">Body (mesosternum)</h3><ul>
+   <li>Manubrium-এর চেয়ে লম্বা, সরু, পাতলা; চারটি sternebra জুড়ে তৈরি; T5–T8-এর সামনে। দৈর্ঘ্য manubrium-এর মোটামুটি দ্বিগুণ।</li>
+   <li><b>প্রস্থ:</b> costal notch-এর জন্য কিনারা ঢেউখেলানো; 5th costal cartilage-এর লেভেলে সবচেয়ে চওড়া, তারপর নিচে সরু।</li>
+   <li><b>Sternal foramen:</b> কখনো 3rd আর 4th sternebra-র মাঝে, অসিফিকেশনের ত্রুটিতে; সাধারণত ক্লিনিক্যাল গুরুত্ব নেই।</li>
+   <li><b>Upper end:</b> sternal angle-এ manubrium-এর সাথে, T4-এর নিচের বর্ডারের লেভেলে।</li>
+   <li><b>Lower end:</b> xiphisternal joint, T8 আর T9-এর মাঝের ডিস্কের লেভেলে।</li>
+   <li><b>Lateral border:</b>
+    <ul>
+     <li>3rd–6th cartilage-এর চারটা পূর্ণ notch; উপরে 2nd আর নিচে 7th-এর অর্ধেক notch।</li>
+     <li>True রিবের cartilage সেগমেন্টের জোড়ায় লাগে, শুধু 1st আর 6th ছাড়া।</li>
+     <li>Notch-এর মাঝের কিনারায় anterior intercostal membrane আর intercostalis internus।</li>
+    </ul></li>
+   <li><b>Anterior surface:</b> প্রায় চ্যাপ্টা, একটু উপরে মুখ করা। তিনটি transverse ridge; দুপাশে pectoralis major।</li>
+   <li><b>Posterior surface:</b> সামান্য অবতল, তিনটি হালকা ridge; নিচের এক-তৃতীয়াংশে sternocostalis।</li></ul>
+   <p class="ref">Datta I, পৃ. ১৪–১৫</p></div>
+  <div class="card"><h3 style="margin-top:0">Xiphoid process (xiphisternum, metasternum)</h3><ul>
+   <li>সবচেয়ে ছোট আর সবচেয়ে বেশি ভিন্ন আকারের অংশ: ত্রিভুজাকার, চওড়া-চ্যাপ্টা, bifid, ছিদ্রযুক্ত, একপাশে বাঁকা বা সামনে বাঁকানো।</li>
+   <li><b>Upper end:</b> body-র সাথে xiphisternal joint; lateral angle-এর demifacet body-র demifacet-এর সাথে মিলে 7th cartilage নেয়।</li>
+   <li><b>অবস্থান:</b> infrasternal angle-এর চূড়ায়, epigastric region-এ।</li>
+   <li><b>Lateral border:</b> internal oblique (আর transversus abdominis)-এর aponeurosis।</li>
+   <li><b>Anterior surface:</b> external oblique আর rectus abdominis-এর aponeurosis।</li>
+   <li><b>Posterior surface:</b> sternocostalis-এর নিচের অংশ আর diaphragm-এর sternal origin। Diaphragm-এর নিচের অংশ liver-এর left lobe-এর সাথে লাগে।</li></ul>
+   <p class="ref">Datta I, পৃ. ১৫–১৬</p></div>
  </div>
 </div></section>
 
 <section class="band sec" id="joints"><div class="wrap">
  <h2>আর্টিকুলেশন: কোন জয়েন্ট কী ধরনের</h2>
  <table class="stack"><thead><tr><th>জয়েন্ট</th><th>যাদের মধ্যে</th><th>ধরন</th></tr></thead><tbody>
-  <tr><td>Sternoclavicular</td><td>Clavicular notch ও clavicle-এর medial প্রান্ত (সাথে 1st costal cartilage)</td><td>Synovial, saddle type, ভেতরে articular disc আছে</td></tr>
-  <tr><td>1st sternocostal</td><td>Manubrium ও 1st costal cartilage</td><td>Primary cartilaginous (synchondrosis), নড়ে না</td></tr>
-  <tr><td>2nd sternocostal</td><td>Manubrium ও body-র জোড়ায়, 2nd costal cartilage</td><td>Synovial, দুটো cavity (intra-articular ligament দিয়ে ভাগ করা)</td></tr>
-  <tr><td>3rd থেকে 7th sternocostal</td><td>Body (7ম: body ও xiphoid) ও costal cartilage</td><td>Synovial, plane type</td></tr>
-  <tr><td>Manubriosternal</td><td>Manubrium ও body</td><td>Secondary cartilaginous (symphysis)</td></tr>
-  <tr><td>Xiphisternal</td><td>Body ও xiphoid</td><td>Primary cartilaginous, বয়সে হাড়ে জুড়ে যায়</td></tr>
+  <tr><td>Sternoclavicular</td><td>Clavicular notch ও clavicle-এর sternal end</td><td>Synovial, saddle আকারের, মাঝে articular disc</td></tr>
+  <tr><td>1st chondrosternal</td><td>Manubrium ও 1st costal cartilage</td><td>Primary cartilaginous; সাধারণত ২৫ বছরের পর হাড়ে পরিণত হয়</td></tr>
+  <tr><td>2nd থেকে 7th chondrosternal</td><td>Costal cartilage ও স্টার্নামের notch</td><td>Synovial</td></tr>
+  <tr><td>Manubriosternal</td><td>Manubrium ও body</td><td>Secondary cartilaginous; প্রায় ৬০ বছরের পর হাড়ে পরিণত হতে পারে</td></tr>
+  <tr><td>Xiphisternal</td><td>Body ও xiphoid</td><td>৪০ বছরের পর হাড়ে পরিণত হয়</td></tr>
  </tbody></table>
- <p class="note" style="margin-top:10px">মডেলের costal notch-গুলো কোনো আঁকা চিহ্ন নয়। আসল costal cartilage যেখানে স্টার্নামকে ছোঁয়, সেই জায়গা মেপে পিনগুলো বসানো হয়েছে। তাই 2nd notch মডেলেও manubrium আর body দুটোতে ভাগ হয়ে আছে, 7th notch আছে body আর xiphoid-এর মাঝে।</p>
+ <p class="ref">Datta I, পৃ. ১১, ১৪, ১৬</p>
+ <p class="note" style="margin-top:10px">মডেলের costal notch-গুলো আঁকা নয়: আসল costal cartilage যেখানে স্টার্নামকে ছোঁয়, সেখানে মার্ক। তাই 2nd notch মডেলেও manubrium আর body দুটোতে ভাগ, 7th body আর xiphoid-এর মাঝে, ঠিক Datta-র বর্ণনার মতো।</p>
 </div></section>
 
 <section class="band sec" id="attach"><div class="wrap">
  <h2>মাসল ও লিগামেন্ট অ্যাটাচমেন্ট</h2>
  <table class="stack"><thead><tr><th>অংশ</th><th>পৃষ্ঠ বা বর্ডার</th><th>কী লাগে</th></tr></thead><tbody id="attTable"></tbody></table>
- <p class="note" style="margin-top:10px">3D মডেলের রঙিন জায়গাগুলো হাতে আঁকা নয়। একই স্ক্যানের আসল মাসলগুলো হাড়ের যেখানে যেখানে ছুঁয়ে আছে (২.৫ মিলিমিটারের মধ্যে), সেখানে রং করা হয়েছে। "মাসল" মোডে মাসলটাও দেখা যায়, তাই কোন মাসল কোথা থেকে কোথায় যাচ্ছে তা চোখে দেখা যায়। Internal oblique আর transversus abdominis-এর মেশ এই ডেটাবেসে নেই, তাই ওগুলো শুধু টেবিলে আছে।</p>
+ <p class="ref">Datta I, পৃ. ১৪–১৬</p>
+ <p class="note" style="margin-top:10px">3D মডেলের রঙিন জায়গাগুলো হাতে আঁকা নয়: একই স্ক্যানের আসল মাসল হাড়ের যেখানে ২.৫ মিমি-র মধ্যে আসে, সেখানে রং। স্ক্যানে sternohyoid-এর ছোঁয়া manubrium-এর পেছনে উপরে-পাশে, Datta-র বর্ণনার সাথে মেলে (clavicular notch-এর কাছে অল্প fibre)।</p>
 </div></section>
 
 <section class="band sec" id="relations"><div class="wrap">
  <h2>রিলেশন: স্টার্নামের সামনে, পেছনে ও পাশে কী আছে</h2>
  <div class="two">
-  <div class="card"><h3 style="margin-top:0">Manubrium-এর পেছনে</h3><ul>
-   <li><b>Left brachiocephalic vein:</b> উপরের অংশের পেছন দিয়ে আড়াআড়ি ডানে যায়।</li>
-   <li><b>Arch of aorta:</b> নিচের অর্ধেকের পেছনে।</li>
-   <li><b>Arch-এর তিন শাখা:</b> brachiocephalic trunk, left common carotid আর left subclavian artery, উপরের অর্ধেকের পেছনে।</li>
-   <li><b>Thymus:</b> শিশুদের বড়, বয়সে ছোট হয়ে চর্বিতে পরিণত হয়।</li>
-   <li><b>দুপাশে:</b> pleura আর lung-এর medial অংশ।</li>
-   <li><b>Jugular notch-এর পেছনে:</b> trachea।</li></ul></div>
+  <div class="card"><h3 style="margin-top:0">Manubrium-এর পেছনে</h3><ol class="steps">
+   <li>প্রথমে দুই ফুসফুস আর pleural sac-এর anterior margin, clavicular notch থেকে sternal angle-এর মাঝ পর্যন্ত তির্যক রেখায়।</li>
+   <li>তার নিচে, <b>নিচের অর্ধেকে:</b> arch of aorta।</li>
+   <li><b>উপরের অর্ধেকে:</b> তির্যকভাবে left brachiocephalic vein; তার পেছনে brachiocephalic trunk, left common carotid আর left subclavian artery।</li></ol>
+   <p class="ref">Datta I, পৃ. ১৫</p>
+   <p class="note">থাইমাস আর jugular notch-এর পেছনের trachea সাধারণ বই থেকে; মডেলে স্ক্যান থেকে দেখানো।</p></div>
   <div class="card"><h3 style="margin-top:0">Body-র পেছনে</h3><ul>
-   <li><b>Pericardium ও হৃৎপিণ্ড:</b> মূলত right ventricle থাকে। Sternopericardial ligament দিয়ে pericardium স্টার্নামে আটকে থাকে।</li>
-   <li><b>Pleura:</b> দুপাশের pleura-র anterior margin sternal angle থেকে 4th cartilage পর্যন্ত মাঝখানে কাছাকাছি থাকে। বাম পাশেরটা 4th cartilage-এর পর বাইরে সরে যায় (cardiac notch)।</li>
-   <li><b>Transversus thoracis</b> body-র নিচের অংশে লেগে থাকে।</li></ul></div>
+   <li><b>ডান ফুসফুস ও pleura:</b> পাতলা anterior border মধ্যরেখার ডানে, পুরো দৈর্ঘ্য জুড়ে।</li>
+   <li><b>বাম ফুসফুস ও pleura:</b> শুধু উপরের দুই সেগমেন্টের বাম অর্ধেকে।</li>
+   <li><b>Pericardium ও হৃৎপিণ্ড:</b> 4th cartilage-এ বাম ফুসফুস আর pleura বাইরে সরে যায়, তাই নিচের দুই সেগমেন্টের বাম অর্ধেক সরাসরি হৃৎপিণ্ড-ঢাকা pericardium-এর সাথে লেগে থাকে।</li></ul>
+   <p class="ref">Datta I, পৃ. ১৫</p></div>
   <div class="card"><h3 style="margin-top:0">পাশের বর্ডার বরাবর</h3><ul>
-   <li><b>Internal thoracic artery:</b> subclavian artery-র প্রথম অংশ থেকে বের হয়। Sternal margin থেকে প্রায় 1.25 cm বাইরে দিয়ে উপরের ছয়টা costal cartilage-এর পেছনে নামে। 6th intercostal space-এ superior epigastric আর musculophrenic artery-তে ভাগ হয়।</li>
-   <li><b>Internal thoracic vein:</b> আর্টারির ভেতরের পাশে থাকে, brachiocephalic vein-এ গিয়ে খোলে।</li>
-   <li><b>Parasternal (internal thoracic) lymph node:</b> এই ভেসেল বরাবর intercostal space-এ থাকে।</li>
-   <li><b>Intercostal nerve (T2–T6):</b> internal thoracic vessel-এর সামনে দিয়ে যায়, sternal border-এর কাছে সামনে বেরিয়ে <b>anterior cutaneous branch</b> হয়।</li></ul></div>
+   <li><b>Internal thoracic artery:</b> subclavian artery-র প্রথম অংশ থেকে; sternal margin থেকে প্রায় 1.25 cm বাইরে উপরের ছয়টা costal cartilage-এর পেছনে নামে, 6th space-এ superior epigastric আর musculophrenic-এ ভাগ হয়।</li>
+   <li><b>Internal thoracic vein:</b> আর্টারির ভেতরে, brachiocephalic vein-এ খোলে।</li>
+   <li><b>Parasternal lymph node:</b> এই ভেসেল বরাবর।</li>
+   <li><b>Intercostal nerve (T2–T6):</b> sternal border-এর কাছে anterior cutaneous branch হয়।</li></ul>
+   <p class="note">এই কার্ডের তথ্য সাধারণ বই থেকে; Datta-র এই হাড়ের অধ্যায়ে নেই।</p></div>
   <div class="card"><h3 style="margin-top:0">স্টার্নামের নিজের সাপ্লাই</h3><ul>
    <li><b>আর্টারি:</b> internal thoracic artery-র sternal ও perforating শাখা।</li>
-   <li><b>ভেইন:</b> internal thoracic vein-এ যায়।</li>
-   <li><b>নার্ভ:</b> intercostal nerve-এর anterior cutaneous branch, যা সামনের চামড়া আর periosteum-এ যায়।</li>
-   <li><b>লিম্ফ:</b> parasternal node-এ যায়, সেখান থেকে bronchomediastinal trunk-এ।</li>
-   <li><b>ক্লিনিক্যাল:</b> স্তনের medial অংশের ক্যান্সার parasternal node-এ ছড়াতে পারে। বাম internal thoracic artery (LIMA) হার্টের বাইপাস সার্জারিতে (CABG) গ্রাফট হিসেবে ব্যবহার হয়।</li></ul></div>
+   <li><b>নার্ভ:</b> intercostal nerve-এর anterior cutaneous branch। Body ব্যথায় সংবেদনশীল, তাই অজ্ঞান রোগীর জ্ঞান ফেরাতে আঙুলের গাঁট দিয়ে স্টার্নাম ঘষা হয় (sternal rub) (Datta I, পৃ. ১৬)।</li>
+   <li><b>লিম্ফ:</b> parasternal node; স্তনের medial অংশের ক্যান্সার এ পথে ছড়াতে পারে।</li></ul></div>
  </div>
- <p class="note" style="margin-top:12px">3D মডেলে aorta ও তার শাখা, SVC, brachiocephalic vein, হৃৎপিণ্ড, ফুসফুস, থাইমাস, ট্র্যাকিয়া আর মাসলগুলো স্ক্যান থেকে নেওয়া। Internal thoracic artery ও vein, intercostal nerve আর parasternal node এই ডেটাবেসে নেই। তাই এগুলো বইয়ের বর্ণনা অনুযায়ী আসল costal cartilage আর subclavian vessel-এর অবস্থান মেপে বসানো স্কিম্যাটিক নল আর বল।</p>
+ <p class="note" style="margin-top:12px">3D মডেলে aorta ও তার শাখা, SVC, brachiocephalic vein, হৃৎপিণ্ড, ফুসফুস, থাইমাস, ট্র্যাকিয়া আর মাসল স্ক্যান থেকে নেওয়া। Internal thoracic vessel, intercostal nerve আর parasternal node স্কিম্যাটিক।</p>
 </div></section>
 
 <section class="band sec" id="louis"><div class="wrap two">
  <div>
-  <h2>Sternal angle (Angle of Louis): কেন এত গুরুত্বপূর্ণ</h2>
-  <p>Manubrium আর body একই সমতলে থাকে না, প্রায় <b>163°</b> কোণে মিলিত হয়। ফলে জয়েন্টের জায়গাটা সামনে একটু উঁচু ঢিবির মতো হয়ে থাকে, যা আঙুলে সহজে অনুভব করা যায়। জীবিত মানুষে এটাই বুকের সবচেয়ে নির্ভরযোগ্য ল্যান্ডমার্ক।</p>
-  <p><b>রিব গোনা শুরু হয় এখান থেকে:</b> ঢিবির দুপাশে 2nd costal cartilage থাকে। তার ঠিক নিচে 2nd intercostal space। 1st rib ক্ল্যাভিকলের নিচে চাপা থাকে বলে সহজে অনুভব করা যায় না, তাই গোনা শুরু হয় 2nd থেকে।</p>
+  <h2>Sternal angle (Angle of Louis)</h2>
+  <p>Manubrium আর body একটু আলাদা সমতলে থাকে, তাই manubriosternal joint-এ সামনে উঁচু একটা কোণ তৈরি হয়।</p>
+  <ul>
+   <li><b>লেভেল:</b> T4-এর নিচের বর্ডার।</li>
+   <li><b>রিব গোনা:</b> দুপাশে 2nd costal cartilage জোড়া লাগে, তাই এখান থেকে রিব গোনা হয়।</li>
+   <li><b>Dermatome:</b> উপরে C4 আর নিচে T2 dermatome-এর জোড়ার রেখা।</li>
+   <li><b>নড়াচড়া:</b> শ্বাসের সময় স্টার্নাম এই জয়েন্টে সামনে-পেছনে নড়ে।</li>
+   <li><b>বয়সে:</b> প্রায় ৬০ বছরের পর জয়েন্টটা হাড়ে পরিণত হতে পারে।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ১১, ১৪, ১৬, ২০</p>
  </div>
- <div class="card"><h3 style="margin-top:0">এই লেভেলে যা যা ঘটে (T4 ও T5 কশেরুকার মাঝের ডিস্ক)</h3><ul>
+ <div class="card"><h3 style="margin-top:0">এই লেভেলে যা যা ঘটে (সাধারণ বই থেকে)</h3><ul>
   <li>Superior আর inferior mediastinum এখানে ভাগ হয়।</li>
   <li>Arch of aorta এই লেভেলে শুরু হয় এবং এখানেই শেষ হয়।</li>
-  <li>Trachea এখানে দুভাগ হয় (bifurcation, carina)।</li>
-  <li>Azygos vein এসে superior vena cava-তে খোলে।</li>
+  <li>Trachea এখানে দুভাগ হয় (bifurcation)।</li>
+  <li>Azygos vein SVC-তে খোলে।</li>
   <li>Pulmonary trunk দুভাগ হয়।</li>
-  <li>Ligamentum arteriosum এই লেভেলে থাকে, left recurrent laryngeal nerve aorta-র নিচ দিয়ে ঘুরে যায়।</li>
-  <li>Thoracic duct ডান থেকে বাম দিকে সরে আসে।</li>
-  <li>Cardiac plexus (superficial ও deep) এই লেভেলে থাকে।</li>
-  <li>দুপাশের pleura এই লেভেলে মাঝখানে এসে একে অপরকে ছোঁয়।</li>
-  <li>দুটো বিচ্ছিন্ন dermatome-এর জোড়ার রেখা: উপরে C4, নিচে T2 (Datta I, পৃ. ২০)।</li>
-  <li>শ্বাসের সময় স্টার্নাম এই manubriosternal joint-এ সামনে-পেছনে নড়ে (Datta I, পৃ. ২০)।</li></ul>
+  <li>Ligamentum arteriosum থাকে; left recurrent laryngeal nerve aorta-র নিচ দিয়ে ঘুরে যায়।</li>
+  <li>Thoracic duct ডান থেকে বামে সরে আসে।</li></ul>
   <h3>স্ক্যানে মেপে দেখা ভার্টিব্রাল লেভেল</h3><p class="note" id="levelNote" style="margin:0"></p></div>
 </div></section>
 
 <section class="band sec" id="clinical"><div class="wrap two">
- <div class="card"><h3 style="margin-top:0">Sternal puncture (বোন ম্যারো সংগ্রহ)</h3>
-  <p>প্রাপ্তবয়স্কেও স্টার্নামে সারাজীবন red marrow থাকে, আর হাড়টা ঠিক চামড়ার নিচে। তাই manubrium অথবা body-র উপরের অংশ (2nd intercostal space বরাবর) থেকে marrow নেওয়া হয়।</p>
-  <p><b>সাবধানতা:</b> পেছনে arch of aorta, great vessels আর right atrium থাকে। তাই guard লাগানো সুই দিয়ে শুধু সামনের cortex পার করতে হয়। Sternal foramen থাকলে সুই সরাসরি pericardium-এ ঢুকে যেতে পারে।</p></div>
+ <div class="card"><h3 style="margin-top:0">Sternal puncture</h3>
+  <p>বড় সুই স্টার্নামের cortex দিয়ে ঢুকিয়ে red bone marrow নিয়ে পরীক্ষা করা হয় (Datta I, পৃ. ১৬)।</p>
+  <p><b>সাবধানতা (সাধারণ বই থেকে):</b> পেছনে aorta, great vessels আর হৃৎপিণ্ড থাকে, তাই guard লাগানো সুই দিয়ে শুধু সামনের cortex পার করতে হয়। Sternal foramen থাকলে বিপদ বেশি।</p></div>
  <div class="card"><h3 style="margin-top:0">অন্যান্য</h3><ul>
-  <li><b>Median sternotomy:</b> হার্ট সার্জারিতে স্টার্নাম মাঝ বরাবর লম্বালম্বি কাটা হয়।</li>
-  <li><b>CPR:</b> চাপ দিতে হয় স্টার্নামের নিচের অর্ধেকে। Xiphoid-এর উপর চাপ দিলে লিভার ফেটে যেতে পারে।</li>
-  <li><b>Sternal fracture:</b> সাধারণত গাড়ির steering-wheel injury থেকে হয়, প্রায়ই sternal angle-এর কাছে। নিচের হৃৎপিণ্ডেও আঘাত লাগতে পারে।</li>
-  <li><b>Pectus excavatum</b> (বুক বসে যাওয়া) ও <b>pectus carinatum</b> (pigeon chest, বুক সামনে উঁচু হয়ে থাকা)।</li>
-  <li><b>Bifid বা cleft sternum:</b> দুপাশের sternal bar জোড়া না লাগলে হয়।</li>
-  <li><b>Jugular notch:</b> এখানে আঙুল দিয়ে trachea-র অবস্থান দেখা হয় (trachea একপাশে সরে গেছে কি না)।</li></ul></div>
+  <li><b>Pectus excavatum (funnel chest):</b> স্টার্নামের নিচের প্রান্ত বসে যায়, xiphoid সামনে উঁচু হয়। হৃৎপিণ্ড বামে সরে, বাম ফুসফুস ফুলতে পারে না, ফলে শ্বাসকষ্ট আর cyanosis হয়।</li>
+  <li><b>Pectus carinatum (pigeon chest):</b> স্টার্নাম সামনে উঁচু, দুপাশ চ্যাপ্টা; rickets-এ দেখা যায়, সাথে costochondral junction-এ rickety rosary।</li>
+  <li><b>Sternal rub:</b> অজ্ঞান রোগীর জ্ঞান ফেরাতে আঙুলের গাঁট দিয়ে body ঘষা হয়।</li>
+  <li><b>Midline sternotomy:</b> middle আর superior mediastinum-এ পৌঁছাতে স্টার্নাম মাঝ বরাবর কাটা হয়।</li>
+  <li><b>Foramen of Morgagni:</b> diaphragm-এর sternal slip জন্মগতভাবে না থাকলে xiphoid আর diaphragm-এর মাঝে ফাঁক তৈরি হয়, সেখান দিয়ে retrosternal diaphragmatic hernia হতে পারে।</li>
+  <li><b>Ectopia cordis:</b> দুই cartilaginous sternal plate একেবারে জোড়া না লাগলে হৃৎপিণ্ড বাইরে উন্মুক্ত থাকে।</li></ul>
+  <p class="ref">Datta I, পৃ. ১৬</p></div>
 </div></section>
 
 <section class="band sec" id="ossi"><div class="wrap">
  <h2>অসিফিকেশন</h2>
- <p>মোট ছয়টি primary center থাকে: manubrium-এ একটি, body-র প্রতিটি sternebra-য় একটি করে মোট চারটি, আর xiphoid-এ একটি।</p>
- <table class="stack"><thead><tr><th>অংশ</th><th>সেন্টার দেখা দেয়</th><th>জুড়ে যায়</th></tr></thead><tbody>
-  <tr><td>Manubrium ও 1st sternebra</td><td>গর্ভাবস্থার 5ম মাস</td><td>Manubriosternal joint সাধারণত সারাজীবন থাকে, বৃদ্ধ বয়সে জুড়তে পারে</td></tr>
-  <tr><td>2nd ও 3rd sternebra</td><td>গর্ভাবস্থার 6ষ্ঠ মাস</td><td rowspan="2">নিচ থেকে উপরের দিকে জোড়া লাগে: puberty থেকে শুরু, প্রায় ২৫ বছরে শেষ</td></tr>
-  <tr><td>4th sternebra</td><td>গর্ভাবস্থার 7ম মাস</td></tr>
-  <tr><td>Xiphoid process</td><td>জন্মের পর প্রায় ৩ বছর</td><td>প্রায় ৪০ বছরে body-র সাথে</td></tr>
+ <p>মধ্যরেখা বরাবর দুটো cartilaginous plate জোড়া লেগে স্টার্নাম তৈরি হয়। Manubrium আর প্রতিটা sternebra-র জন্য আলাদা primary center থাকে।</p>
+ <table class="stack"><thead><tr><th>অংশ</th><th>সেন্টার</th><th>কখন দেখা দেয়</th></tr></thead><tbody>
+  <tr><td>Manubrium</td><td>১ থেকে ৩টা</td><td>গর্ভাবস্থার 5ম মাস</td></tr>
+  <tr><td>1st ও 2nd sternebra</td><td>প্রতিটায় একটা</td><td>গর্ভাবস্থার 5ম মাস</td></tr>
+  <tr><td>3rd sternebra</td><td>সাধারণত জোড়া (দুটো)</td><td>গর্ভাবস্থার 5ম মাস</td></tr>
+  <tr><td>4th sternebra</td><td>সাধারণত জোড়া (দুটো)</td><td>গর্ভাবস্থার 6ষ্ঠ মাস</td></tr>
+  <tr><td>Xiphoid process</td><td>একটা</td><td>জন্মের পর ৩য় বছর</td></tr>
  </tbody></table>
- <p class="note" style="margin-top:10px">বইয়ের সংস্করণভেদে সময়ে সামান্য পার্থক্য থাকতে পারে। পরীক্ষার আগে নিজের কলেজের রেফারেন্স বইয়ের সাথে মিলিয়ে নিন।</p>
+ <ul style="margin-top:12px">
+  <li><b>Sternebra:</b> puberty-তে জোড়া লাগা শুরু হয়, প্রায় ২৫ বছরে শেষ।</li>
+  <li><b>Xiphoid:</b> প্রায় ৪০ বছরে body-র সাথে জোড়া লাগে।</li>
+  <li><b>Manubriosternal joint:</b> প্রায় ৬০ বছরে বা তার পরে হাড়ে জোড়া লাগতে পারে।</li>
+ </ul>
+ <p class="ref">Datta I, পৃ. ১৬</p>
 </div></section>
 
 <section class="band sec" id="viva"><div class="wrap">
@@ -203,9 +239,9 @@
 
 <section class="band" id="credit"><div class="wrap">
  <h2>সূত্র ও লাইসেন্স</h2>
- <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI ডেটা থেকে তৈরি। এই পেজে মেশগুলো হালকা করা হয়েছে (decimated), আর ল্যান্ডমার্কের অবস্থান মেশ থেকে হিসাব করে বের করা হয়েছে।</p>
- <p><b>লেখার রেফারেন্স:</b> BD Chaurasia's Human Anatomy (Vol. 1, Thorax), Snell's Clinical Anatomy by Regions, Gray's Anatomy।</p>
- <p class="note">এটি একটি প্রথম খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i>, Part-I, The Thoracic Cage, পৃ. ১১, ১৪–১৬, ২০। "সাধারণ বই থেকে" লেখা অংশগুলো এই অধ্যায়ে নেই (BD Chaurasia, Snell, Gray's)।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI ডেটা থেকে তৈরি। মেশ হালকা করা (decimated), ল্যান্ডমার্ক মেশ থেকে মাপা।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
 </div></section>
 
 <script src="content.js"></script>

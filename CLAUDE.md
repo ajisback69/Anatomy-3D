@@ -11,7 +11,8 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 - Layers: rib, clav, muscle, artery, vein, nerve, lymph, organ, vert.
 
 ## Accuracy rules
-- Text reference, from the ribs onward: A.K. Datta, Essentials of Human Anatomy (the owner's choice). Match its terminology, classifications and numbers (e.g. ossification dates). Where page excerpts from the owner are available, follow them and give page references. Never reproduce long verbatim passages. Older pages (sternum, ribs) cite BD Chaurasia, Snell and Gray's; re-check them against Datta when excerpts arrive. The ribs have now been rewritten from Datta pp. 16–20, and the sternal-angle notes from p. 20 have been added. Sternum pp. ~1–15 have not been checked yet.
+- Text reference, from the ribs onward: A.K. Datta, Essentials of Human Anatomy (the owner's choice). Match its terminology, classifications and numbers (e.g. ossification dates). Where page excerpts from the owner are available, follow them and give page references. Never reproduce long verbatim passages. Older pages (sternum, ribs) cite BD Chaurasia, Snell and Gray's; re-check them against Datta when excerpts arrive. The ribs have now been rewritten from Datta pp. 16–20, and the sternal-angle notes from p. 20 have been added. The sternum has been re-checked against Datta pp. 11, 14–16 and 20. Thoracic vertebrae follow Datta pp. 12–14 (that volume has no vertebra ossification).
+- The Datta PDFs and their extracted text (/home/claude/datta, uploads) are copyrighted. Never commit them to this public repo.
 - Landmarks and attachments are measured from the meshes, not drawn by hand.
 - A structure missing from BodyParts3D is built as a schematic fitted to measured landmarks, and the page must label it as schematic.
 - Every bone needs review by an anatomy teacher before release.
@@ -23,6 +24,8 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 - A REG entry with `lm:1` is tinted outside muscle mode, e.g. the vessel grooves on the 1st rib.
 - Side trainer (mode `side`): needs `DATA.side = {R, L}`, plus `BONE.sideRules`, `sideView` and `sideDist`. Use it for every paired bone.
 - Multi-specimen pages, e.g. ribs (first, second, typical, tenth, eleventh, twelfth): an inline loader picks `data/<spec>-core.js` from `#spec`. `content.js` picks `window.BONE` from `window.SPEC`. Elements carry `data-only="spec1 spec2"`; the ones not for the current spec are removed before the viewer runs.
+- Which-number trainer (mode `which`): `BONE.whichSrc` (e.g. data/which.js, window.WHICH.items with `k`), plus whichNames, whichRules, whichQ, whichHint, whichView, whichDist. Built by `build_which()` in pipeline/vertebrae.py.
+- `pipeline/vertebrae.py`: specs typical (T6), first, ninth, tenth, eleventh, twelfth. Parts 1–6 (body, pedicle, lamina, TP, spinous, articular). Facets come from rib contact.
 - `pipeline/ribs.py`: `python pipeline/ribs.py [spec ...]`. Each spec has `kind` and `tub` (False for 11th and 12th, which have no neck or tubercle). `cart` may be None, in which case the pointed tip is used as the anterior end.
 
 ## Publishing
@@ -31,6 +34,7 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 The sternum artifact is https://claude.ai/artifact/XnBUeNz5TYhtDxsg5qiFbs (slug f94115fd-a467-4978-9aa8-6d1362b72586). It is published in this layout. To update it, first call get_artifact for the live version.
 
 Ribs artifact: https://claude.ai/artifact/SRsCNGFiPpn9oT47duJaNU (slug cded4058-688d-4861-9dd2-176acf0347e9).
+Thoracic vertebrae artifact: https://claude.ai/artifact/JZzGKA4ncTSYL6WYPtWCqD (slug 8e4672b4-5ef1-4821-9513-3a4454223130).
 After changing viewer.js, republish viewer/viewer.js to every bone artifact.
 
 ## Local test

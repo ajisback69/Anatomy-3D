@@ -137,18 +137,19 @@ function setMode(m){
  mode=m;sel=null;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
  pins.forEach(x=>x.el.classList.remove('on'));quizMark.visible=false;highlight(null);
  for(const k in layerOn)layerOn[k]=!!(M.layers||{})[k];
- const names={parts:'অংশ',lm:'ল্যান্ডমার্ক',att:'মাসল',rel:'রিলেশন',level:'লেভেল',joint:'জয়েন্ট',side:'ডান না বাম'};
- bone.forEach(b=>b.visible=m!=='side');sideGroup.visible=m==='side';
+ const names={parts:'অংশ',lm:'ল্যান্ডমার্ক',att:'মাসল',rel:'রিলেশন',level:'লেভেল',joint:'জয়েন্ট',side:'ডান না বাম',which:'কোন নম্বর?'};
+ bone.forEach(b=>b.visible=m!=='side'&&m!=='which');sideGroup.visible=m==='side';whichGroup.visible=m==='which';
  if(M.card)card(names[m]||'',M.card);
  if(m==='parts')legend.innerHTML='<div class="legend">'+Object.entries(B.PARTS).map(([k,o])=>`<button data-part="${k}"><span class="sw" style="background:${o.c}"></span>${o.t}</button>`).join('')+'</div>';
  else if(m==='att')legend.innerHTML='<div class="legend">'+Object.entries(B.REG).map(([k,o])=>`<button data-reg="${k}"><span class="sw" style="background:${o.c}"></span>${o.t}</button>`).join('')+'</div>';
  else if(m==='rel')legend.innerHTML='<div class="legend">'+B.relLegend.map(([k,c])=>`<button data-str="${k}"><span class="sw" style="background:${c}"></span>${B.STR[k].t}</button>`).join('')+'</div>';
- else if(m==='quiz'||m==='side')legend.innerHTML='<div class="quiz" id="qz"></div>';
+ else if(m==='quiz'||m==='side'||m==='which')legend.innerHTML='<div class="quiz" id="qz"></div>';
  else if(m==='lm'||m==='joint'){const used=new Set(lms.map(x=>x.cls.split('mk-')[1]));legend.innerHTML='<div class="legend mkleg">'+MK.filter(t=>used.has(t[0])).map(([k,t])=>`<div><span class="pin mk mk-${k} demo"><i class="sh"></i>${k==='num'?'<b class="no">২</b>':''}</span>${t}</div>`).join('')+'<div class="note" style="color:#b9d3cb">মার্কে ট্যাপ করলে নাম দেখাবে। হালকা মার্কগুলো হাড়ের পেছনে, ট্যাপ করলে ঘুরে সামনে আসবে।</div></div>'}
  else legend.innerHTML='';
  if(M.view)flyView(M.view);
  if(m==='quiz')newQ();
  if(m==='side')newSide();
+ if(m==='which')loadWhich(newWhich);
  if(['att','rel','level'].includes(m)&&!layersReady)note('লেয়ার লোড হচ্ছে…');
  applyLayers();paint();
 }
@@ -165,6 +166,8 @@ legend.addEventListener('click',e=>{
  if(b.id==='nextQ')newQ();
  if(b.dataset.side)answerSide(b.dataset.side);
  if(b.id==='nextSide')newSide();
+ if(b.dataset.which)answerWhich(b.dataset.which);
+ if(b.id==='nextWhich')newWhich();
 });
 $('#holdBtn')?.addEventListener('click',()=>{view.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});setTimeout(()=>fly(...B.holdView),reduce?0:350)});
 
@@ -234,8 +237,38 @@ function answerSide(c){
  card(ok?'সঠিক!':'হলো না',{t:sideCur==='R'?'এটা ডান পাশের':'এটা বাম পাশের',b:'মডেল এখন শরীরে যেভাবে থাকে সেভাবে ঘুরে যাচ্ছে',d:'যেভাবে চিনবেন:',l:B.sideRules||[]});
  $('#qz .score').textContent=`স্কোর: ${sideStats.ok} / ${sideStats.n}`;
  $('#qz').insertAdjacentHTML('beforeend','<div class="bar"><button class="btn" id="nextSide">পরেরটা</button></div>');
- rotAnim={q0:sideGroup.quaternion.clone(),q1:new THREE.Quaternion(),s:performance.now()};
+ rotAnim={g:sideGroup,q0:sideGroup.quaternion.clone(),q1:new THREE.Quaternion(),s:performance.now()};
  fly(B.sideView||[0,0,1],B.sideDist||300,ZERO);
+}
+
+/* ---------- কোন নম্বর? (একই ধরনের কয়েকটা হাড়ের মধ্যে চেনা, যেমন কশেরুকা) ---------- */
+const whichGroup=new THREE.Group();whichGroup.visible=false;scene.add(whichGroup);
+const whichMesh={};let whichCur=null,whichStats={ok:0,n:0},whichLoaded=false;
+function loadWhich(cb){
+ if(whichLoaded)return cb();
+ const sc=document.createElement('script');sc.src=B.whichSrc;
+ sc.onload=()=>{for(const m of window.WHICH.items){const mesh=new THREE.Mesh(geo(m),new THREE.MeshStandardMaterial({color:'#ece4d4',roughness:.78}));mesh.visible=false;whichGroup.add(mesh);whichMesh[m.k]=mesh}whichLoaded=true;if(mode==='which')cb()};
+ sc.onerror=()=>note('ট্রেনারের ডেটা লোড হয়নি, পেজ রিফ্রেশ করুন।');
+ document.body.appendChild(sc);
+}
+function newWhich(){
+ const keys=Object.keys(whichMesh);if(!keys.length)return;
+ const pool=keys.filter(k=>k!==whichCur);whichCur=pool[Math.floor(Math.random()*pool.length)];
+ for(const k in whichMesh)whichMesh[k].visible=k===whichCur;
+ rotAnim=null;whichGroup.quaternion.setFromEuler(new THREE.Euler(Math.random()*6.28,Math.random()*6.28,Math.random()*6.28));
+ info.innerHTML=`<div class="k">কোন নম্বর?</div><h3>${esc(B.whichQ||'এটা কোনটা?')}</h3><p style="margin:6px 0 0">${esc(B.whichHint||'')}</p>`;
+ $('#qz').innerHTML=`<div class="score">স্কোর: ${whichStats.ok} / ${whichStats.n}</div><div class="opts">${keys.map(k=>`<button class="opt" data-which="${esc(k)}">${esc(B.whichNames[k])}</button>`).join('')}</div>`;
+ fly(B.whichView||[0,.4,1],B.whichDist||200,ZERO);dirty=true;
+}
+function answerWhich(k){
+ if($('#qz .opt.ok'))return;
+ const ok=k===whichCur;whichStats.n++;if(ok)whichStats.ok++;
+ document.querySelectorAll('#qz .opt').forEach(o=>{if(o.dataset.which===whichCur)o.classList.add('ok');else if(o.dataset.which===k)o.classList.add('no')});
+ card(ok?'সঠিক!':'হলো না',{t:'এটা '+B.whichNames[whichCur],b:'মডেল এখন শরীরে যেভাবে থাকে সেভাবে ঘুরে যাচ্ছে',d:'যেভাবে চিনবেন:',l:(B.whichRules||{})[whichCur]||[]});
+ $('#qz .score').textContent=`স্কোর: ${whichStats.ok} / ${whichStats.n}`;
+ $('#qz').insertAdjacentHTML('beforeend','<div class="bar"><button class="btn" id="nextWhich">পরেরটা</button></div>');
+ rotAnim={g:whichGroup,q0:whichGroup.quaternion.clone(),q1:new THREE.Quaternion(),s:performance.now()};
+ fly(B.whichView||[0,.4,1],B.whichDist||200,ZERO);
 }
 
 /* ---------- ভারী লেয়ার, পরে লোড ---------- */
@@ -277,7 +310,7 @@ const ro=new ResizeObserver(size);ro.observe(view);
 function tick(now){
  if(anim){let k=Math.min(1,(now-anim.s)/700);k=k<.5?2*k*k:1-((-2*k+2)**2)/2;cam.position.lerpVectors(anim.p0,anim.p1,k);ctl.target.lerpVectors(anim.t0,anim.t1,k);if(k>=1)anim=null;dirty=occDirty=true;lastMove=now}
  ctl.update();
- if(rotAnim){let k=reduce?1:Math.min(1,(now-rotAnim.s)/900);sideGroup.quaternion.slerpQuaternions(rotAnim.q0,rotAnim.q1,k<.5?2*k*k:1-((-2*k+2)**2)/2);dirty=true;if(k>=1)rotAnim=null}
+ if(rotAnim){let k=reduce?1:Math.min(1,(now-rotAnim.s)/900);rotAnim.g.quaternion.slerpQuaternions(rotAnim.q0,rotAnim.q1,k<.5?2*k*k:1-((-2*k+2)**2)/2);dirty=true;if(k>=1)rotAnim=null}
  if(quizMark.visible&&!reduce){quizMark.scale.setScalar(1+.25*Math.sin(now/220));dirty=true}
  if(dirty){renderer.render(scene,cam);place(false);dirty=false}
  if(occDirty&&now-lastMove>140){place(true);occDirty=false}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>থোরাসিক কশেরুকা 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+<script>
+/* URL-এর #typical, #first, #ninth, #tenth, #eleventh, #twelfth দেখে কোন কশেরুকা দেখাবে ঠিক করে */
+(function(){var L=['typical','first','ninth','tenth','eleventh','twelfth'],h=location.hash.slice(1),s=L.indexOf(h)>=0?h:'typical';
+window.SPEC=s;document.documentElement.dataset.spec=s;
+document.write('<script src="data/'+s+'-core.js"><\/script>');
+addEventListener('hashchange',function(){var n=location.hash.slice(1);if(L.indexOf(n)>=0&&n!==s)location.reload()});})();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+
+<section class="band stage">
+ <div class="wrap">
+  <h1>
+   <span data-only="typical">টিপিক্যাল থোরাসিক কশেরুকা <span style="font-weight:500;opacity:.8">· T2–T8 (মডেল T6)</span></span>
+   <span data-only="first">প্রথম থোরাসিক কশেরুকা <span style="font-weight:500;opacity:.8">· T1</span></span>
+   <span data-only="ninth">নবম থোরাসিক কশেরুকা <span style="font-weight:500;opacity:.8">· T9</span></span>
+   <span data-only="tenth">দশম থোরাসিক কশেরুকা <span style="font-weight:500;opacity:.8">· T10</span></span>
+   <span data-only="eleventh">একাদশ থোরাসিক কশেরুকা <span style="font-weight:500;opacity:.8">· T11</span></span>
+   <span data-only="twelfth">দ্বাদশ থোরাসিক কশেরুকা <span style="font-weight:500;opacity:.8">· T12</span></span>
+  </h1>
+  <p class="lead">আসল মানুষের স্ক্যান থেকে নেওয়া কশেরুকা, সাথে আসল রিব, পাশের কশেরুকা আর মাসল। Costal facet-গুলো রিবের ছোঁয়া থেকে মাপা। "কোন নম্বর?" দিয়ে চেনার প্র্যাকটিস করুন। লেখা A.K. Datta অনুযায়ী।</p>
+  <nav class="spec" aria-label="কোন কশেরুকা"><a href="#typical" data-spec-link="typical">Typical (T6)</a><a href="#first" data-spec-link="first">T1</a><a href="#ninth" data-spec-link="ninth">T9</a><a href="#tenth" data-spec-link="tenth">T10</a><a href="#eleventh" data-spec-link="eleventh">T11</a><a href="#twelfth" data-spec-link="twelfth">T12</a></nav>
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="false">অংশ</button>
+     <button class="btn" data-mode="lm" aria-pressed="true">ল্যান্ডমার্ক</button>
+     <button class="btn" data-mode="att" aria-pressed="false">মাসল</button>
+     <button class="btn" data-mode="rel" aria-pressed="false">রিলেশন</button>
+     <button class="btn" data-mode="joint" aria-pressed="false">জয়েন্ট</button>
+     <button class="btn" data-mode="which" aria-pressed="false">কোন নম্বর?</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="lat">পাশ থেকে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+     <button class="btn" data-view="obl">তির্যক</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="rib"> রিব</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>পাশের কশেরুকা ও ডিস্ক</label>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#d1495b"></i>মাসল</label>
+     <label class="tog"><input type="checkbox" data-layer="artery"><i class="dot" style="background:#e0443e"></i>Aorta</label>
+     <label class="tog"><input type="checkbox" data-layer="vein"><i class="dot" style="background:#4a78e0"></i>ভেইন</label>
+     <label class="tog"><input type="checkbox" data-layer="nerve"><i class="dot" style="background:#f2c230"></i>Cord ও নার্ভ</label>
+     <label class="tog"><input type="checkbox" data-layer="organ"><i class="dot" style="background:#cfd6dc"></i>Oesophagus</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+ <a href="#s-gen">সাধারণ</a><a href="#s-hold">চেনার চিহ্ন</a><a href="#s-feat">ফিচার</a><a href="#s-att">অ্যাটাচমেন্ট</a><a href="#s-joint">জয়েন্ট</a><a href="#s-viva">ভাইভা</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+
+<section class="band sec" id="s-gen"><div class="wrap two">
+ <div>
+  <h2>থোরাসিক কশেরুকা: সাধারণ কথা</h2>
+  <ul>
+   <li><b>সংখ্যা:</b> বারোটা।</li>
+   <li><b>চেনার মূল চিহ্ন:</b> body-র পাশে costal facet আর transverse process-এ costal facet। শেষ দুটোর transverse process-এ facet থাকে না।</li>
+   <li><b>Typical:</b> T2–T8, সবার ফিচার একই।</li>
+   <li><b>Atypical:</b> T1 আর T9–T12; প্রতিটা নিজের বিশেষ চিহ্ন দিয়ে চেনা যায়।</li>
+   <li><b>বক্রতা:</b> পাশ থেকে দেখলে সামনে অবতল বাঁক, যা ভ্রূণ অবস্থা থেকেই থাকে, তাই <b>primary curvature</b>। মূলত body-র সামনের উচ্চতা কম হওয়ায় তৈরি, T2 থেকে T12 পর্যন্ত।</li>
+  </ul>
+  <p class="ref">Datta I, পৃ. ১২</p>
+ </div>
+ <div class="card"><h3 style="margin-top:0">কোনটা কেমন, এক নজরে</h3>
+  <table class="stack"><thead><tr><th>কশেরুকা</th><th>Body-তে costal facet</th><th>TP-তে facet</th></tr></thead><tbody>
+   <tr><td>T1</td><td>উপরে পূর্ণ (1st রিব), নিচে demi (2nd)</td><td>আছে</td></tr>
+   <tr><td>T2–T8</td><td>উপরে demi (নিজের রিব), নিচে demi (পরের রিব)</td><td>আছে</td></tr>
+   <tr><td>T9</td><td>শুধু উপরে demi; নিচেরটা সাধারণত নেই</td><td>আছে</td></tr>
+   <tr><td>T10</td><td>একটা পূর্ণ, উপরের বর্ডারের কাছে</td><td>আছে</td></tr>
+   <tr><td>T11</td><td>একটা গোল, উপরের বর্ডার থেকে একটু নিচে</td><td>নেই</td></tr>
+   <tr><td>T12</td><td>একটা, body-র মাঝখানে, pedicle-এ ঢুকে</td><td>নেই</td></tr>
+  </tbody></table><p class="ref">Datta I, পৃ. ১২–১৪</p></div>
+</div></section>
+
+<section class="band sec" id="s-hold"><div class="wrap two">
+ <div>
+  <h2>চেনার চিহ্ন</h2>
+  <ul data-only="typical"><li>Body হৃৎপিণ্ডের মতো: আড়াআড়ি আর সামনে-পেছনের মাপ প্রায় সমান।</li><li>প্রতি পাশে দুটো demifacet: উপরে বড়টা pedicle-এর সামনে, নিচে ছোটটা inferior notch-এর সামনে।</li><li>Vertebral foramen ছোট, গোল।</li><li>Transverse process বড়, মুগুরের মতো, ডগার কাছে costal facet।</li><li>Spine লম্বা, নিচে হেলানো।</li></ul>
+  <ul data-only="first"><li>উপরে পূর্ণ গোল costal facet (1st রিব), নিচে demifacet (2nd রিব)।</li><li>Body ছোট, cervical ধরনের: আড়াআড়ি মাপ বেশি।</li><li>Superior notch স্পষ্ট (C8 নার্ভ), inferior notch দিয়ে T1।</li><li>Foramen বড়, ত্রিভুজাকার।</li><li>Spine লম্বা, প্রায় আড়াআড়ি।</li></ul>
+  <ul data-only="ninth"><li>Typical-এর মতো, কিন্তু শুধু উপরের demifacet (9th রিব)।</li><li>নিচের demifacet সাধারণত থাকে না, কারণ 10th রিব শুধু T10-এর সাথে জোড়া লাগে।</li></ul>
+  <ul data-only="tenth"><li>প্রতি পাশে একটাই পূর্ণ costal facet, উপরের বর্ডারের কাছে (10th রিব)।</li><li>Transverse process-এ costal facet আছে (10th রিবের tubercle)।</li><li>Body বড়, lumbar ধরনের।</li></ul>
+  <ul data-only="eleventh"><li>একটাই গোল costal facet, উপরের বর্ডার থেকে একটু নিচে সরে; 11th রিবের head পুরোপুরি।</li><li>Transverse process-এ costal facet নেই (11th রিব floating)।</li><li>নিচের articular facet typical-এর মতো চ্যাপ্টা, সামনে-ভেতরে মুখ করা।</li></ul>
+  <ul data-only="twelfth"><li><b>তিনভাবে আলাদা</b> (Datta-র ভাষায় "thrice unique"):</li><li>১. Body বড়, lumbar ধরনের; costal facet body-র উপর-নিচের প্রায় মাঝখানে, pedicle-এ ঢুকে গেছে।</li><li>২. Transverse process ছোট, costal facet নেই; তিনটা tubercle: superior, lateral, inferior। Superior আর inferior হলো lumbar-এর mamillary আর accessory tubercle; lateral-টাই আসল transverse process।</li><li>৩. নিচের articular facet উত্তল, lumbar-এর মতো সামনে-বাইরে মোচড়ানো।</li></ul>
+  <p class="ref" data-only="typical">Datta I, পৃ. ১২–১৩, Fig. 1.2, 1.3</p>
+  <p class="ref" data-only="first">Datta I, পৃ. ১৩, Fig. 1.4</p>
+  <p class="ref" data-only="ninth tenth eleventh">Datta I, পৃ. ১৩, Fig. 1.5</p>
+  <p class="ref" data-only="twelfth">Datta I, পৃ. ১৩–১৪, Fig. 1.5</p>
+  <div class="bar"><button class="btn" id="holdBtn" style="color:var(--ink);border-color:var(--line);background:var(--card)">উপর থেকে দেখুন</button></div>
+ </div>
+ <div class="card"><h3 style="margin-top:0">এই স্ক্যানের body-র মাপ (মিলিমিটার)</h3>
+  <div class="stat" id="dims"></div><p class="note" id="dimNote"></p>
+  <p data-only="typical">Datta: body হৃৎপিণ্ডের মতো কারণ দুই ব্যাস প্রায় সমান। উপরের দিকে body ধীরে ধীরে cervical ধরনের আর নিচের দিকে lumbar ধরনের হয়। (পৃ. ১২)</p>
+  <p data-only="first">Datta: T1-এর body cervical ধরনের, আড়াআড়ি ব্যাস বেশি। (পৃ. ১৩)</p>
+  <p data-only="tenth twelfth">Datta: body বড়, lumbar ধরনের। (পৃ. ১৩–১৪)</p></div>
+</div></section>
+
+<section class="band sec" id="s-feat"><div class="wrap two">
+ <div class="card"><h3 style="margin-top:0">Body, pedicle, lamina</h3><ul>
+  <li><b>Body:</b> হৃৎপিণ্ডের মতো; T3-এর body সবচেয়ে ছোট। T5–T8-এর body-র বাম পাশ descending aorta-র চাপে চ্যাপ্টা। মডেলে T6-এর বাম পাশে aorta-র ছোঁয়া মাপা গেছে।</li>
+  <li><b>Costal demifacet:</b> উপরেরটা বড়, pedicle-এর সামনে, একই নম্বরের রিবের head-এর সাথে। নিচেরটা ছোট, inferior notch-এর সামনে, পরের রিবের head-এর সাথে।</li>
+  <li><b>Vertebral foramen:</b> ছোট, গোল।</li>
+  <li><b>Pedicle:</b> ছোট; নিচের দিকে ক্রমশ মোটা।</li>
+  <li><b>Vertebral notch:</b> superior notch অস্পষ্ট (T1 ছাড়া); inferior notch সবখানে স্পষ্ট, একই নম্বরের spinal nerve বহন করে।</li>
+  <li><b>Lamina:</b> ছোট, মোটা, চওড়া; উপর থেকে নিচে একটার উপর আরেকটা পড়ে। পাশাপাশি lamina ligamenta flava দিয়ে যুক্ত।</li></ul>
+  <p class="ref">Datta I, পৃ. ১২–১৩</p></div>
+ <div class="card"><h3 style="margin-top:0">Processes</h3><ul>
+  <li><b>Transverse process:</b> বড়, মুগুরের মতো; pedicle আর lamina-র জোড়া থেকে বাইরে-পেছনে।
+   <ul>
+    <li><b>Facet:</b> ডগার কাছে সামনের পৃষ্ঠে ডিম্বাকার facet, একই নম্বরের রিবের tubercle-এর সাথে। উপরের ছয়টায় অবতল, সামনে-বাইরে মুখ করা; পরের চারটায় (T10 পর্যন্ত) চ্যাপ্টা, উপরে-সামনে-বাইরে মুখ করা।</li>
+    <li><b>Ligament:</b> facet-এর ভেতরে costotransverse ligament রিবের neck-এর সাথে; ডগায় lateral costotransverse ligament; নিচের বর্ডারে superior costotransverse ligament পরের রিবের neck-এর উপরের কিনারায়।</li>
+    <li><b>পেছনের পৃষ্ঠ:</b> deep extensor মাসল।</li>
+   </ul></li>
+  <li><b>Articular process:</b> superior facet চ্যাপ্টা, পেছনে-বাইরে মুখ করা, দুপাশের facet একটা বৃত্তের চাপে; তাই থোরাসিক অঞ্চলে ঘোরানো অন্য অঞ্চলের চেয়ে মুক্ত। Inferior facet উল্টো দিকে।</li>
+  <li><b>Spinous process:</b> লম্বা, নিচে হেলানো; T5–T8 সবচেয়ে লম্বা আর হেলানো, একটার উপর আরেকটা পড়ে।</li></ul>
+  <p class="ref">Datta I, পৃ. ১৩</p></div>
+</div></section>
+
+<section class="band sec" id="s-att"><div class="wrap">
+ <h2>অ্যাটাচমেন্ট</h2>
+ <table class="stack"><thead><tr><th>মাসল / চিহ্ন</th><th>কোথায়</th></tr></thead><tbody id="tbl-att"></tbody></table>
+ <p class="ref">Datta I, পৃ. ১৩: spinous process-এ interspinous ও supraspinous ligament, trapezius, rhomboid major ও minor, latissimus dorsi, serratus posterior superior ও inferior, erector spinae-র medial group; transverse process-এর পেছনে deep extensor।</p>
+ <p class="note" style="margin-top:10px">মডেলে শুধু এই কশেরুকায় যে মাসলগুলো আসলে ছুঁয়েছে (২.৫ মিমি-র মধ্যে), সেগুলোর রং আছে। তালিকার সব মাসল সব কশেরুকায় লাগে না। Psoas, longus colli আর diaphragm-এর তথ্য সাধারণ বই থেকে।</p>
+</div></section>
+
+<section class="band sec" id="s-joint"><div class="wrap">
+ <h2>জয়েন্ট</h2>
+ <table class="stack"><thead><tr><th>জয়েন্ট</th><th>যাদের মধ্যে</th><th>ধরন</th></tr></thead><tbody>
+  <tr><td>Costovertebral (joint of head of rib)</td><td>Body-র costal facet ও রিবের head</td><td>Synovial</td></tr>
+  <tr data-only="typical first ninth tenth"><td>Costotransverse</td><td>Transverse process-এর facet ও একই নম্বরের রিবের tubercle</td><td>Synovial</td></tr>
+  <tr><td>Zygapophyseal (facet joint)</td><td>পাশাপাশি কশেরুকার articular process</td><td>Synovial; থোরাসিকে ঘোরানো তুলনামূলক মুক্ত</td></tr>
+  <tr><td>Intervertebral disc</td><td>পাশাপাশি body</td><td>Secondary cartilaginous (symphysis)</td></tr>
+ </tbody></table>
+ <p class="ref">Datta I, পৃ. ১২–১৩, ১৬–১৭</p>
+ <p class="note" style="margin-top:10px">Disc-এর জোড়ার ধরন সাধারণ বই থেকে। অসিফিকেশন Datta-র এই খণ্ডে (Thorax) নেই, তাই এখানে দেওয়া হয়নি।</p>
+</div></section>
+
+<section class="band sec" id="s-viva"><div class="wrap">
+ <h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>থোরাসিক কশেরুকা চেনার মূল চিহ্ন কী?</summary><p>Body-র পাশে costal facet, আর transverse process-এ costal facet (শেষ দুটো ছাড়া)। (পৃ. ১২)</p></details>
+ <details><summary>Typical আর atypical কোনগুলো?</summary><p>Typical T2–T8; atypical T1, T9, T10, T11, T12। (পৃ. ১২)</p></details>
+ <details><summary>Body কেন হৃৎপিণ্ডের মতো?</summary><p>আড়াআড়ি আর সামনে-পেছনের ব্যাস প্রায় সমান। (পৃ. ১২)</p></details>
+ <details><summary>কোন কশেরুকার body অসমান, কেন?</summary><p>T5–T8; বাম পাশ descending aorta-র চাপে চ্যাপ্টা। (পৃ. ১২)</p></details>
+ <details><summary>সবচেয়ে ছোট body কোনটার?</summary><p>T3। (পৃ. ১২)</p></details>
+ <details><summary>থোরাসিক অঞ্চলে ঘোরানো কেন বেশি মুক্ত?</summary><p>Superior articular facet চ্যাপ্টা, পেছনে-বাইরে মুখ করা, দুপাশের facet একটা বৃত্তের চাপে থাকে। (পৃ. ১৩)</p></details>
+ <details><summary>সবচেয়ে লম্বা আর হেলানো spine কোনগুলোর?</summary><p>T5–T8। (পৃ. ১৩)</p></details>
+ <details><summary>T1 কীভাবে চিনবেন?</summary><p>উপরে পূর্ণ গোল facet, নিচে demifacet; body cervical ধরনের; superior notch স্পষ্ট; foramen বড় ত্রিভুজাকার; spine প্রায় আড়াআড়ি। (পৃ. ১৩)</p></details>
+ <details><summary>T9, T10, T11 আলাদা কীভাবে?</summary><p>T9: শুধু উপরের demifacet। T10: একটা পূর্ণ facet উপরের বর্ডারের কাছে, TP-তে facet আছে। T11: একটা গোল facet একটু নিচে, TP-তে facet নেই। (পৃ. ১৩)</p></details>
+ <details><summary>T12 কেন "thrice unique"?</summary><p>(১) Body lumbar ধরনের, facet body-র মাঝে pedicle-এ ঢুকে; (২) TP ছোট, তিন tubercle, facet নেই; (৩) inferior articular facet উত্তল, lumbar-এর মতো। (পৃ. ১৪)</p></details>
+ <details><summary>T12-এর transverse process-এর তিন tubercle কী কী?</summary><p>Superior (= lumbar-এর mamillary), inferior (= accessory), lateral (= আসল transverse process)। (পৃ. ১৪)</p></details>
+</div></section>
+
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i>, Part-I, The Thoracic Cage, পৃ. ১২–১৪ (রিবের সাথে জোড়ার অংশ পৃ. ১৬–১৭)। "সাধারণ বই থেকে" লেখা অংশগুলো এই অধ্যায়ে নেই।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে তৈরি। Costal facet, articular facet আর মাসল অ্যাটাচমেন্ট মেশ থেকে মাপা; spinal cord, spinal nerve, sympathetic trunk আর azygos স্কিম্যাটিক।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+<script>document.querySelectorAll('[data-only]').forEach(function(e){if(e.dataset.only.split(' ').indexOf(window.SPEC)<0)e.remove()})</script>
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>
