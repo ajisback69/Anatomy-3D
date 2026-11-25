@@ -108,7 +108,7 @@ const lms=D.lm.map(o=>{
 function card(k,o){
  info.innerHTML=`<div class="k">${esc(k)}</div><h3>${esc(o.t)}</h3><div class="sub">${esc(o.b)}</div><p style="margin:0 0 6px">${esc(o.d)}</p>${o.l?'<ul>'+o.l.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}`;
 }
-function selectLm(L){sel={lm:L};if(L.cut&&L.cut!==true&&(B.modes[mode]||{}).cuts&&!cutHas(L,curCut)){const c=[].concat(L.cut).find(k=>(B.modes[mode].cuts||[]).includes(k));if(c)setCut(c,false)}pins.forEach(x=>x.el.classList.toggle('on',x===L));card('ল্যান্ডমার্ক',L.inf);if(L.el.classList.contains('occ')&&!clipOn)fly(L.n,cam.position.distanceTo(ctl.target),ctl.target.clone().lerp(L.p,.5),true);}  // পেছনে চাপা পড়া মার্ক হলেই শুধু ঘোরায়
+function selectLm(L){sel={lm:L};if(L.cut&&L.cut!==true&&(B.modes[mode]||{}).cuts&&!cutHas(L,curCut)){const c=[].concat(L.cut).find(k=>(B.modes[mode].cuts||[]).includes(k));if(c)setCut(c,false)}pins.forEach(x=>x.el.classList.toggle('on',x===L));card('ল্যান্ডমার্ক',L.inf);}  // শুধু নাম দেখায়, ক্যামেরা ঘোরায় না
 
 /* ---------- লেভেল তল ---------- */
 const levelGroup=new THREE.Group();levelGroup.visible=false;scene.add(levelGroup);
@@ -174,7 +174,7 @@ function setMode(m){
  else if(M.paint==='terr')legend.innerHTML='<div class="legend">'+Object.entries(B.TERR).map(([k,o])=>`<button data-terr="${k}"><span class="sw" style="background:${o.c}"></span>${o.t}</button>`).join('')+'</div>';
  else if(m==='rel')legend.innerHTML='<div class="legend">'+B.relLegend.map(([k,c])=>`<button data-str="${k}"><span class="sw" style="background:${c}"></span>${B.STR[k].t}</button>`).join('')+'</div>';
  else if(m==='quiz'||m==='side'||m==='which')legend.innerHTML='<div class="quiz" id="qz"></div>';
- else if(m==='lm'||m==='joint'||M.markers){const used=new Set(lms.filter(x=>[].concat(x.show).includes(m)).map(x=>x.cls.split('mk-')[1]));legend.innerHTML=(M.cuts?cutBar(M):'')+'<div class="legend mkleg">'+MK.filter(t=>used.has(t[0])).map(([k,t])=>`<div><span class="pin mk mk-${k} demo"><i class="sh"></i>${k==='num'?'<b class="no">২</b>':''}</span>${t}</div>`).join('')+'<div class="note" style="color:#b9d3cb">'+esc(B.mkNote||'মার্কে ট্যাপ করলে নাম দেখাবে। হালকা মার্কগুলো হাড়ের পেছনে, ট্যাপ করলে ঘুরে সামনে আসবে।')+'</div></div>'}
+ else if(m==='lm'||m==='joint'||M.markers){const used=new Set(lms.filter(x=>[].concat(x.show).includes(m)).map(x=>x.cls.split('mk-')[1]));legend.innerHTML=(M.cuts?cutBar(M):'')+'<div class="legend mkleg">'+MK.filter(t=>used.has(t[0])).map(([k,t])=>`<div><span class="pin mk mk-${k} demo"><i class="sh"></i>${k==='num'?'<b class="no">২</b>':''}</span>${t}</div>`).join('')+'<div class="note" style="color:#b9d3cb">'+esc(B.mkNote||'মার্কে ট্যাপ করলে নাম দেখাবে। শুধু যে পাশ দেখছেন সেই পাশের মার্ক দেখায়; ঘোরালে অন্য পাশের মার্ক আসবে।')+'</div></div>'}
  else legend.innerHTML='';
  if(M.view)flyView(M.view);
  setCut(M.cut||(M.cuts&&M.cuts[0])||null,!M.view);
@@ -345,9 +345,9 @@ function place(doOcc){
   L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;
   let vis=L.vis;
   if(!L.occ)vis=v.z<1;
-  else if(doOcc){toCam.subVectors(cam.position,L.p).normalize();vis=toCam.dot(L.n)>-0.3;
+  else if(doOcc){toCam.subVectors(cam.position,L.p).normalize();vis=toCam.dot(L.n)>(L.mk?-0.12:-0.3);
    if(vis&&boneOp>=1){const dist=cam.position.distanceTo(L.p);occ.set(cam.position,toCam.negate());occ.far=dist-7;vis=occ.intersectObjects(bone,false).filter(x=>!clipOn||clipPlane.distanceToPoint(x.point)>=-.5).length===0}}
-  if(L.mk){if(!L.vis){L.el.classList.remove('hid');L.vis=true}if(doOcc)L.el.classList.toggle('occ',!vis);continue}
+  if(L.mk){if(doOcc){L.el.classList.toggle('hid',!vis);L.el.classList.remove('occ');L.vis=vis}continue}
   if(vis!==L.vis||doOcc){L.el.classList.toggle('hid',!vis);L.vis=vis}
  }
 }
@@ -362,6 +362,6 @@ function tick(now){
  if(occDirty&&now-lastMove>140){place(true);occDirty=false}
  requestAnimationFrame(tick);
 }
-setMode('lm');size();requestAnimationFrame(tick);
+setMode(B.startMode||'lm');size();requestAnimationFrame(tick);
 const sc=document.createElement('script');sc.src=B.layersSrc||'data/layers.js';sc.onload=buildLayers;sc.onerror=()=>note('লেয়ার লোড হয়নি, পেজ রিফ্রেশ করুন।');
 setTimeout(()=>document.body.appendChild(sc),300);

@@ -181,10 +181,10 @@ const CUTS={
 for(const k in CUTS)if(D.cuts[k])Object.assign(CUTS[k],D.cuts[k]);
 
 const B={
- id:'heart',PARTS,REG,TERR,STR,views:VIEWS,target:[0,0,0],dist:340,MK,cuts:CUTS,
+ id:'heart',startMode:'cor',PARTS,REG,TERR,STR,views:VIEWS,target:[0,0,0],dist:340,MK,cuts:CUTS,
  baseColor:'#c97a6d',innerColor:'#ecb8ad',boneRough:.6,
  partLabel:'প্রকোষ্ঠ',regLabel:'পৃষ্ঠ',terrLabel:'কোন ধমনীর এলাকা',
- mkNote:'মার্কে ট্যাপ করলে নাম দেখাবে। হালকা মার্কগুলো পেছনে, ট্যাপ করলে ঘুরে সামনে আসবে।',
+ mkNote:'মার্কে ট্যাপ করলে নাম দেখাবে। শুধু যে পাশ দেখছেন সেই পাশের মার্ক দেখায়; ঘোরালে অন্য পাশের মার্ক আসবে।',
  modes:{
   parts:{layers:{great:1},paint:'parts',view:['ant',340],card:{t:'চারটা প্রকোষ্ঠ',b:'নীল: ডান হার্ট · লাল: বাম হার্ট',d:`ডান অলিন্দ (RA), ডান নিলয় (RV), বাম অলিন্দ (LA), বাম নিলয় (LV); হালকা রং auricle। ঘুরিয়ে দেখুন: সামনে থেকে বেশিরভাগ RV, পেছনে দুই অলিন্দ। ${DT('৫৮')}`,l:['সীমানা স্ক্যান থেকে মাপা: দেয়ালের প্রতিটা বিন্দু যে গহ্বরের সবচেয়ে কাছে সেই প্রকোষ্ঠের']}},
   lm:{layers:{great:1},view:['ant',340],card:{t:'বাইরের গঠন',b:'Apex, base, পৃষ্ঠ, বর্ডার, খাঁজ',d:`মার্কে ট্যাপ করুন। হার্টে আছে একটা apex, একটা base, তিনটা পৃষ্ঠ আর তিনটা বর্ডার। পেছন আর নিচ থেকেও ঘুরিয়ে দেখুন। ${DT('৫৯')}`}},
