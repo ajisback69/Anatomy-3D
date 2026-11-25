@@ -11,6 +11,7 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 - Layers: rib, clav, muscle, artery, vein, nerve, lymph, organ, vert.
 
 ## Accuracy rules
+- Upper limb text: Datta, Superior & Inferior Extremities volume (PDF page = book page + 6), pp. 3–25.
 - Text reference, from the ribs onward: A.K. Datta, Essentials of Human Anatomy (the owner's choice). Match its terminology, classifications and numbers (e.g. ossification dates). Where page excerpts from the owner are available, follow them and give page references. Never reproduce long verbatim passages. Older pages (sternum, ribs) cite BD Chaurasia, Snell and Gray's; re-check them against Datta when excerpts arrive. The ribs have now been rewritten from Datta pp. 16–20, and the sternal-angle notes from p. 20 have been added. The sternum has been re-checked against Datta pp. 11, 14–16 and 20. Thoracic vertebrae follow Datta pp. 12–14 (that volume has no vertebra ossification).
 - The Datta PDFs and their extracted text (/home/claude/datta, uploads) are copyrighted. Never commit them to this public repo.
 - Landmarks and attachments are measured from the meshes, not drawn by hand.
@@ -30,6 +31,8 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 - `pipeline/vertebrae.py`: specs typical (T6), first, ninth, tenth, eleventh, twelfth. Parts 1–6 (body, pedicle, lamina, TP, spinous, articular). Facets come from rib contact.
 - Organs (heart): the main mesh is still `group:'bone'` with `p` (chamber; +10 = inner wall), `r` (outer surface) and `t` (coronary territory). Mode options: `paint` ('parts'|'reg'|'terr'), `boneOp` (opacity), `cut`/`cuts` with `BONE.cuts[k] = {n, o, view}` (clipping plane, keep n·x >= o; slider in the legend), `clipLayers`, `legend` (STR list), `markers`. Landmarks may carry `cut` (shown only with that cut). `relLabels` entries can name a mode as 3rd item. `BONE.MK` overrides the marker legend; extra types `open`, `node`.
 - `pipeline/heart.py`: voxelises the wall (FMA7274) plus great vessels; the two closed cavities are split at the AV annulus plane into RA/RV/LA/LV; auricles by morphological opening. Epicardium = surface facing the outside space. Surfaces by visibility (front/below/behind/left). Exports cuts, measurements (`meas`) and Datta's surface marking fitted to this subject's cartilages. Cache in `.cache/`.
+- `pipeline/limb.py [bone...]`: clavicle, scapula, humerus, radius, ulna, hand (right side; left only for the side trainer). Muscle attachments = scan contact (2.5 mm) restricted to the zone Datta describes (`Z` per bone: t-range along the long axis + facing direction, or a vertex mask), because MRI muscles touch bone in many places. Joint surfaces: within `jt` mm of the nearest distance to the neighbour bone (MRI joints have gaps). Scapula processes are split by mesh connectivity. Hand = all 27 right-hand bones in one mesh, part id per bone; `which` trainer for the 8 carpals; side trainer uses the scaphoid.
+- `tools/limbpage.py` + `tools/pages_upper.py [bone...]` write the limb pages' index.html; `#tbl-att` is filled from REG by viewer.js.
 - `pipeline/ribs.py`: `python pipeline/ribs.py [spec ...]`. Each spec has `kind` and `tub` (False for 11th and 12th, which have no neck or tubercle). `cart` may be None, in which case the pointed tip is used as the anterior end.
 
 ## Publishing
@@ -40,6 +43,7 @@ The sternum artifact is https://claude.ai/artifact/XnBUeNz5TYhtDxsg5qiFbs (slug 
 Ribs artifact: https://claude.ai/artifact/SRsCNGFiPpn9oT47duJaNU (slug cded4058-688d-4861-9dd2-176acf0347e9).
 Thoracic vertebrae artifact: https://claude.ai/artifact/JZzGKA4ncTSYL6WYPtWCqD (slug 8e4672b4-5ef1-4821-9513-3a4454223130).
 Heart artifact: https://claude.ai/artifact/Ud6Pob99Wuam16tt4UbXM4 (slug dfb0d7db-7429-46c9-b24f-4f92cdba1ce3). Text from Datta pp. 58–86 and 342–343.
+Upper limb artifacts: clavicle https://claude.ai/artifact/QdTbyAETqT612AgMumMVE4 (bf595c09-8150-4b19-8c54-8fe1218022c5), scapula https://claude.ai/artifact/GAE9C17N3JmyYzSaiBvbPv (7ac2df54-7e4c-49c8-9b56-1bcd06e46b41), humerus https://claude.ai/artifact/MK6RSkSBgjV9DKKgr1VB6M (a47d808c-9a23-48fe-be37-3c2f75297f5e), radius https://claude.ai/artifact/TL1rpAerdnj6F5ywDHE5SY (d535441d-6bae-4bdb-b16c-6c4a854ba461), ulna https://claude.ai/artifact/G6pBUu9upjy9Vk84VD2b4Z (7a48dff9-09df-409e-a45a-e562a5fe133e), hand https://claude.ai/artifact/B9eS8p6ADs9LB2vfzX8GWH (523067e8-1e81-4898-898d-cbe636ba0656).
 After changing viewer.js, republish viewer/viewer.js to every bone artifact.
 
 ## Local test

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ক্ল্যাভিকল 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+table.cmp{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.1);vertical-align:top}
+table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+<script src="data/core.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+<section class="band stage">
+ <div class="wrap">
+  <h1>ক্ল্যাভিকল <span style="font-weight:500;opacity:.8">· Clavicle</span></h1>
+  <p class="lead">আসল মানুষের স্ক্যান থেকে নেওয়া ডান ক্ল্যাভিকল, সাথে আসল স্টার্নাম, ১ম রিব, স্ক্যাপুলা আর মাসল। লেখা A.K. Datta অনুযায়ী।</p>
+  
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="false">অংশ</button>
+     <button class="btn" data-mode="lm" aria-pressed="true">ল্যান্ডমার্ক</button>
+     <button class="btn" data-mode="att" aria-pressed="false">মাসল</button>
+     <button class="btn" data-mode="rel" aria-pressed="false">নার্ভ ও নালী</button>
+     <button class="btn" data-mode="joint" aria-pressed="false">জয়েন্ট</button>
+     <button class="btn" data-mode="side" aria-pressed="false">ডান না বাম</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+     <button class="btn" data-view="lat">বাইরে থেকে</button>
+     <button class="btn" data-view="med">ভেতর থেকে</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#d1495b"></i>মাসল</label>
+     <label class="tog"><input type="checkbox" data-layer="nerve"><i class="dot" style="background:#f2c230"></i>নার্ভ (স্কিম্যাটিক)</label>
+     <label class="tog"><input type="checkbox" data-layer="artery"><i class="dot" style="background:#e0443e"></i>ধমনী</label>
+     <label class="tog"><input type="checkbox" data-layer="vein"><i class="dot" style="background:#4a78e0"></i>শিরা</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>পাশের হাড়</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+<a href="#s-gen">সাধারণ</a><a href="#s-feat">ফিচার</a><a href="#s-att">অ্যাটাচমেন্ট</a><a href="#s-viva">ভাইভা</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+<section class="band sec" id="s-gen"><div class="wrap two">
+ <div>
+  <h2>ক্ল্যাভিকল: সাধারণ কথা</h2>
+  <ul>
+   <li>Shoulder girdle-এর হাড়; pelvic girdle-এ এর কোনো জোড়া নেই।</li>
+   <li><b>কাজ:</b> (১) strut-এর মতো scapula-কে বাইরে রাখে, তাই হাত শরীরের পাশ থেকে মুক্তভাবে দোলে; (২) coraco-clavicular ligament আর ভেতরের ২/৩ দিয়ে হাতের বল axial skeleton-এ পাঠায়; (৩) পেছনের অবতল ভেতরের ২/৩ গলার গোড়ার নার্ভ-রক্তনালী রক্ষা করে; (৪) হাত মাথার উপরে তোলার সময় নিজের অক্ষে ঘোরে।</li>
+   <li><b>বিশেষত্ব:</b> modified long bone: medullary cavity নেই, বেশিরভাগ membrane-এ ossify হয়, কখনো supraclavicular nerve ফোঁড়ে।</li>
+   <li>সবার আগে ossification শুরু (৫–৬ সপ্তাহ), সবার শেষে শেষ (২১ বছরের পরে)।</li>
+   <li>আড়াআড়ি, চামড়া আর platysma-র ঠিক নিচে; তাই ভাঙলে সাধারণত চামড়া ফুটো করে না।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৩</p>
+ </div>
+ <div>
+  <h2>শরীরে যেভাবে রাখবেন (ডান না বাম)</h2>
+  <ul>
+   <li>বড় sternal প্রান্ত ভেতরে, একটু সামনে-নিচে।</li>
+   <li>খসখসে দাগ আর subclavius-এর খাঁজ নিচে।</li>
+   <li>সামনের পৃষ্ঠের বাঁক ভেতর থেকে বাইরে: আগে উত্তল, পরে অবতল।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৫</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-feat"><div class="wrap two">
+ <div>
+  <h2>প্রান্ত দুটো</h2>
+  <ul>
+   <li><b>Sternal end:</b> উপর-নিচে উত্তল, সামনে-পেছনে একটু অবতল; fibrocartilage-এ ঢাকা। চারপাশে capsule, উপরে interclavicular ligament, উপরে-পেছনে articular disc। কাছেই নিচে costo-clavicular ligament-এর গর্ত।</li>
+   <li><b>Acromial end:</b> চ্যাপ্টা, ডিম্বাকার facet বাইরে-নিচে; acromion-এর সাথে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৩–৪</p>
+ </div>
+ <div>
+  <h2>শ্যাফট</h2>
+  <ul>
+   <li><b>বাইরের ১/৩:</b> চ্যাপ্টা; সামনের অবতল আর পেছনের উত্তল বর্ডার, উপরের পৃষ্ঠ চামড়ার নিচে; নিচে conoid tubercle আর trapezoid ridge।</li>
+   <li><b>ভেতরের ২/৩:</b> চার পৃষ্ঠ, বর্ডার নেই। নিচে মাঝের ১/৩-এ subclavius-এর খাঁজ; সামনে ভেতরের অর্ধেকে pectoralis major; উপরে ভেতরের ১/৩-এ SCM; পেছনে sternohyoid।</li>
+   <li><b>পেছনের সম্পর্ক:</b> ভেতরে IJV, subclavian ও brachiocephalic vein; বাইরে subclavian artery আর brachial plexus; ফুসফুসের apex (cervical pleura ও suprapleural membrane-সহ); suprascapular vessels।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৪–৫</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-att"><div class="wrap two">
+ <div>
+  <h2>মাসল ও লিগামেন্টের অ্যাটাচমেন্ট</h2>
+  <table class="cmp"><thead><tr><th>মাসল</th><th>কোথায়</th></tr></thead><tbody id="tbl-att"></tbody></table>
+  <p class="note">লিগামেন্ট: conoid tubercle আর trapezoid ridge-এ coraco-clavicular; স্টার্নাল প্রান্তের নিচে costo-clavicular।</p>
+ </div>
+ <div>
+  <h2>অসিফিকেশন ও ক্লিনিক্যাল</h2>
+  <ul>
+   <li><b>Primary:</b> দুটো (ভেতরের ও বাইরের), membrane-এ, গর্ভের ৫ম–৬ষ্ঠ সপ্তাহে; পরে জুড়ে একটা। সবার আগে ossify হওয়া হাড়।</li>
+   <li><b>Secondary:</b> sternal প্রান্তে, cartilage-এ, প্রায় ১৮ বছরে; জোড়া শুরু ২১ বছরে, শেষ ৩১ বছর পর্যন্ত। তাই সবার শেষে ossification শেষ করা হাড়। কখনো acromial প্রান্তেও।</li>
+   <li><b>Growing end:</b> sternal প্রান্ত; nutrient vessel বাইরের দিকে।</li>
+   <li><b>ভাঙা:</b> প্রসারিত হাতে পড়লে পরোক্ষ বলে সবচেয়ে বেশি ভাঙা হাড়গুলোর একটা; সাধারণত দুই বাঁকের জোড়ায়।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৩, ৫</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-viva"><div class="wrap">
+<h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>Clavicle কেন modified long bone?</summary><p>Medullary cavity নেই, বেশিরভাগ membrane-এ ossify, কখনো নার্ভ ফোঁড়ে; তবু ভেতরের ২/৩ long bone-এর মতো বল বহন করে। (পৃ. ৩)</p></details>
+ <details><summary>কোন হাড় সবার আগে ossify হয়?</summary><p>Clavicle, গর্ভের ৫ম–৬ষ্ঠ সপ্তাহে; আবার সবার শেষে (৩১ বছর পর্যন্ত) শেষ হয়। (পৃ. ৩, ৫)</p></details>
+ <details><summary>Conoid tubercle কোথায়?</summary><p>নিচের পৃষ্ঠে, পেছনের কিনারার কাছে, ভেতরের ২/৩ আর বাইরের ১/৩-এর জোড়ায়। (পৃ. ৪)</p></details>
+ <details><summary>Clavicle সাধারণত কোথায় ভাঙে, কেন?</summary><p>দুই বাঁকের জোড়ায়, প্রসারিত হাতে পড়লে পরোক্ষ বলে। (পৃ. ৫)</p></details>
+ <details><summary>ভাঙলে সাধারণত compound হয় না কেন?</summary><p>হাড় platysma-র নিচে, চামড়া এর উপর দিয়ে মুক্তভাবে সরে। (পৃ. ৩)</p></details>
+ <details><summary>ডান না বাম কীভাবে বুঝবেন?</summary><p>বড় প্রান্ত ভেতরে, খাঁজ নিচে, ভেতরের অংশ সামনে উত্তল। (পৃ. ৫)</p></details>
+</div></section>
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i> (Superior &amp; Inferior Extremities), Bones of the Upper Limb, পৃ. ৩–৫।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে তৈরি। অংশ, ল্যান্ডমার্ক আর জোড়ার তল মেশ থেকে মাপা। মাসলের অ্যাটাচমেন্ট: স্ক্যানের মাসল যেখানে হাড় ছোঁয়, বইয়ে বলা এলাকার ভেতরে। নার্ভ আর ছোট রক্তনালী স্ক্যানে নেই, সেগুলো স্কিম্যাটিক। Subclavian artery আর vein স্ক্যান থেকে।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>

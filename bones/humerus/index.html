@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>হিউমেরাস 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+table.cmp{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.1);vertical-align:top}
+table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+<script src="data/core.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+<section class="band stage">
+ <div class="wrap">
+  <h1>হিউমেরাস <span style="font-weight:500;opacity:.8">· Humerus</span></h1>
+  <p class="lead">আসল মানুষের স্ক্যান থেকে নেওয়া ডান হিউমেরাস, সাথে আসল কাঁধ আর কনুইয়ের হাড় আর মাসল। ঘুরিয়ে দেখুন, মার্কে ট্যাপ করুন। লেখা A.K. Datta অনুযায়ী।</p>
+  
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="false">অংশ</button>
+     <button class="btn" data-mode="lm" aria-pressed="true">ল্যান্ডমার্ক</button>
+     <button class="btn" data-mode="att" aria-pressed="false">মাসল</button>
+     <button class="btn" data-mode="rel" aria-pressed="false">নার্ভ ও নালী</button>
+     <button class="btn" data-mode="joint" aria-pressed="false">জয়েন্ট</button>
+     <button class="btn" data-mode="side" aria-pressed="false">ডান না বাম</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="lat">বাইরে থেকে</button>
+     <button class="btn" data-view="med">ভেতর থেকে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#d1495b"></i>মাসল</label>
+     <label class="tog"><input type="checkbox" data-layer="nerve"><i class="dot" style="background:#f2c230"></i>নার্ভ (স্কিম্যাটিক)</label>
+     <label class="tog"><input type="checkbox" data-layer="artery"><i class="dot" style="background:#e0443e"></i>ধমনী</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>পাশের হাড়</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+<a href="#s-gen">সাধারণ</a><a href="#s-feat">ফিচার</a><a href="#s-att">অ্যাটাচমেন্ট</a><a href="#s-oss">অসিফিকেশন</a><a href="#s-viva">ভাইভা</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+<section class="band sec" id="s-gen"><div class="wrap two">
+ <div>
+  <h2>হিউমেরাস: সাধারণ কথা</h2>
+  <ul>
+   <li>বাহুর হাড়; upper limb-এর সবচেয়ে লম্বা long bone।</li>
+   <li>উপরের প্রান্ত, শ্যাফট আর নিচের প্রান্ত।</li>
+   <li><b>Angle of humeral torsion:</b> head-এর অক্ষ আর নিচের প্রান্তের অক্ষের মধ্যে প্রায় ১৬৪° (প্রাপ্তবয়স্কে)।</li>
+   <li><b>তিন রকম neck:</b> anatomical (head-এর ঠিক পরে), surgical (উপরের প্রান্ত আর শ্যাফটের জোড়ায়), morphological (কিশোর বয়সে epiphyseal line, surgical neck-এর প্রায় ০.৫ সেমি উপরে)।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৯–১০</p>
+ </div>
+ <div>
+  <h2>শরীরে যেভাবে রাখবেন (ডান না বাম)</h2>
+  <ul>
+   <li>Head উপরে, ভেতরের দিকে মুখ করা।</li>
+   <li>Lesser tubercle আর intertubercular sulcus সামনে।</li>
+   <li>নিচের প্রান্তে olecranon fossa পেছনে; medial epicondyle বেশি উঁচু।</li>
+  </ul>
+  <p class="note">"ডান না বাম" মোডে আসল ডান আর বাম হাড় এলোমেলো ঘুরিয়ে দেখায়।</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-feat"><div class="wrap two">
+ <div>
+  <h2>উপরের প্রান্ত</h2>
+  <ul>
+   <li><b>Head:</b> গোলকের ১/৩; ভেতরে-পেছনে-উপরে; hyaline cartilage মাঝে মোটা, কিনারায় পাতলা।</li>
+   <li><b>Greater tubercle:</b> সবচেয়ে বাইরে; উপরে-পেছনে তিন ছাপ: supraspinatus, infraspinatus, teres minor। চার scapulo-humeral মাসলের tendon capsule-এর সাথে মিশে <b>rotator cuff</b>।</li>
+   <li><b>Lesser tubercle:</b> সামনে; subscapularis।</li>
+   <li><b>Intertubercular sulcus:</b> biceps-এর long head; lateral lip-এ pectoralis major, floor-এ latissimus dorsi, medial lip-এ teres major।</li>
+   <li><b>Capsule:</b> anatomical neck বরাবর; দুই জায়গায় ব্যতিক্রম: sulcus-এর মাথায় ফাঁক (biceps tendon যায়), আর নিচে ভেতরের দিকে ১ সেমি নেমে surgical neck ছোঁয়।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৯–১১</p>
+  <h2>শ্যাফট</h2>
+  <ul>
+   <li><b>Anterior border:</b> greater tubercle-এর সামনে থেকে coronoid আর radial fossa-র মাঝ পর্যন্ত; উপরের ১/৩ sulcus-এর lateral lip।</li>
+   <li><b>Medial border:</b> নিচে medial supracondylar ridge; মাঝে coracobrachialis-এর খসখসে অংশ আর nutrient foramen (নিচের দিকে মুখ)।</li>
+   <li><b>Lateral border:</b> নিচে lateral supracondylar ridge; মাঝে spiral groove-এ হারিয়ে যায়।</li>
+   <li><b>Antero-lateral পৃষ্ঠ:</b> মাঝামাঝি V আকারের deltoid tuberosity।</li>
+   <li><b>Posterior পৃষ্ঠ:</b> spiral groove (radial nerve, profunda brachii); উপরে lateral head, নিচে medial head of triceps।</li>
+   <li>কখনো <b>supracondylar process</b> আর <b>ligament of Struthers</b>: median nerve বা brachial artery চেপে যেতে পারে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১১–১২</p>
+ </div>
+ <div>
+  <h2>নিচের প্রান্ত</h2>
+  <ul>
+   <li><b>Capitulum:</b> radius-এর head; সোজা হাতে নিচের দিকে, ভাঁজে সামনের দিকে ছোঁয়।</li>
+   <li><b>Trochlea:</b> অসম কপিকল; ভেতরের কিনারা ৬ মিমি নিচে নামে, তাই <b>carrying angle</b> প্রায় ১৬৩° (বাইরের দিকে স্থূলকোণ)। মেয়েদের বেশি বলে ধরা হয়; ভাঁজ আর pronation-এ হারিয়ে যায়।</li>
+   <li><b>তিন fossa:</b> radial (capitulum-এর উপরে), coronoid (trochlea-র উপরে, সামনে), olecranon (পেছনে, গভীর)। তিনটাই elbow-এর capsule-এর ভেতরে।</li>
+   <li><b>Medial epicondyle:</b> ulnar collateral ligament, common flexor origin, পেছনে ulnar nerve।</li>
+   <li><b>Lateral epicondyle:</b> radial collateral ligament, common extensor origin, পেছনে anconeus।</li>
+   <li>Elbow-এর capsule: দুই epicondyle বাদ, তিন fossa ভেতরে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১২–১৩</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-att"><div class="wrap two">
+ <div>
+  <h2>মাসলের অ্যাটাচমেন্ট</h2>
+  <table class="cmp"><thead><tr><th>মাসল</th><th>কোথায়</th></tr></thead><tbody id="tbl-att"></tbody></table>
+  <p class="note">"মাসল" মোডে রঙিন জায়গায় ট্যাপ করুন। ECU আর triceps-এর long head স্ক্যানে হিউমেরাস ছোঁয় না (long head লাগে scapula-য়)।</p>
+ </div>
+ <div>
+  <h2>বিশেষ কথা</h2>
+  <ol>
+   <li>Scapulo-humeral মাসল head ঘিরে উপরের প্রান্তে।</li>
+   <li>Thoraco-humeral মাসল sulcus বরাবর।</li>
+   <li>উপরের অর্ধেকে শুধু insertion, triceps-এর lateral head বাদে।</li>
+   <li>নিচের অর্ধেকে শুধু origin।</li>
+   <li>হাড় ছোঁয়া নার্ভ: axillary (surgical neck), radial (spiral groove), ulnar (medial epicondyle-এর পেছনে)।</li>
+  </ol>
+  <p class="ref">Datta, পৃ. ১৩</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-oss"><div class="wrap two">
+ <div>
+  <h2>অসিফিকেশন</h2>
+  <ul>
+   <li><b>Primary:</b> শ্যাফটের মাঝে, গর্ভের ৮ম সপ্তাহে।</li>
+   <li><b>উপরের প্রান্ত (৩টা):</b> head ১ বছর, greater tubercle ৩ বছর, lesser tubercle ৫ বছর; ৬ বছরে জুড়ে একটা epiphysis, শ্যাফটের সাথে মেশে প্রায় ২০ বছরে।</li>
+   <li><b>নিচের প্রান্ত (৪টা):</b> capitulum ও trochlea-র বাইরের অংশ ২ বছর, medial epicondyle ৫ বছর, trochlea-র ভেতরের অংশ ১০ বছর, lateral epicondyle ১২ বছর। Medial epicondyle আলাদা মেশে ১৬–১৭ বছরে, বাকি তিনটা একসাথে প্রায় ১৮ বছরে।</li>
+   <li><b>Growing end:</b> উপরের প্রান্ত (দেরিতে মেশে)।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৩</p>
+ </div>
+ <div>
+  <h2>ক্লিনিক্যাল</h2>
+  <ul>
+   <li>ভাঙার সাধারণ জায়গা: surgical neck, শ্যাফটের মাঝখান, supracondylar অঞ্চল।</li>
+   <li>উপরের আর মাঝের ১/৩-এর জোড়ায় রক্ত সরবরাহ কম: ভাঙলে দেরিতে জোড়া লাগে বা লাগে না।</li>
+   <li>Surgical neck ভাঙলে axillary nerve → deltoid অবশ; শ্যাফট ভাঙলে radial nerve।</li>
+   <li>ছোটদের বাহু কাটলে নরম টিস্যু যথেষ্ট রাখতে হয়, নইলে উপরের প্রান্ত বাড়তে থাকায় conical stump।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১০, ১৩</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-viva"><div class="wrap">
+<h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>Humerus-এর কয়টা neck, কোনটা ক্লিনিক্যালি জরুরি?</summary><p>তিনটা: anatomical, surgical, morphological। Surgical neck: পেছনে axillary nerve আর posterior circumflex humeral vessels। (পৃ. ১০)</p></details>
+ <details><summary>Rotator cuff কী কী দিয়ে?</summary><p>Subscapularis, supraspinatus, infraspinatus, teres minor-এর tendon, capsule-এর সাথে মেশা। (পৃ. ১০)</p></details>
+ <details><summary>Intertubercular sulcus-এ কী কী লাগে?</summary><p>Lateral lip pectoralis major, floor latissimus dorsi, medial lip teres major; ভেতরে biceps-এর long head। (পৃ. ১১)</p></details>
+ <details><summary>Carrying angle কেন হয়?</summary><p>Trochlea-র ভেতরের কিনারা বাইরেরটার চেয়ে প্রায় ৬ মিমি নিচে নামে; কোণ প্রায় ১৬৩°। (পৃ. ১২)</p></details>
+ <details><summary>কোন নার্ভ কোথায় হাড় ছোঁয়?</summary><p>Axillary: surgical neck; radial: spiral groove; ulnar: medial epicondyle-এর পেছনে। (পৃ. ১৩)</p></details>
+ <details><summary>Humerus-এর growing end কোনটা?</summary><p>উপরের প্রান্ত। (পৃ. ১৩)</p></details>
+ <details><summary>Ligament of Struthers কী?</summary><p>Supracondylar process থেকে medial epicondyle পর্যন্ত fibrous band; coracobrachialis-এর তৃতীয় head-এর অবশেষ; median nerve/brachial artery চাপতে পারে। (পৃ. ১২)</p></details>
+</div></section>
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i> (Superior &amp; Inferior Extremities), Bones of the Upper Limb, পৃ. ৯–১৩।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে তৈরি। অংশ, ল্যান্ডমার্ক আর জোড়ার তল মেশ থেকে মাপা। মাসলের অ্যাটাচমেন্ট: স্ক্যানের মাসল যেখানে হাড় ছোঁয়, বইয়ে বলা এলাকার ভেতরে। নার্ভ আর ছোট রক্তনালী স্ক্যানে নেই, সেগুলো স্কিম্যাটিক।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>

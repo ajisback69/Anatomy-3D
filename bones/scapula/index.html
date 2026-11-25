@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>স্ক্যাপুলা 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+table.cmp{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.1);vertical-align:top}
+table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+<script src="data/core.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+<section class="band stage">
+ <div class="wrap">
+  <h1>স্ক্যাপুলা <span style="font-weight:500;opacity:.8">· Scapula</span></h1>
+  <p class="lead">আসল মানুষের স্ক্যান থেকে নেওয়া ডান স্ক্যাপুলা, সাথে আসল হিউমেরাস, ক্ল্যাভিকল, রিব আর ১৭টা মাসল। লেখা A.K. Datta অনুযায়ী।</p>
+  
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="false">অংশ</button>
+     <button class="btn" data-mode="lm" aria-pressed="true">ল্যান্ডমার্ক</button>
+     <button class="btn" data-mode="att" aria-pressed="false">মাসল</button>
+     <button class="btn" data-mode="rel" aria-pressed="false">নার্ভ ও নালী</button>
+     <button class="btn" data-mode="joint" aria-pressed="false">জয়েন্ট</button>
+     <button class="btn" data-mode="side" aria-pressed="false">ডান না বাম</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="lat">বাইরে থেকে</button>
+     <button class="btn" data-view="med">ভেতর থেকে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#d1495b"></i>মাসল</label>
+     <label class="tog"><input type="checkbox" data-layer="nerve"><i class="dot" style="background:#f2c230"></i>নার্ভ (স্কিম্যাটিক)</label>
+     <label class="tog"><input type="checkbox" data-layer="artery"><i class="dot" style="background:#e0443e"></i>ধমনী</label>
+     <label class="tog"><input type="checkbox" data-layer="organ"><i class="dot" style="background:#cfd6dc"></i>লিগামেন্ট ও অন্যান্য</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>পাশের হাড়</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+<a href="#s-gen">সাধারণ</a><a href="#s-feat">ফিচার</a><a href="#s-att">অ্যাটাচমেন্ট</a><a href="#s-oss">অসিফিকেশন</a><a href="#s-viva">ভাইভা</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+<section class="band sec" id="s-gen"><div class="wrap two">
+ <div>
+  <h2>স্ক্যাপুলা: সাধারণ কথা</h2>
+  <ul>
+   <li>Shoulder girdle-এর চ্যাপ্টা, ত্রিভুজ আকারের হাড়; বুকের পেছনে-বাইরে ২য়–৭ম রিবের উপর।</li>
+   <li><b>দুই পৃষ্ঠ:</b> costal (সামনে) আর dorsal (পেছনে)।</li>
+   <li><b>তিন বর্ডার:</b> lateral, medial, superior। <b>তিন অ্যাঙ্গেল:</b> lateral, inferior, superior। <b>তিন প্রসেস:</b> spine, acromion, coracoid।</li>
+   <li><b>Neck:</b> anatomical (glenoid-এর পরের সরু অংশ) আর surgical (suprascapular notch থেকে infraglenoid tubercle; পেছনে spinoglenoid notch দিয়ে)।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৫–৬</p>
+ </div>
+ <div>
+  <h2>শরীরে যেভাবে রাখবেন (ডান না বাম)</h2>
+  <ul>
+   <li>যে পাশের scapula, সেই হাতে ধরুন।</li>
+   <li>Costal পৃষ্ঠ সামনে-ভেতরে, glenoid বাইরে একটু সামনে-উপরে।</li>
+   <li>Coracoid-এর ডগা প্রায় সোজা সামনে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৯</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-feat"><div class="wrap two">
+ <div>
+  <h2>পৃষ্ঠ ও বর্ডার</h2>
+  <ul>
+   <li><b>Costal পৃষ্ঠ:</b> অগভীর subscapular fossa; medial কিনারায় serratus anterior-এর ফালি (উপরে-নিচে ত্রিকোণ এলাকা); বাকিটায় subscapularis; oblique ridge-এ এর tendon; lateral border-এর কাছে লম্বা ridge।</li>
+   <li><b>Dorsal পৃষ্ঠ:</b> spine দিয়ে ছোট supraspinous আর বড় infraspinous fossa; spinoglenoid notch দিয়ে দুটো যুক্ত।</li>
+   <li><b>Lateral border:</b> শুধু origin (subscapularis, teres minor, teres major); infraglenoid tubercle-এ triceps-এর long head।</li>
+   <li><b>Medial border:</b> শুধু insertion (serratus anterior, levator scapulae, rhomboid minor ও major); পাশে dorsal scapular nerve ও transverse cervical artery-র শাখা।</li>
+   <li><b>Superior border:</b> suprascapular notch; omohyoid-এর inferior belly; transverse scapular ligament।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৬–৮</p>
+ </div>
+ <div>
+  <h2>প্রসেস ও অ্যাঙ্গেল</h2>
+  <ul>
+   <li><b>Lateral angle:</b> glenoid cavity; labrum কিনারা গভীর করে; সামনের কিনারায় subscapularis tendon-এর খাঁজ।</li>
+   <li><b>Spine:</b> apex T3-এর লেভেলে; crest-এর উপরের ঠোঁটে trapezius, নিচের ঠোঁটে deltoid; deltoid tubercle-এ trapezius-এর নিচের তন্তু।</li>
+   <li><b>Acromion:</b> lateral border-এ deltoid (৪টা tubercle, multipennate); ডগায় coraco-acromial ligament; medial border-এ clavicular facet; নিচে subacromial bursa আর supraspinatus tendon।</li>
+   <li><b>Coraco-acromial arch:</b> acromion + coraco-acromial ligament + coracoid: shoulder-এর ছাউনি।</li>
+   <li><b>Coracoid:</b> উপরে pectoralis minor; ডগায় coracobrachialis ও biceps short head; ligament: conoid, trapezoid, coraco-acromial, coraco-humeral।</li>
+   <li><b>Inferior angle:</b> ৭ম রিবের উপর; হাত তুললে সরে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৭–৯</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-att"><div class="wrap two">
+ <div>
+  <h2>মাসলের অ্যাটাচমেন্ট</h2>
+  <table class="cmp"><thead><tr><th>মাসল</th><th>কোথায়</th></tr></thead><tbody id="tbl-att"></tbody></table>
+ </div>
+ <div>
+  <h2>Morphology ও বিশেষ কথা</h2>
+  <ul>
+   <li>Scapula যৌগিক হাড়: dorsal element (body) + ventral element (coracoid ও precoracoid)। Body = ilium, coracoid (glenoid-এর উপরের ১/৩-সহ) = ischium, precoracoid = pubis।</li>
+   <li>Ventral element-এর মাসল brachial plexus-এর ventral division থেকে, body-র মাসল dorsal division থেকে নার্ভ পায়; ব্যতিক্রম trapezius, levator scapulae, omohyoid (ধড় থেকে সরে আসা মাসল)।</li>
+   <li><b>Scapular anastomosis:</b> suprascapular, circumflex scapular আর transverse cervical-এর শাখা: subclavian-এর ১ম অংশ আর axillary-র ৩য় অংশের মধ্যে বিকল্প পথ।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৭, ৯</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-oss"><div class="wrap two">
+ <div>
+  <h2>অসিফিকেশন</h2>
+  <ul>
+   <li>মোট ৮টা কেন্দ্র: ১টা primary, ৭টা secondary।</li>
+   <li><b>Primary:</b> body (glenoid-এর নিচের ২/৩-সহ), cartilage-এ, গর্ভের ৮ম সপ্তাহে।</li>
+   <li><b>Coracoid:</b> ১ম বছরে; subcoracoid (glenoid-এর উপরের ১/৩-সহ) puberty-তে; দুটো ১৫ বছরে body-র সাথে মেশে।</li>
+   <li><b>Puberty-তে:</b> acromion-এ ২টা, medial border-এ ১টা, inferior angle-এ ১টা, glenoid-এর নিচের কিনারায় ১টা; প্রায় ২০ বছরে মেশে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৯</p>
+ </div>
+ <div>
+  <h2>ক্লিনিক্যাল</h2>
+  <ul>
+   <li>Blade ভাঙলে রক্ত infraspinatus fascia-র নিচে আটকে হাড়ের কিনারা পর্যন্ত ফোলা তৈরি করে।</li>
+   <li>Acromion স্থানচ্যুত হলে ক্ল্যাভিকলের নিচে চলে যায়।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ৪, ৭</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-viva"><div class="wrap">
+<h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>Scapula-র কয়টা ossification centre?</summary><p>৮টা: ১ primary, ৭ secondary। (পৃ. ৯)</p></details>
+ <details><summary>Suprascapular notch দিয়ে কী যায়?</summary><p>Transverse scapular ligament-এর নিচ দিয়ে suprascapular nerve; vessels উপর দিয়ে। (পৃ. ৭)</p></details>
+ <details><summary>Spinoglenoid notch-এর গুরুত্ব?</summary><p>দুই fossa যুক্ত করে; suprascapular nerve ও vessels যায়। (পৃ. ৭)</p></details>
+ <details><summary>কোন border-এ শুধু origin, কোনটায় শুধু insertion?</summary><p>Lateral border origin-এ, medial border insertion-এ ভরা। (পৃ. ৭)</p></details>
+ <details><summary>Coraco-acromial arch কী দিয়ে তৈরি?</summary><p>Acromion-এর নিচের পৃষ্ঠ, coraco-acromial ligament, coracoid-এর আড়াআড়ি অংশ। (পৃ. ৮)</p></details>
+ <details><summary>Spine-এর apex কোন লেভেলে?</summary><p>T3-এর spine। (পৃ. ৮)</p></details>
+ <details><summary>Scapula-র কোন অংশ ilium, ischium, pubis-এর সমতুল্য?</summary><p>Body = ilium, coracoid = ischium, precoracoid = pubis। (পৃ. ৯)</p></details>
+</div></section>
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i> (Superior &amp; Inferior Extremities), Bones of the Upper Limb, পৃ. ৫–৯।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে তৈরি। অংশ, ল্যান্ডমার্ক আর জোড়ার তল মেশ থেকে মাপা। মাসলের অ্যাটাচমেন্ট: স্ক্যানের মাসল যেখানে হাড় ছোঁয়, বইয়ে বলা এলাকার ভেতরে। নার্ভ আর ছোট রক্তনালী স্ক্যানে নেই, সেগুলো স্কিম্যাটিক।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>

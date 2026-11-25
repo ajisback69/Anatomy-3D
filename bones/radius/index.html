@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>রেডিয়াস 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+table.cmp{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.1);vertical-align:top}
+table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+<script src="data/core.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+<section class="band stage">
+ <div class="wrap">
+  <h1>রেডিয়াস <span style="font-weight:500;opacity:.8">· Radius</span></h1>
+  <p class="lead">আসল মানুষের স্ক্যান থেকে নেওয়া ডান রেডিয়াস, সাথে আসল আলনা, হিউমেরাস, কার্পাল হাড় আর মাসল। লেখা A.K. Datta অনুযায়ী।</p>
+  
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="false">অংশ</button>
+     <button class="btn" data-mode="lm" aria-pressed="true">ল্যান্ডমার্ক</button>
+     <button class="btn" data-mode="att" aria-pressed="false">মাসল</button>
+     <button class="btn" data-mode="rel" aria-pressed="false">নার্ভ ও নালী</button>
+     <button class="btn" data-mode="joint" aria-pressed="false">জয়েন্ট</button>
+     <button class="btn" data-mode="side" aria-pressed="false">ডান না বাম</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="lat">বাইরে থেকে</button>
+     <button class="btn" data-view="med">ভেতর থেকে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#d1495b"></i>মাসল</label>
+     <label class="tog"><input type="checkbox" data-layer="nerve"><i class="dot" style="background:#f2c230"></i>নার্ভ (স্কিম্যাটিক)</label>
+     <label class="tog"><input type="checkbox" data-layer="artery"><i class="dot" style="background:#e0443e"></i>ধমনী</label>
+     <label class="tog"><input type="checkbox" data-layer="organ"><i class="dot" style="background:#cfd6dc"></i>লিগামেন্ট ও অন্যান্য</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>পাশের হাড়</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+<a href="#s-gen">সাধারণ</a><a href="#s-feat">ফিচার</a><a href="#s-att">অ্যাটাচমেন্ট</a><a href="#s-clin">ক্লিনিক্যাল</a><a href="#s-viva">ভাইভা</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+<section class="band sec" id="s-gen"><div class="wrap two">
+ <div>
+  <h2>Forearm-এর দুই হাড়</h2>
+  <ul>
+   <li>Radius বাইরে, ulna ভেতরে; শক্ত interosseous membrane দিয়ে জোড়া।</li>
+   <li>Ulna উপরে বড়, নিচে সরু; radius উপরে সরু, নিচে চওড়া।</li>
+   <li>Elbow-এ ulna বেশি অংশ নেয়; wrist-এ শুধু radius (articular disc-এর সাহায্যে)।</li>
+   <li>Radius = tibia, ulna = fibula (post-axial)।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৪, ১৬</p>
+ </div>
+ <div>
+  <h2>শরীরে যেভাবে রাখবেন (ডান না বাম)</h2>
+  <ul>
+   <li>চাকতির মতো head উপরে।</li>
+   <li>শ্যাফটের হালকা অবতলতা সামনে।</li>
+   <li>Styloid process বাইরের দিকে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৬</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-feat"><div class="wrap two">
+ <div>
+  <h2>উপরের প্রান্ত ও শ্যাফট</h2>
+  <ul>
+   <li><b>Head:</b> উপরের অবতল পৃষ্ঠ capitulum-এ (সোজায় নিচে, ভাঁজে সামনে ছোঁয়); কিনারা radial notch আর annular ligament-এ।</li>
+   <li><b>Neck:</b> annular ligament-এর নিচের অংশে ঘেরা; quadrate ligament।</li>
+   <li><b>Radial tuberosity:</b> পেছনে biceps, সামনে bursa।</li>
+   <li><b>Borders:</b> anterior (উপরে তির্যক: FDS; নিচে উঁচু রেখা: extensor retinaculum), posterior, interosseous (membrane)।</li>
+   <li><b>Surfaces:</b> anterior (FPL, PQ, nutrient foramen কনুইয়ের দিকে), posterior (APL, EPB), lateral (supinator, PT; নিচে ECRL ও ECRB-এর tendon)।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৪–১৬</p>
+ </div>
+ <div>
+  <h2>নিচের প্রান্ত</h2>
+  <ul>
+   <li><b>Lateral:</b> styloid; উপরে brachioradialis; APL আর EPB-এর tendon তির্যকভাবে পার হয়।</li>
+   <li><b>Medial:</b> ulnar notch (inferior radio-ulnar); নিচের কিনারায় articular disc-এর গোড়া।</li>
+   <li><b>Anterior:</b> মোটা উঁচু রেখা; palmar radio-carpal ligament; radial pulse।</li>
+   <li><b>Posterior:</b> Lister-এর tubercle আর তিন খাঁজ: বাইরে ECRL/ECRB, ঠিক ভেতরে EPL, আরও ভেতরে ED, EI ও posterior interosseous nerve; সব extensor retinaculum-এর নিচে।</li>
+   <li><b>Inferior:</b> scaphoid (বাইরের ত্রিকোণ) আর lunate (ভেতরের চতুর্ভুজ): wrist joint।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৬</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-att"><div class="wrap two">
+ <div>
+  <h2>মাসলের অ্যাটাচমেন্ট</h2>
+  <table class="cmp"><thead><tr><th>মাসল</th><th>কোথায়</th></tr></thead><tbody id="tbl-att"></tbody></table>
+ </div>
+ <div>
+  <h2>অসিফিকেশন</h2>
+  <ul>
+   <li><b>Radius:</b> শ্যাফট গর্ভের ৮ম সপ্তাহে; নিচের প্রান্ত ১ বছরে (মেশে ২০ বছরে); head ৫ বছরে (মেশে ১৮ বছরে)। Growing end: নিচের প্রান্ত।</li>
+   <li><b>Ulna:</b> শ্যাফট গর্ভের ৮ম সপ্তাহে; নিচের প্রান্ত ৫ বছরে (মেশে ১৮ বছরে); olecranon-এর উপরের আঁশের মতো traction epiphysis ১০ বছরে (মেশে ১৫–১৬ বছরে)। Growing end: নিচের প্রান্ত।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৮</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-clin"><div class="wrap">
+  <h2>ক্লিনিক্যাল</h2>
+  <ul>
+   <li><b>Colles' fracture:</b> প্রসারিত হাতে পড়লে radius-এর নিচের প্রান্তের প্রায় ২ সেমি উপরে; নিচের টুকরো উপরে-পেছনে-বাইরে সরে "dinner fork" বিকৃতি।</li>
+   <li><b>Pulled elbow:</b> ছোট বাচ্চার (৬ বছরের নিচে) semi-prone হাতে হঠাৎ টানলে radius-এর head annular ligament থেকে আংশিক বেরিয়ে যায় (head আর neck প্রায় সমান মাপের); জোরে supination করলে ঠিক হয়।</li>
+   <li>দুই হাড়ই ভাঙলে খেয়াল: দুই হাড় যেন জোড়া না লাগে, নইলে pronation-supination যায়।</li>
+   <li>Olecranon আর দুই epicondyle-এর স্বাভাবিক সম্পর্ক বদলালে কনুই স্থানচ্যুত।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৯</p>
+</div></section>
+<section class="band sec" id="s-viva"><div class="wrap">
+<h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>Radius কোন কোন জোড়ায় অংশ নেয়?</summary><p>Elbow (humero-radial), superior ও inferior radio-ulnar, wrist। (পৃ. ১৪–১৬)</p></details>
+ <details><summary>Lister-এর tubercle-এর গুরুত্ব?</summary><p>EPL এটাকে কপিকল হিসেবে ব্যবহার করে বুড়ো আঙুলে যায়। (পৃ. ১৬)</p></details>
+ <details><summary>Colles' fracture কী?</summary><p>নিচের প্রান্তের ২ সেমি উপরে; নিচের টুকরো উপরে-পেছনে-বাইরে: dinner fork। (পৃ. ১৯)</p></details>
+ <details><summary>Posterior interosseous nerve কোথায় হাড় ছোঁয়?</summary><p>Supinator-এর দুই স্তরের মাঝে, radius-এর উপরের অংশে। (পৃ. ১৬)</p></details>
+ <details><summary>Radius-এর growing end কোনটা?</summary><p>নিচের প্রান্ত। (পৃ. ১৮)</p></details>
+ <details><summary>Pulled elbow কেন ছোটদের হয়?</summary><p>৬ বছরের নিচে head আর neck প্রায় সমান মাপের। (পৃ. ১৯)</p></details>
+</div></section>
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i> (Superior &amp; Inferior Extremities), Bones of the Upper Limb, পৃ. ১৪–১৬, ১৮–১৯।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে তৈরি। অংশ, ল্যান্ডমার্ক আর জোড়ার তল মেশ থেকে মাপা। মাসলের অ্যাটাচমেন্ট: স্ক্যানের মাসল যেখানে হাড় ছোঁয়, বইয়ে বলা এলাকার ভেতরে। নার্ভ আর ছোট রক্তনালী স্ক্যানে নেই, সেগুলো স্কিম্যাটিক।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>

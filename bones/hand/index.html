@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>হাতের হাড় 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+table.cmp{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.1);vertical-align:top}
+table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+<script src="data/core.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+<section class="band stage">
+ <div class="wrap">
+  <h1>হাতের হাড় <span style="font-weight:500;opacity:.8">· Bones of the Hand</span></h1>
+  <p class="lead">আসল মানুষের স্ক্যান থেকে নেওয়া ডান হাতের ২৭টা হাড়, সাথে আসল মাসল আর flexor retinaculum। Carpal চেনার প্র্যাকটিস "কোনটা?" মোডে। লেখা A.K. Datta অনুযায়ী।</p>
+  
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="true">অংশ</button>
+     <button class="btn" data-mode="lm" aria-pressed="false">ল্যান্ডমার্ক</button>
+     <button class="btn" data-mode="att" aria-pressed="false">মাসল</button>
+     <button class="btn" data-mode="tunnel" aria-pressed="false">কার্পাল টানেল</button>
+     <button class="btn" data-mode="joint" aria-pressed="false">জয়েন্ট</button>
+     <button class="btn" data-mode="which" aria-pressed="false">কোনটা?</button>
+     <button class="btn" data-mode="side" aria-pressed="false">ডান না বাম</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="palm">হাতের তালু</button>
+     <button class="btn" data-view="dors">হাতের পিঠ</button>
+     <button class="btn" data-view="lat">বাইরে থেকে</button>
+     <button class="btn" data-view="med">ভেতর থেকে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#d1495b"></i>মাসল</label>
+     <label class="tog"><input type="checkbox" data-layer="nerve"><i class="dot" style="background:#f2c230"></i>নার্ভ (স্কিম্যাটিক)</label>
+     <label class="tog"><input type="checkbox" data-layer="artery"><i class="dot" style="background:#e0443e"></i>ধমনী</label>
+     <label class="tog"><input type="checkbox" data-layer="organ"><i class="dot" style="background:#cfd6dc"></i>লিগামেন্ট ও অন্যান্য</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>পাশের হাড়</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+<a href="#s-gen">সাধারণ</a><a href="#s-carp">Carpal</a><a href="#s-mc">Metacarpal ও phalanx</a><a href="#s-att">অ্যাটাচমেন্ট</a><a href="#s-viva">ভাইভা</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+<section class="band sec" id="s-gen"><div class="wrap two">
+ <div>
+  <h2>হাতের কঙ্কাল</h2>
+  <ul>
+   <li><b>Carpal:</b> ৮টা ছোট হাড়, দুই সারিতে চারটা করে। উপরের সারি (বাইরে থেকে): scaphoid, lunate, triquetral, pisiform; নিচের সারি: trapezium, trapezoid, capitate, hamate।</li>
+   <li><b>Metacarpal:</b> ৫টা ছোট long bone, বাইরে থেকে নম্বর; head, shaft, base।</li>
+   <li><b>Phalanx:</b> ১৪টা; বুড়ো আঙুলে ২টা, বাকিগুলোতে ৩টা (proximal, middle, distal)।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৯, ২১, ২৪</p>
+ </div>
+ <div>
+  <h2>Carpal-এর বিশেষত্ব</h2>
+  <ul>
+   <li>প্রতিটা প্রায় ঘনক, ছয় পৃষ্ঠ; palmar আর dorsal খসখসে, বাকিগুলো জোড়ার (triquetral আর pisiform বাদে)।</li>
+   <li>Dorsal পৃষ্ঠ palmar-এর চেয়ে চওড়া, শুধু lunate-এ উল্টো।</li>
+   <li>প্রান্তের হাড়ের বাইরের পৃষ্ঠ অ-জোড়া।</li>
+   <li>Palmar দিকে অবতল: বাইরের স্তম্ভ scaphoid-এর tubercle আর trapezium-এর crest, ভেতরের স্তম্ভ pisiform আর hamate-এর hook; মাঝে retinaculum দিয়ে carpal tunnel।</li>
+   <li>Scaphoid, lunate, triquetral মিলে wrist joint-এর উত্তল পৃষ্ঠ; দুই সারির মাঝে S-আকার midcarpal joint।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৯</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-carp"><div class="wrap two">
+ <div>
+  <h2>একেকটা carpal</h2>
+  <ul>
+   <li><b>Scaphoid:</b> নৌকা; tubercle দিয়ে পাশ চেনা; ৫টা জোড়া।</li>
+   <li><b>Lunate:</b> অর্ধচন্দ্র; চওড়া palmar পৃষ্ঠ; ৫টা জোড়া।</li>
+   <li><b>Triquetral:</b> কীলক; pisiform-এর facet; ৩টা হাড় + disc।</li>
+   <li><b>Pisiform:</b> মটর; একটাই facet; FCU-র sesamoid।</li>
+   <li><b>Trapezium:</b> saddle পৃষ্ঠ, FCR-এর খাঁজ, crest; ৪টা জোড়া।</li>
+   <li><b>Trapezoid:</b> বুট; ৪টা জোড়া।</li>
+   <li><b>Capitate:</b> সবচেয়ে বড়; head আর neck; ৭টা জোড়া।</li>
+   <li><b>Hamate:</b> hook; ৫টা জোড়া।</li>
+  </ul>
+  <p class="note">"কোনটা?" মোডে আসল carpal হাড় এলোমেলো ঘুরিয়ে দেখায়; চিনে বলুন।</p>
+  <p class="ref">Datta, পৃ. ২০–২১</p>
+ </div>
+ <div>
+  <h2>Ossification (carpal)</h2>
+  <p>সব জন্মের পরে, ঘুরে ঘুরে (spiral):</p>
+  <table class="cmp"><thead><tr><th>হাড়</th><th>বয়স</th></tr></thead><tbody>
+   <tr><td>Capitate, hamate</td><td>১ বছর</td></tr><tr><td>Triquetral</td><td>৩ বছর</td></tr><tr><td>Lunate</td><td>৪ বছর</td></tr>
+   <tr><td>Scaphoid</td><td>৫ বছর</td></tr><tr><td>Trapezium</td><td>৬ বছর</td></tr><tr><td>Trapezoid</td><td>৭ বছর</td></tr><tr><td>Pisiform</td><td>১২ বছর</td></tr>
+  </tbody></table>
+  <p class="ref">Datta, পৃ. ২০</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-mc"><div class="wrap two">
+ <div>
+  <h2>Metacarpal</h2>
+  <ul>
+   <li>প্রত্যেকটার একটাই epiphysis, head-এ; শুধু ১ম-এর base-এ (phalanx-এর মতো)।</li>
+   <li>Head knuckle তৈরি করে; shaft-এর পেছনে ত্রিকোণ চ্যাপ্টা জায়গা (১ম-এ নেই)।</li>
+   <li><b>১ম:</b> ছোট, মোটা; trapezium-এর সাথে saddle জোড়া; সামনের তলে, ৯০° ঘোরানো।</li>
+   <li><b>২য়:</b> সবচেয়ে লম্বা; খাঁজকাটা base, প্রায় নড়ে না।</li>
+   <li><b>৩য়:</b> base-এ styloid process।</li>
+   <li><b>৪র্থ:</b> চতুর্ভুজ base। <b>৫ম:</b> base-এ ভেতরে tubercle। ৪র্থ-৫ম hamate-এ, তাই বেশি নড়ে।</li>
+   <li><b>Ossification:</b> shaft গর্ভের ৯ম সপ্তাহে; epiphysis প্রায় ২ বছরে; মেশে ১৬–১৮ বছরে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ২১–২৪</p>
+ </div>
+ <div>
+  <h2>Phalanx</h2>
+  <ul>
+   <li>ছোট long bone; একটাই epiphysis, base-এ।</li>
+   <li>Proximal phalanx-এর base অবতল (MCP joint); middle আর distal-এর base-এ রেখা দিয়ে দুই facet (IP joint)।</li>
+   <li>Proximal আর middle-এর head কপিকল; distal-এর head-এ palmar দিকে ঘোড়ার খুর আকারের tuberosity।</li>
+   <li>Proximal, middle, distal চেনা সহজ, কিন্তু ডান-বাম চেনা যায় না।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ২৪</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-att"><div class="wrap two">
+ <div>
+  <h2>মাসলের অ্যাটাচমেন্ট</h2>
+  <table class="cmp"><thead><tr><th>মাসল</th><th>কোথায়</th></tr></thead><tbody id="tbl-att"></tbody></table>
+ </div>
+ <div>
+  <h2>ক্লিনিক্যাল</h2>
+  <ul>
+   <li><b>Scaphoid fracture:</b> প্রসারিত হাতে পড়লে সরু কোমর ভাঙে; রক্ত আসে নিচের দিক থেকে, তাই উপরের টুকরো avascular necrosis।</li>
+   <li><b>Lunate dislocation:</b> palmar দিকে সরে median nerve চাপে।</li>
+  </ul>
+  <p class="ref">Datta, পৃ. ১৯–২০</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-viva"><div class="wrap">
+<h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>Carpal tunnel দিয়ে কী যায়?</summary><p>FDS, FDP, FPL-এর tendon আর median nerve; FCR retinaculum-এর স্তরের মাঝে। (পৃ. ১৯)</p></details>
+ <details><summary>কোন carpal সবার আগে আর কোনটা সবার শেষে ossify হয়?</summary><p>Capitate আগে (১ বছর), pisiform শেষে (১২ বছর)। (পৃ. ২০)</p></details>
+ <details><summary>Capitate কয়টা হাড়ের সাথে জোড়া?</summary><p>৭টা। (পৃ. ২১)</p></details>
+ <details><summary>Scaphoid-এর পাশ কীভাবে চিনবেন?</summary><p>Tubercle বাইরে-নিচে-সামনে। (পৃ. ২০)</p></details>
+ <details><summary>১ম metacarpal কেন পরিবর্তিত phalanx বলা হয়?</summary><p>Epiphysis base-এ, phalanx-এর মতো। (পৃ. ২১)</p></details>
+ <details><summary>২য় metacarpal কেন নড়ে না?</summary><p>খাঁজকাটা base trapezoid-এর রেখায় বসে, trapezium আর capitate-এর মাঝে আটকানো। (পৃ. ২১)</p></details>
+ <details><summary>Pisiform-কে sesamoid কেন বলা হয়?</summary><p>FCU-র tendon-এর ভেতরে ossify হয়। (পৃ. ২০)</p></details>
+</div></section>
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i> (Superior &amp; Inferior Extremities), Bones of the Upper Limb, পৃ. ১৯–২৫।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে তৈরি। অংশ, ল্যান্ডমার্ক আর জোড়ার তল মেশ থেকে মাপা। মাসলের অ্যাটাচমেন্ট: স্ক্যানের মাসল যেখানে হাড় ছোঁয়, বইয়ে বলা এলাকার ভেতরে। নার্ভ আর ছোট রক্তনালী স্ক্যানে নেই, সেগুলো স্কিম্যাটিক। Flexor retinaculum স্ক্যান থেকে।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>

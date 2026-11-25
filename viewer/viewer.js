@@ -10,6 +10,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const V3=a=>new THREE.Vector3(...a);
 B.render?.(D,$);
+{const t=$('#tbl-att');if(t&&!t.innerHTML.trim()&&B.REG)t.innerHTML=Object.values(B.REG).filter(r=>r.k&&r.w).map(r=>`<tr><td><span class="sw" style="display:inline-block;vertical-align:-3px;margin-right:8px;background:${r.c}"></span>${r.t}</td><td>${r.w}</td></tr>`).join('')}
 
 /* ---------- দৃশ্য ---------- */
 const view=$('#view'),pinsEl=$('#pins'),info=$('#info'),legend=$('#legend');
@@ -246,6 +247,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
   return;
  }
  if(ud.group==='muscle'&&B.MUS_REG&&B.MUS_REG[ud.key]!=null)showMuscle(B.MUS_REG[ud.key]);
+ else if((ud.group==='vert'||ud.group==='disc')&&B.STR[ud.key])showStr(ud.key);
  else if(ud.group==='vert'||ud.group==='disc')card('লেভেল',{...B.STR.vert,t:ud.group==='disc'?'Intervertebral disc':'Thoracic vertebra '+ud.key,b:ud.group==='disc'?'ইন্টারভার্টিব্রাল ডিস্ক':'থোরাসিক কশেরুকা '+ud.key});
  else{const k=ud.group==='lung'?'lung':ud.key;if(B.STR[k])showStr(k)}
 });
