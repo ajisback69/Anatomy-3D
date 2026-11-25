@@ -11,6 +11,7 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 - Layers: rib, clav, muscle, artery, vein, nerve, lymph, organ, vert.
 
 ## Accuracy rules
+- Text reference, from the ribs onward: A.K. Datta, Essentials of Human Anatomy (the owner's choice). Match its terminology, classifications and numbers (e.g. ossification dates). Where page excerpts from the owner are available, follow them and give page references. Never reproduce long verbatim passages. Older pages (sternum, ribs) cite BD Chaurasia, Snell and Gray's; re-check them against Datta when excerpts arrive.
 - Landmarks and attachments are measured from the meshes, not drawn by hand.
 - A structure missing from BodyParts3D is built as a schematic fitted to measured landmarks, and the page must label it as schematic.
 - Every bone needs review by an anatomy teacher before release.
