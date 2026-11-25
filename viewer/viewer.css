@@ -94,5 +94,6 @@ pre,.scroll{overflow-x:auto}.scroll a{flex:none}html{scroll-padding-top:72px}
 .pin.mk.on .nm{display:block}
 .pin.mk.on .sh{transform:scale(1.35)}.mk-groove.on .sh{transform:rotate(45deg) scale(1.35)}
 .pin.mk.occ{opacity:.38}.pin.mk.occ.on{opacity:1}
+.pin.mk.hid,.pin.mk.occ.hid{opacity:0;pointer-events:none}
 .mkleg>div{display:flex;align-items:center;gap:10px;font-size:14.5px;color:#e9f2ef}
 .pin.mk.demo{position:relative;transform:none;pointer-events:none;flex:none}

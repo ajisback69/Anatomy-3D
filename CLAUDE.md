@@ -11,7 +11,7 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 - Layers: rib, clav, muscle, artery, vein, nerve, lymph, organ, vert.
 
 ## Accuracy rules
-- Text reference, from the ribs onward: A.K. Datta, Essentials of Human Anatomy (the owner's choice). Match its terminology, classifications and numbers (e.g. ossification dates). Where page excerpts from the owner are available, follow them and give page references. Never reproduce long verbatim passages. Older pages (sternum, ribs) cite BD Chaurasia, Snell and Gray's; re-check them against Datta when excerpts arrive.
+- Text reference, from the ribs onward: A.K. Datta, Essentials of Human Anatomy (the owner's choice). Match its terminology, classifications and numbers (e.g. ossification dates). Where page excerpts from the owner are available, follow them and give page references. Never reproduce long verbatim passages. Older pages (sternum, ribs) cite BD Chaurasia, Snell and Gray's; re-check them against Datta when excerpts arrive. The ribs have now been rewritten from Datta pp. 16–20, and the sternal-angle notes from p. 20 have been added. Sternum pp. ~1–15 have not been checked yet.
 - Landmarks and attachments are measured from the meshes, not drawn by hand.
 - A structure missing from BodyParts3D is built as a schematic fitted to measured landmarks, and the page must label it as schematic.
 - Every bone needs review by an anatomy teacher before release.
@@ -22,7 +22,8 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 - A landmark's `show` can be an array of modes, e.g. `['lm','joint']`.
 - A REG entry with `lm:1` is tinted outside muscle mode, e.g. the vessel grooves on the 1st rib.
 - Side trainer (mode `side`): needs `DATA.side = {R, L}`, plus `BONE.sideRules`, `sideView` and `sideDist`. Use it for every paired bone.
-- Multi-specimen pages, e.g. ribs: an inline loader picks `data/<spec>-core.js` from `#spec`. `content.js` picks `window.BONE` from `window.SPEC`. The inactive spec's HTML blocks are removed before the viewer runs.
+- Multi-specimen pages, e.g. ribs (first, second, typical, tenth, eleventh, twelfth): an inline loader picks `data/<spec>-core.js` from `#spec`. `content.js` picks `window.BONE` from `window.SPEC`. Elements carry `data-only="spec1 spec2"`; the ones not for the current spec are removed before the viewer runs.
+- `pipeline/ribs.py`: `python pipeline/ribs.py [spec ...]`. Each spec has `kind` and `tub` (False for 11th and 12th, which have no neck or tubercle). `cart` may be None, in which case the pointed tip is used as the anterior end.
 
 ## Publishing
 `python tools/make_artifact.py <bone>` builds `dist/<bone>/`. Publish those files as a claude.ai artifact (index.html, content.js, data/*, viewer/*).
