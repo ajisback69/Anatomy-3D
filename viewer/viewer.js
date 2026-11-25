@@ -321,7 +321,11 @@ function buildLayers(){
  for(const s of LY.spheres||[]){const m=addMesh(new THREE.SphereGeometry(s.r,16,12),s.layer==='mark'?'mark':(s.group||'artery'),s.key,s.key,s.layer);m.material.color.set(s.col);m.position.set(...s.p)}
  const anchors=LY.anchors||{};
  const center=k=>{const ms=pickable.filter(m=>m.userData.key===k);if(!ms.length)return null;const b=new THREE.Box3();ms.forEach(m=>b.expandByObject(m));const c=b.getCenter(new THREE.Vector3());let best=null,bd=1e9;for(const m of ms){const p=m.geometry.attributes.position;for(let i=0;i<p.count;i+=7){const d=(p.getX(i)+m.position.x-c.x)**2+(p.getY(i)+m.position.y-c.y)**2+(p.getZ(i)+m.position.z-c.z)**2;if(d<bd){bd=d;best=new THREE.Vector3(p.getX(i),p.getY(i),p.getZ(i)).add(m.position)}}}return best};
- for(const [k,lab,md] of B.relLabels||[]){const p=anchors[k]?V3(anchors[k]):center(k);if(p)makePin({p,n:new THREE.Vector3(0,0,1),inf:B.STR[k],lab,cls:'rel',show:md||'rel',occ:false,onclick:()=>showStr(k)})}
+ for(const [k,lab,md,ty] of B.relLabels||[]){const p=anchors[k]?V3(anchors[k]):center(k);if(!p)continue;
+  if(B.relAsMarkers){ // লেখার বদলে বিন্দু: ট্যাপ করলে নাম, শুধু দেখা পাশেরগুলো
+   const n=(md==='surf'?new THREE.Vector3(0,0,1):p.clone().sub(TGT).normalize());
+   const L=makePin({p,n,inf:B.STR[k],lab,cls:'mk mk-'+(ty||'part'),mk:true,show:md||'rel',occ:true,onclick:()=>{pins.forEach(x=>x.el.classList.toggle('on',x===L));showStr(k)}});
+  } else makePin({p,n:new THREE.Vector3(0,0,1),inf:B.STR[k],lab,cls:'rel',show:md||'rel',occ:false,onclick:()=>showStr(k)})}
  for(const [k,lab] of B.muscleLabels||[]){const p=center(k);if(p)makePin({p,n:new THREE.Vector3(0,0,1),inf:B.REG[B.MUS_REG[k]],lab,cls:'rel',show:'att',occ:false,onclick:()=>showMuscle(B.MUS_REG[k])})}
  layersReady=true;info.querySelector('.ld')?.remove();applyLayers();applyClip();
 }

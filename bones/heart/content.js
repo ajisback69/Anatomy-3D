@@ -198,15 +198,18 @@ const B={
   quiz:{layers:{great:1},clipLayers:['great']}
  },
  relLegend:[],
+ relAsMarkers:true,
  relLabels:[
-  ['rcaTrunk','RCA','cor'],['lad','LAD','cor'],['lcx','Circumflex','cor'],['pda','Post. IV a.','cor'],['rcaMarg','Right marginal','cor'],['cs','Coronary sinus','cor'],['gcv','Great cardiac v.','cor'],['mcv','Middle cardiac v.','cor'],['scv','Small cardiac v.','cor'],
-  ['hisBundle','AV bundle (His)','cond'],['rbb','Right branch','cond'],['lbb','Left branch','cond'],['intTract','Internodal tract','cond'],['modBand','Moderator band','cond'],
-  ['modBand','Moderator band','valve'],['aorValve','Aortic valve','valve'],['chordae','Chordae','valve'],
-  ['lung','Lung','rel'],['dia','Diaphragm','rel'],['eso','Oesophagus','rel'],['aoDesc','Desc. aorta','rel'],['trachea','Trachea','rel'],['sternum','Sternum','rel'],
-  ['mkRight','ডান বর্ডার','surf'],['mkLeft','বাম বর্ডার','surf'],['mkInf','নিচের বর্ডার','surf'],['mkUpper','উপরের বর্ডার','surf'],['scanOutline','আসল হার্ট','surf'],
-  ['ausAor','A','surf'],['ausPul','P','surf'],['ausTri','T','surf'],['ausMit','M','surf'],
-  ['orPul','Pulmonary','surf'],['orAor','Aortic','surf'],['orTri','Tricuspid','surf'],['orMit','Mitral','surf']
+  ['rcaTrunk','RCA','cor','art'],['lad','LAD','cor','art'],['lcx','Circumflex','cor','art'],['pda','Posterior IV artery','cor','art'],['rcaMarg','Right marginal artery','cor','art'],['lcaStem','Left coronary artery','cor','art'],
+  ['cs','Coronary sinus','cor','ven'],['gcv','Great cardiac vein','cor','ven'],['mcv','Middle cardiac vein','cor','ven'],['scv','Small cardiac vein','cor','ven'],['acv','Anterior cardiac veins','cor','ven'],['plv','Posterior vein of LV','cor','ven'],
+  ['hisBundle','AV bundle (His)','cond','node'],['rbb','Right bundle branch','cond','node'],['lbb','Left bundle branch','cond','node'],['intTract','Internodal tract','cond','node'],['modBand','Moderator band','cond','elev'],
+  ['modBand','Moderator band','valve','elev'],['aorValve','Aortic valve','valve','open'],['chordae','Chordae tendineae','valve','elev'],
+  ['lung','Lung','rel','part'],['dia','Diaphragm','rel','part'],['eso','Oesophagus','rel','part'],['aoDesc','Descending aorta','rel','art'],['trachea','Trachea','rel','part'],['sternum','Sternum','rel','part'],
+  ['mkRight','ডান বর্ডার (বই)','surf','surf'],['mkLeft','বাম বর্ডার (বই)','surf','surf'],['mkInf','নিচের বর্ডার (বই)','surf','surf'],['mkUpper','উপরের বর্ডার (বই)','surf','surf'],['scanOutline','স্ক্যানের আসল হার্ট','surf','surf'],
+  ['ausAor','Aortic area (A)','surf','aus'],['ausPul','Pulmonary area (P)','surf','aus'],['ausTri','Tricuspid area (T)','surf','aus'],['ausMit','Mitral area (M)','surf','aus'],
+  ['orPul','Pulmonary orifice','surf','open'],['orAor','Aortic orifice','surf','open'],['orTri','Tricuspid orifice','surf','open'],['orMit','Mitral orifice','surf','open']
  ],
+
  holdView:[[0,0,1],340]
 };
 B.lmInfo=id=>{const o=LMS[id]||{t:id,b:'',d:'',type:'part',show:['lm']};return {inf:o,lab:o.t,kind:'lm',type:o.type,quiz:o.show.includes('quiz'),quizName:o.t,show:o.show.filter(x=>x!=='quiz')}};

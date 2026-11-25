@@ -561,6 +561,19 @@ def build():
         addm(k, 'artery', fma, 2500 if k in ('lad', 'lcx', 'rcaTrunk', 'rcaMarg') else 1200, 'artery')
     for k, fma in VEN.items():
         addm(k, 'vein', fma, 2000, 'vein')
+    # রক্তনালীর বিন্দু: যে দিক থেকে নালীটা সাধারণত দেখা হয় (বইয়ের চিত্রের মতো), সেই দিকে নালীর মাঝের অংশের সবচেয়ে বাইরের বিন্দু
+    hc = (W.bounds[0] + W.bounds[1]) / 2
+    ANT, INF, POST, LEFT = [0, -1, 0.1], [0, -0.3, -1], [0, 1, -0.2], [1, 0, 0]
+    PREF = {'rcaTrunk': ANT, 'rcaMarg': ANT, 'lcaStem': [0.4, -1, 0.3], 'lad': ANT, 'ladSept': ANT, 'rcaSept': INF, 'pda': INF, 'rcaPL': INF,
+            'lcx': LEFT, 'cs': POST, 'gcv': [0.5, -1, 0], 'mcv': INF, 'acv': ANT, 'plv': INF}
+    for k, fma in list(ART.items()) + list(VEN.items()):
+        V = load(fma).vertices
+        d0 = unit(np.array(PREF.get(k, ANT), float))
+        s = (V - hc) @ d0
+        front = V[s > np.quantile(s, 0.7)]            # সেই দিকের অংশ
+        dd = np.linalg.norm(front - front.mean(0), axis=1)
+        cand = front[dd < np.quantile(dd, 0.5)]        # তার মাঝখান
+        lay['anchors'][k] = F.tf(cand[np.argmax((cand - hc) @ d0)]).round(2).tolist()
     addm('aoAsc', 'artery', GREAT['aoAsc'], 2500, 'great')
     addm('aoArch', 'artery', GREAT['aoArch'], 2500, 'great')
     addm('svc', 'vein', GREAT['svc'], 1500, 'great')
