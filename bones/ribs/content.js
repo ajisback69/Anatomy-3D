@@ -49,14 +49,14 @@ const FIRST={
  relLabels:[['rsa','Subclavian a.'],['rscv','Subclavian v.'],['lowerTrunk','Lower trunk'],['symp','Sympathetic trunk'],['t1','T1 nerve'],['sia','Sup. intercostal a.'],['lung','Apex of lung']],
  muscleLabels:[['scalAnt','Scalenus anterior'],['scalMed','Scalenus medius'],['scalPost','Scalenus posterior'],['serrAnt','Serratus anterior'],['subclavius','Subclavius']],
  lms:{
-  headFacet:{t:'Head (single facet)',b:'হেড, একটাই facet',lab:'Head',show:['lm','joint'],d:'ছোট, গোল, একটাই facet। শুধু T1-এর body-র সাথে জোড়া লাগে, তাই typical রিবের মতো দুই facet বা crest নেই।',l:['জয়েন্ট: synovial plane, একটাই cavity']},
-  neck:{t:'Neck',b:'নেক',lab:'Neck',d:'গোল, উপরে-পেছনে-বাইরে মুখ করা।',l:['সামনে (ভেতর থেকে বাইরে): sympathetic trunk, 1st posterior intercostal vein, superior intercostal artery, T1 ventral ramus','উপরে: deep cervical vessels, C8 ventral ramus']},
-  tubFacet:{t:'Tubercle',b:'টিউবারকল',lab:'Tubercle',show:['lm','joint'],d:'বড় ও উঁচু। 1st রিবে tubercle আর angle একই জায়গায় থাকে।',l:['T1-এর transverse process-এর সাথে costotransverse joint (synovial)','Lateral costotransverse ligament লাগে']},
-  scalTub:{t:'Scalene tubercle',b:'স্ক্যালেন টিউবারকল',lab:'Scalene tubercle',d:'Inner border-এর ছোট উঁচু জায়গা। Scalenus anterior এখানে লাগে, আর এটা দুই groove-এর মাঝে থাকে।',l:['মডেলে আসল scalenus anterior রিবকে যেখানে ছোঁয় সেখানে পিন']},
-  grooveA:{t:'Groove for subclavian artery',b:'আর্টারির খাঁজ',lab:'Groove: subclavian a.',d:'Scalene tubercle-এর পেছনে। Subclavian artery আর lower trunk of brachial plexus থাকে।',l:['এর পেছনে scalenus medius-এর জায়গা']},
-  grooveV:{t:'Groove for subclavian vein',b:'ভেইনের খাঁজ',lab:'Groove: subclavian v.',d:'Scalene tubercle-এর সামনে। Subclavian vein থাকে।',l:['মনে রাখার কৌশল: VAN সামনে থেকে পেছনে, vein → (scalenus anterior) → artery → nerve']},
-  ccl:{t:'Costoclavicular ligament impression',b:'কস্টোক্ল্যাভিকুলার লিগামেন্ট',lab:'Costoclavicular lig.',d:'সামনের প্রান্তের উপরে, যেখানে clavicle সবচেয়ে কাছে আসে। এখান থেকে লিগামেন্ট clavicle-এ যায়।',l:['মডেলে রিবের যে বিন্দু clavicle-এর সবচেয়ে কাছে, সেখানে পিন','এর সামনে subclavius লাগে']},
-  antEnd:{t:'Anterior end',b:'সামনের প্রান্ত',lab:'Anterior end',show:['lm','joint'],d:'সবচেয়ে বড় ও মোটা। 1st costal cartilage-এর সাথে জোড়া লাগে।',l:['Costochondral joint: primary cartilaginous','1st cartilage আর manubrium: primary cartilaginous (synchondrosis)']},
+  headFacet:{type:'joint',t:'Head (single facet)',b:'হেড, একটাই facet',lab:'Head',show:['lm','joint'],d:'ছোট, গোল, একটাই facet। শুধু T1-এর body-র সাথে জোড়া লাগে, তাই typical রিবের মতো দুই facet বা crest নেই।',l:['জয়েন্ট: synovial plane, একটাই cavity']},
+  neck:{type:'part',t:'Neck',b:'নেক',lab:'Neck',d:'গোল, উপরে-পেছনে-বাইরে মুখ করা।',l:['সামনে (ভেতর থেকে বাইরে): sympathetic trunk, 1st posterior intercostal vein, superior intercostal artery, T1 ventral ramus','উপরে: deep cervical vessels, C8 ventral ramus']},
+  tubFacet:{type:'joint',t:'Tubercle',b:'টিউবারকল',lab:'Tubercle',show:['lm','joint'],d:'বড় ও উঁচু। 1st রিবে tubercle আর angle একই জায়গায় থাকে।',l:['T1-এর transverse process-এর সাথে costotransverse joint (synovial)','Lateral costotransverse ligament লাগে']},
+  scalTub:{type:'elev',t:'Scalene tubercle',b:'স্ক্যালেন টিউবারকল',lab:'Scalene tubercle',d:'Inner border-এর ছোট উঁচু জায়গা। Scalenus anterior এখানে লাগে, আর এটা দুই groove-এর মাঝে থাকে।',l:['মডেলে আসল scalenus anterior রিবকে যেখানে ছোঁয় সেখানে পিন']},
+  grooveA:{type:'groove',t:'Groove for subclavian artery',b:'আর্টারির খাঁজ',lab:'Groove: subclavian a.',d:'Scalene tubercle-এর পেছনে। Subclavian artery আর lower trunk of brachial plexus থাকে।',l:['এর পেছনে scalenus medius-এর জায়গা']},
+  grooveV:{type:'groove',t:'Groove for subclavian vein',b:'ভেইনের খাঁজ',lab:'Groove: subclavian v.',d:'Scalene tubercle-এর সামনে। Subclavian vein থাকে।',l:['মনে রাখার কৌশল: VAN সামনে থেকে পেছনে, vein → (scalenus anterior) → artery → nerve']},
+  ccl:{type:'groove',t:'Costoclavicular ligament impression',b:'কস্টোক্ল্যাভিকুলার লিগামেন্ট',lab:'Costoclavicular lig.',d:'সামনের প্রান্তের উপরে, যেখানে clavicle সবচেয়ে কাছে আসে। এখান থেকে লিগামেন্ট clavicle-এ যায়।',l:['মডেলে রিবের যে বিন্দু clavicle-এর সবচেয়ে কাছে, সেখানে পিন','এর সামনে subclavius লাগে']},
+  antEnd:{type:'joint',t:'Anterior end',b:'সামনের প্রান্ত',lab:'Anterior end',show:['lm','joint'],d:'সবচেয়ে বড় ও মোটা। 1st costal cartilage-এর সাথে জোড়া লাগে।',l:['Costochondral joint: primary cartilaginous','1st cartilage আর manubrium: primary cartilaginous (synchondrosis)']},
   supSurf:{t:'Superior surface',b:'উপরের পৃষ্ঠ',lab:'Sup. surface',surf:1,d:'চওড়া, চ্যাপ্টা। দুটো groove আর scalene tubercle এই পৃষ্ঠে।'},
   infSurf:{t:'Inferior surface',b:'নিচের পৃষ্ঠ',lab:'Inf. surface',surf:1,d:'মসৃণ, কোনো costal groove নেই। Pleura দিয়ে ঢাকা।'},
   outBorder:{t:'Outer border',b:'বাইরের বর্ডার',lab:'Outer border',surf:1,d:'উত্তল; পেছনে মোটা, সামনে পাতলা। Intercostal muscle আর serratus anterior লাগে।'},
@@ -64,7 +64,7 @@ const FIRST={
  },
  modes:{
   parts:{layers:{},view:['sup',260],card:{t:'পাঁচটা অংশ',b:'Head · Neck · Tubercle · Shaft · Anterior end',d:'রঙ দিয়ে অংশগুলো আলাদা করা। 1st রিবে tubercle আর angle একই জায়গায়, তাই আলাদা angle নেই।'}},
-  lm:{layers:{},view:['sup',260],card:{t:'পিনে ট্যাপ করুন',b:'অ্যানাটমিক্যাল পয়েন্ট',d:'উপর থেকে দেখলে দুটো groove আর scalene tubercle সবচেয়ে ভালো দেখা যায়। লাল খাঁজে artery, নীল খাঁজে vein: আসল ভেসেল যেখানে ছোঁয় সেখানে রং করা।'}},
+  lm:{layers:{},view:['sup',260],card:{t:'মার্কে ট্যাপ করুন',b:'অ্যানাটমিক্যাল পয়েন্ট',d:'উপর থেকে দেখলে দুটো groove আর scalene tubercle সবচেয়ে ভালো দেখা যায়। লাল খাঁজে artery, নীল খাঁজে vein: আসল ভেসেল যেখানে ছোঁয় সেখানে রং করা।'}},
   att:{layers:{muscle:1},view:['obl',420],card:{t:'কোন মাসল কোথায় লাগে',b:'আসল মাসল + হাড়ে তার ছাপ',d:'মাসলগুলো স্ক্যান থেকে নেওয়া, শুধু রিবের আশপাশের অংশ রাখা হয়েছে। তালিকা থেকে একটা মাসল বেছে নিলে শুধু সেটা গাঢ় হবে।'}},
   rel:{layers:{artery:1,vein:1,nerve:1,organ:1},view:['obl',330],viewDist:330,card:{t:'1st রিবের চারপাশে কী আছে',b:'থোরাসিক ইনলেট',d:'1st রিব থোরাসিক ইনলেটের পাশের সীমানা। উপরে subclavian vessels আর brachial plexus, নিচে ফুসফুসের apex। লাল আর্টারি, নীল ভেইন, হলুদ নার্ভ।'}},
   joint:{layers:{vert:1,rib:1},view:['obl',380],card:{t:'1st রিব কোথায় কোথায় জোড়া লাগে',b:'আর্টিকুলেশন',d:'পেছনে T1-এর সাথে দুটো জোড়া (head আর tubercle), সামনে costal cartilage।',l:['Head ↔ T1 body: synovial, একটাই facet','Tubercle ↔ T1 transverse process: synovial','Anterior end ↔ 1st costal cartilage: primary cartilaginous']}},
@@ -107,23 +107,23 @@ const TYP={
  relLabels:[['pia','Post. intercostal a.'],['piv','Post. intercostal v.'],['icn','Intercostal n.'],['azygos','Azygos v.'],['aoDesc','Aorta']],
  muscleLabels:[['serrAnt','Serratus anterior'],['extObl','External oblique'],['iliocost','Iliocostalis'],['longThor','Longissimus'],['innIC','Innermost IC']],
  lms:{
-  facetUp:{t:'Upper facet of head',b:'হেডের উপরের facet',lab:'Upper facet',show:['lm','joint'],d:'ছোট। উপরের কশেরুকার (T5) body-র নিচের costal facet-এর সাথে জোড়া লাগে।',l:['মডেলে আসল T5 যেখানে ছোঁয় সেখানে পিন']},
-  facetLow:{t:'Lower facet of head',b:'হেডের নিচের facet',lab:'Lower facet',show:['lm','joint'],d:'বড়। নিজের কশেরুকার (T6) body-র উপরের costal facet-এর সাথে জোড়া লাগে।',l:['মডেলে আসল T6 যেখানে ছোঁয় সেখানে পিন']},
-  crest:{t:'Crest of head',b:'হেডের ক্রেস্ট',lab:'Crest',show:['lm','joint'],d:'দুই facet-এর মাঝের আড়াআড়ি উঁচু রেখা।',l:['Intra-articular ligament এখান থেকে intervertebral disc-এ যায়, জয়েন্টটাকে দুই cavity-তে ভাগ করে']},
-  neck:{t:'Neck',b:'নেক',lab:'Neck',d:'প্রায় 2.5 cm লম্বা। সামনের পৃষ্ঠ মসৃণ (costal pleura), পেছনের পৃষ্ঠ খসখসে।',l:['উপরের ধারালো crest of neck-এ superior costotransverse ligament লাগে','পেছনের পৃষ্ঠে costotransverse ligament']},
-  tubFacet:{t:'Tubercle: articular part',b:'টিউবারকলের জোড়ার অংশ',lab:'Tubercle facet',show:['lm','joint'],d:'Tubercle-এর ভেতরের-নিচের ডিম্বাকার facet। নিজের কশেরুকার (T6) transverse process-এর সাথে costotransverse joint তৈরি করে।',l:['মডেলে আসল transverse process যেখানে ছোঁয় সেখানে পিন']},
-  tubRough:{t:'Tubercle: non-articular part',b:'টিউবারকলের খসখসে অংশ',lab:'Non-articular',d:'Tubercle-এর বাইরের খসখসে অংশ।',l:['Lateral costotransverse ligament লাগে']},
-  angle:{t:'Angle',b:'অ্যাঙ্গেল',lab:'Angle',d:'Tubercle থেকে প্রায় 5–6 cm বাইরে, যেখানে shaft হঠাৎ সামনের দিকে বাঁক নেয় আর একটু মোচড় খায়।',l:['Iliocostalis এখানে লাগে; মডেলে পিনটা আসল iliocostalis-এর ছোঁয়ার জায়গা থেকে মাপা','রিবের সবচেয়ে দুর্বল জায়গা, ফ্র্যাকচার সাধারণত এখানেই হয়','Costal groove এখানে সবচেয়ে গভীর']},
+  facetUp:{type:'joint',t:'Upper facet of head',b:'হেডের উপরের facet',lab:'Upper facet',show:['lm','joint'],d:'ছোট। উপরের কশেরুকার (T5) body-র নিচের costal facet-এর সাথে জোড়া লাগে।',l:['মডেলে আসল T5 যেখানে ছোঁয় সেখানে পিন']},
+  facetLow:{type:'joint',t:'Lower facet of head',b:'হেডের নিচের facet',lab:'Lower facet',show:['lm','joint'],d:'বড়। নিজের কশেরুকার (T6) body-র উপরের costal facet-এর সাথে জোড়া লাগে।',l:['মডেলে আসল T6 যেখানে ছোঁয় সেখানে পিন']},
+  crest:{type:'elev',t:'Crest of head',b:'হেডের ক্রেস্ট',lab:'Crest',show:['lm','joint'],d:'দুই facet-এর মাঝের আড়াআড়ি উঁচু রেখা।',l:['Intra-articular ligament এখান থেকে intervertebral disc-এ যায়, জয়েন্টটাকে দুই cavity-তে ভাগ করে']},
+  neck:{type:'part',t:'Neck',b:'নেক',lab:'Neck',d:'প্রায় 2.5 cm লম্বা। সামনের পৃষ্ঠ মসৃণ (costal pleura), পেছনের পৃষ্ঠ খসখসে।',l:['উপরের ধারালো crest of neck-এ superior costotransverse ligament লাগে','পেছনের পৃষ্ঠে costotransverse ligament']},
+  tubFacet:{type:'joint',t:'Tubercle: articular part',b:'টিউবারকলের জোড়ার অংশ',lab:'Tubercle facet',show:['lm','joint'],d:'Tubercle-এর ভেতরের-নিচের ডিম্বাকার facet। নিজের কশেরুকার (T6) transverse process-এর সাথে costotransverse joint তৈরি করে।',l:['মডেলে আসল transverse process যেখানে ছোঁয় সেখানে পিন']},
+  tubRough:{type:'elev',t:'Tubercle: non-articular part',b:'টিউবারকলের খসখসে অংশ',lab:'Non-articular',d:'Tubercle-এর বাইরের খসখসে অংশ।',l:['Lateral costotransverse ligament লাগে']},
+  angle:{type:'elev',t:'Angle',b:'অ্যাঙ্গেল',lab:'Angle',d:'Tubercle থেকে প্রায় 5–6 cm বাইরে, যেখানে shaft হঠাৎ সামনের দিকে বাঁক নেয় আর একটু মোচড় খায়।',l:['Iliocostalis এখানে লাগে; মডেলে পিনটা আসল iliocostalis-এর ছোঁয়ার জায়গা থেকে মাপা','রিবের সবচেয়ে দুর্বল জায়গা, ফ্র্যাকচার সাধারণত এখানেই হয়','Costal groove এখানে সবচেয়ে গভীর']},
   extSurf:{t:'External surface',b:'বাইরের পৃষ্ঠ',lab:'Ext. surface',surf:1,d:'উত্তল, মসৃণ। Serratus anterior আর external oblique লাগে।'},
   intSurf:{t:'Internal surface',b:'ভেতরের পৃষ্ঠ',lab:'Int. surface',surf:1,d:'অবতল, costal pleura দিয়ে ঢাকা। নিচের দিকে costal groove।'},
   upBorder:{t:'Upper border',b:'উপরের বর্ডার',lab:'Upper border',surf:1,d:'গোল, মোটা। External আর internal intercostal লাগে।',l:['Chest tube/needle এই বর্ডার ঘেঁষে ঢোকানো হয় (উপরের রিবের groove-এর VAN এড়াতে)']},
   lowBorder:{t:'Lower border',b:'নিচের বর্ডার',lab:'Lower border',surf:1,d:'ধারালো, পাতলা। ভেতরের দিকে costal groove।'},
-  groove:{t:'Costal groove',b:'কস্টাল গ্রুভ',lab:'Costal groove',d:'Inner surface-এ নিচের বর্ডার ঘেঁষে খাঁজ। Angle-এর কাছে সবচেয়ে গভীর, সামনে মিলিয়ে যায়।',l:['ভেতরে উপর থেকে নিচে: posterior intercostal Vein, Artery, Nerve (VAN)','রিলেশন মোডে VAN দেখা যায়']},
-  antEnd:{t:'Anterior end',b:'সামনের প্রান্ত',lab:'Anterior end',show:['lm','joint'],d:'কাপের মতো গর্ত, যেখানে costal cartilage বসে।',l:['Costochondral joint: primary cartilaginous']}
+  groove:{type:'groove',t:'Costal groove',b:'কস্টাল গ্রুভ',lab:'Costal groove',d:'Inner surface-এ নিচের বর্ডার ঘেঁষে খাঁজ। Angle-এর কাছে সবচেয়ে গভীর, সামনে মিলিয়ে যায়।',l:['ভেতরে উপর থেকে নিচে: posterior intercostal Vein, Artery, Nerve (VAN)','রিলেশন মোডে VAN দেখা যায়']},
+  antEnd:{type:'joint',t:'Anterior end',b:'সামনের প্রান্ত',lab:'Anterior end',show:['lm','joint'],d:'কাপের মতো গর্ত, যেখানে costal cartilage বসে।',l:['Costochondral joint: primary cartilaginous']}
  },
  modes:{
   parts:{layers:{},view:['obl',460],card:{t:'পাঁচটা অংশ',b:'Head · Neck · Tubercle · Shaft · Anterior end',d:'রঙ দিয়ে অংশগুলো আলাদা করা। Angle শ্যাফটের উপর একটা বিন্দু, "ল্যান্ডমার্ক" মোডে দেখুন।'}},
-  lm:{layers:{},view:['obl',460],card:{t:'পিনে ট্যাপ করুন',b:'অ্যানাটমিক্যাল পয়েন্ট',d:'পেছন-পাশ থেকে দেখলে head, neck, tubercle আর angle সবচেয়ে ভালো দেখা যায়। Costal groove দেখতে ভেতর থেকে ("ভেতর থেকে" বোতাম) দেখুন।'}},
+  lm:{layers:{},view:['obl',460],card:{t:'মার্কে ট্যাপ করুন',b:'অ্যানাটমিক্যাল পয়েন্ট',d:'পেছন-পাশ থেকে দেখলে head, neck, tubercle আর angle সবচেয়ে ভালো দেখা যায়। Costal groove দেখতে ভেতর থেকে ("ভেতর থেকে" বোতাম) দেখুন।'}},
   att:{layers:{muscle:1},view:['lat',560],card:{t:'কোন মাসল কোথায় লাগে',b:'আসল মাসল + হাড়ে তার ছাপ',d:'মাসলগুলো স্ক্যান থেকে নেওয়া, শুধু রিবের আশপাশের অংশ রাখা। তিন স্তরের intercostal দেখতে তালিকা থেকে একটা একটা করে বেছে নিন।'}},
   rel:{layers:{artery:1,vein:1,nerve:1,vert:1},view:['medant',460],viewDist:460,card:{t:'Costal groove-এ কী থাকে',b:'Intercostal VAN',d:'ভেতর থেকে দেখুন: groove-এ উপর থেকে নিচে নীল vein, লাল artery, হলুদ nerve। Artery aorta থেকে, vein azygos-এ যায়।'}},
   joint:{layers:{vert:1,rib:1},view:['post',360],card:{t:'6th রিব কোথায় কোথায় জোড়া লাগে',b:'আর্টিকুলেশন',d:'পেছনে তিনটা জোড়া: head-এর দুই facet দুই কশেরুকার সাথে, tubercle transverse process-এর সাথে। সামনে costal cartilage।',l:['Head ↔ T5 ও T6 body (costovertebral): synovial plane, intra-articular ligament দিয়ে দুই cavity','Tubercle ↔ T6 transverse process (costotransverse): synovial plane','Anterior end ↔ costal cartilage: primary cartilaginous']}},
@@ -139,7 +139,7 @@ const TYP={
 /* ---------- কমন ---------- */
 const ORD={first:FIRST,typical:TYP};
 const B=ORD[window.SPEC]||FIRST;
-B.lmInfo=id=>{const o=B.lms[id];return {inf:o,lab:o.lab,kind:o.surf?'surf':'lm',quiz:!o.surf,show:o.show}};
+B.lmInfo=id=>{const o=B.lms[id];return {inf:o,lab:o.lab,kind:o.surf?'surf':'lm',type:o.surf?'surf':o.type,quiz:!o.surf,show:o.show}};
 B.layersSrc='data/'+(window.SPEC||'first')+'-layers.js';
 B.render=(D,$)=>{
  const o=window.SPEC==='typical'?'#tbl-typ':'#tbl-first';

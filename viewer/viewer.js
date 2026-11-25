@@ -86,21 +86,24 @@ function highlight(key){
  dirty=true;
 }
 
-/* ---------- পিন ---------- */
+/* ---------- পিন ও মার্ক ---------- */
+const MK=[['elev','উঁচু অংশ: tubercle, crest, angle, head'],['joint','জোড়ার তল: facet, notch যেখানে হাড় জোড়া লাগে'],['groove','খাঁজ বা ছাপ: groove, notch, impression'],['part','অংশ: neck ইত্যাদি'],['surf','পৃষ্ঠ বা বর্ডার'],['num','নম্বর: costal notch']];
 const pins=[];
 function makePin(o){
- const el=document.createElement('button');el.type='button';el.className='pin '+(o.cls||'');el.textContent=o.lab;el.setAttribute('aria-label',o.inf.t);
+ const el=document.createElement('button');el.type='button';el.className='pin '+(o.cls||'');el.setAttribute('aria-label',o.inf.t);
+ if(o.mk){el.innerHTML=`<i class="sh"></i>${o.num?`<b class="no">${esc(o.num)}</b>`:''}<span class="nm">${esc(o.lab)}</span>`}else el.textContent=o.lab;
  el.addEventListener('click',e=>{e.stopPropagation();if(mode==='quiz')return;o.onclick?o.onclick():selectLm(o)});
  pinsEl.appendChild(el);o.el=el;o.vis=true;pins.push(o);return o;
 }
 const lms=D.lm.map(o=>{
  const x=B.lmInfo(o.id);
- return makePin({id:o.id,p:V3(o.p),n:V3(o.n).normalize(),inf:x.inf,lab:x.lab,kind:x.kind,quiz:x.quiz,quizName:x.quizName,cls:x.kind==='num'?'num':x.kind==='surf'?'surf':'',show:x.show||'lm',occ:true});
+ const type=x.type||(x.kind==='num'?'num':x.kind==='surf'?'surf':'elev');
+ return makePin({id:o.id,p:V3(o.p),n:V3(o.n).normalize(),inf:x.inf,lab:x.kind==='num'?(x.inf.t):x.lab,num:x.kind==='num'?x.lab:null,kind:x.kind,quiz:x.quiz,quizName:x.quizName,cls:'mk mk-'+type,mk:true,show:x.show||'lm',occ:true});
 });
 function card(k,o){
  info.innerHTML=`<div class="k">${esc(k)}</div><h3>${esc(o.t)}</h3><div class="sub">${esc(o.b)}</div><p style="margin:0 0 6px">${esc(o.d)}</p>${o.l?'<ul>'+o.l.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}`;
 }
-function selectLm(L){sel={lm:L};pins.forEach(x=>x.el.classList.toggle('on',x===L));card('ল্যান্ডমার্ক',L.inf);fly(L.n,320,L.p,true)}
+function selectLm(L){sel={lm:L};pins.forEach(x=>x.el.classList.toggle('on',x===L));card('ল্যান্ডমার্ক',L.inf);if(L.el.classList.contains('occ'))fly(L.n,cam.position.distanceTo(ctl.target),ctl.target.clone().lerp(L.p,.5),true);}  // পেছনে চাপা পড়া মার্ক হলেই শুধু ঘোরায়
 
 /* ---------- লেভেল তল ---------- */
 const levelGroup=new THREE.Group();levelGroup.visible=false;scene.add(levelGroup);
@@ -141,6 +144,7 @@ function setMode(m){
  else if(m==='att')legend.innerHTML='<div class="legend">'+Object.entries(B.REG).map(([k,o])=>`<button data-reg="${k}"><span class="sw" style="background:${o.c}"></span>${o.t}</button>`).join('')+'</div>';
  else if(m==='rel')legend.innerHTML='<div class="legend">'+B.relLegend.map(([k,c])=>`<button data-str="${k}"><span class="sw" style="background:${c}"></span>${B.STR[k].t}</button>`).join('')+'</div>';
  else if(m==='quiz'||m==='side')legend.innerHTML='<div class="quiz" id="qz"></div>';
+ else if(m==='lm'||m==='joint'){const used=new Set(lms.map(x=>x.cls.split('mk-')[1]));legend.innerHTML='<div class="legend mkleg">'+MK.filter(t=>used.has(t[0])).map(([k,t])=>`<div><span class="pin mk mk-${k} demo"><i class="sh"></i>${k==='num'?'<b class="no">২</b>':''}</span>${t}</div>`).join('')+'<div class="note" style="color:#b9d3cb">মার্কে ট্যাপ করলে নাম দেখাবে। হালকা মার্কগুলো হাড়ের পেছনে, ট্যাপ করলে ঘুরে সামনে আসবে।</div></div>'}
  else legend.innerHTML='';
  if(M.view)flyView(M.view);
  if(m==='quiz')newQ();
@@ -264,6 +268,7 @@ function place(doOcc){
   if(!L.occ)vis=v.z<1;
   else if(doOcc){toCam.subVectors(cam.position,L.p).normalize();vis=toCam.dot(L.n)>-0.3;
    if(vis){const dist=cam.position.distanceTo(L.p);occ.set(cam.position,toCam.negate());occ.far=dist-7;vis=occ.intersectObjects(bone,false).length===0}}
+  if(L.mk){if(!L.vis){L.el.classList.remove('hid');L.vis=true}if(doOcc)L.el.classList.toggle('occ',!vis);continue}
   if(vis!==L.vis||doOcc){L.el.classList.toggle('hid',!vis);L.vis=vis}
  }
 }

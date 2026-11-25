@@ -87,12 +87,13 @@ const VIVA=[
 
 
 /* ---------- ভিউয়ারের কনফিগারেশন ---------- */
+const LM_TYPE={jugular:'groove',angle:'joint',xsj:'joint',xtip:'elev'};
 const lmInfo=id=>{
  const cn=/^cn([RL])(\d)$/.exec(id);
- if(cn)return {inf:cnInfo(cn[1],+cn[2]),lab:ORD[+cn[2]-1],kind:'num',quizName:'Costal notch '+cn[2],quiz:cn[1]==='R'};
- if(/^clav/.test(id))return {inf:LM.clav,lab:LM.clav.lab,kind:'lm',quiz:true};
- if(/^ridge/.test(id))return {inf:LM.ridge,lab:LM.ridge.lab,kind:'lm',quiz:true};
- const o=LM[id];return {inf:o,lab:o.lab,kind:o.surf?'surf':'lm',quiz:!o.surf};
+ if(cn)return {inf:cnInfo(cn[1],+cn[2]),lab:ORD[+cn[2]-1],kind:'num',type:'num',quizName:'Costal notch '+cn[2],quiz:cn[1]==='R'};
+ if(/^clav/.test(id))return {inf:LM.clav,lab:LM.clav.lab,kind:'lm',type:'joint',quiz:true};
+ if(/^ridge/.test(id))return {inf:LM.ridge,lab:LM.ridge.lab,kind:'lm',type:'elev',quiz:true};
+ const o=LM[id];return {inf:o,lab:o.lab,kind:o.surf?'surf':'lm',type:o.surf?'surf':LM_TYPE[id],quiz:!o.surf};
 };
 const TGT=[0,-5,0];
 window.BONE={
@@ -103,7 +104,7 @@ window.BONE={
  dist:420,
  modes:{
   parts:{layers:{},view:['ant',420],card:{t:'তিনটি অংশ',b:'Manubrium · Body · Xiphoid',d:'রঙ দিয়ে তিনটি অংশ আলাদা করা আছে। যেকোনো অংশে ট্যাপ করলে তার বিবরণ আসবে।'}},
-  lm:{layers:{},view:['ant',420],card:{t:'পিনে ট্যাপ করুন',b:'অ্যানাটমিক্যাল পয়েন্ট',d:'কমলা পিনগুলো গুরুত্বপূর্ণ ল্যান্ডমার্ক। নম্বর লেখা পিনগুলো costal notch, আর সবুজ বিন্দুগুলো পৃষ্ঠ (surface) বা বর্ডার। হালকা নীল রঙের জায়গাগুলোতে জয়েন্ট আছে।'}},
+  lm:{layers:{},view:['ant',420],card:{t:'মার্কে ট্যাপ করুন',b:'অ্যানাটমিক্যাল পয়েন্ট',d:'প্রতিটা মার্ক একটা ল্যান্ডমার্ক, আকার দেখে ধরন বোঝা যায় (নিচের তালিকা)। মার্কে ট্যাপ করলে নাম আর বিবরণ আসবে। হালকা নীল রঙের জায়গাগুলোতে জয়েন্ট আছে।'}},
   att:{layers:{muscle:1},view:['obl',640,[0,-20,0]],card:{t:'কোন মাসল কোথায় লাগে',b:'আসল মাসল + হাড়ে তার ছাপ',d:'স্বচ্ছ মাসলগুলো স্ক্যান থেকে নেওয়া। হাড়ের রঙিন জায়গায় মাসলটা আসলে হাড়কে ছুঁয়ে আছে। একটা মাসল বেছে নিলে শুধু সেটা গাঢ় হবে। পেছনের মাসল দেখতে "পেছনে" চাপুন, অথবা "মাসল" লেয়ার বন্ধ করে শুধু ছাপ দেখুন।'}},
   rel:{layers:{artery:1,vein:1,nerve:1,lymph:1,organ:1},view:['rel',560,[0,15,-35]],viewDist:600,card:{t:'স্টার্নামের চারপাশে কী আছে',b:'আর্টারি · ভেইন · নার্ভ · লিম্ফ নোড',d:'লাল আর্টারি, নীল ভেইন, হলুদ নার্ভ, সবুজ লিম্ফ নোড। যেকোনো কিছুতে ট্যাপ করুন বা নিচের তালিকা থেকে বেছে নিন। পেছন থেকে দেখলে manubrium-এর পেছনের জিনিসগুলো পরিষ্কার দেখা যায়।'}},
   level:{layers:{vert:1},view:['lat',640,[0,-5,-60]],card:{t:'কোন ল্যান্ডমার্ক কোন কশেরুকার লেভেলে',b:'স্ক্যানে মেপে দেখা',d:'কমলা তলগুলো তিনটি ল্যান্ডমার্ক থেকে সোজা পেছনে কশেরুকা পর্যন্ত গেছে। পাশ থেকে দেখলে সবচেয়ে ভালো বোঝা যায়।',l:['Jugular notch → T2–T3 ডিস্ক','Sternal angle → T4–T5 ডিস্ক','Xiphisternal joint → T9']}},

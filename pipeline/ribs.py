@@ -178,7 +178,7 @@ def build(name, S):
         ga, _ = contact('FMA3953', 2.5); add('grooveA', ga.mean(0))
         gv, _ = contact('FMA4755', 2.5); add('grooveV', gv.mean(0))
         cl, dcl = contact('FMA13322', 99); add('ccl', rv[np.argmin(dcl)])
-        tm = 0.6; add('supSurf', at(tm, 0, 1)); add('infSurf', at(tm, 0, -1)); add('outBorder', at(tm, 1, 0)); add('inBorder', at(tm, -1, 0))
+        add('supSurf', at(0.42, 0, 1)); add('infSurf', at(0.5, 0, -1)); add('outBorder', at(0.32, 1, 0)); add('inBorder', at(0.42, -1, 0))  # groove এলাকা (0.6–0.8) এড়িয়ে
         meta['tGrooveA'] = float(np.median(tOf(ga))); meta['tGrooveV'] = float(np.median(tOf(gv)))
     core['lm'] = lm; core['meta'] = meta
     print(name, 'parts t: head≤%.3f tubercle %.3f–%.3f anterior≥%.3f' % (th1, tt0, tt1, ta0), {k: round(v, 3) for k, v in meta.items()})

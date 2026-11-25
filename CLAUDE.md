@@ -17,6 +17,7 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 
 ## Engine features (viewer.js)
 - Optional per-vertex part ids on a bone mesh (`p`), with `PARTS` keyed by id. Used by ribs for head, neck, tubercle, shaft and anterior end.
+- Landmarks are drawn as typed markers with no visible name: elev, joint, groove, part, surf, num. `lmInfo` returns `type`. Tapping a marker shows its name. A marker hidden behind the bone is faded, not removed; tapping it rotates the camera.
 - A landmark's `show` can be an array of modes, e.g. `['lm','joint']`.
 - A REG entry with `lm:1` is tinted outside muscle mode, e.g. the vessel grooves on the 1st rib.
 - Side trainer (mode `side`): needs `DATA.side = {R, L}`, plus `BONE.sideRules`, `sideView` and `sideDist`. Use it for every paired bone.
