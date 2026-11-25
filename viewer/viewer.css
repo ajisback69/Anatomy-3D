@@ -111,3 +111,6 @@ pre,.scroll{overflow-x:auto}.scroll a{flex:none}html{scroll-padding-top:72px}
 .mk-art .sh{background:#e0443e;border:2px solid #fff;border-radius:50%}
 .mk-ven .sh{background:#4a78e0;border:2px solid #fff;border-radius:50%}
 .mk-aus .sh{background:#f06595;border:2px solid #fff;border-radius:50%;width:18px;height:18px}
+/* 3D মার্ক: আকারটা 3D দৃশ্যে আঁকা হয়, এখানে শুধু নির্বাচিত মার্কের নাম */
+.pin.mk.mk3d{width:2px;height:2px;pointer-events:none}
+.pin.mk.mk3d .nm{left:16px}

@@ -19,7 +19,7 @@ The owner is an MBBS student in Bangladesh. Reply in Bangla. They are new to tec
 
 ## Engine features (viewer.js)
 - Optional per-vertex part ids on a bone mesh (`p`), with `PARTS` keyed by id. Used by ribs for head, neck, tubercle, shaft and anterior end.
-- Landmarks are drawn as typed markers with no visible name: elev, joint, groove, part, surf, num. `lmInfo` returns `type`. Tapping a marker shows its name and never moves the camera. Owner's rule: show only the markers on the side being viewed; markers on the far side (or hidden behind the bone) are hidden, not faded, and appear when the model is turned.
+- Landmarks are drawn as typed markers with no visible name: elev, joint, groove, part, surf, num. `lmInfo` returns `type`. Tapping a marker shows its name and never moves the camera. Owner's rule: show only the markers on the side being viewed; markers on the far side (or hidden behind the bone) are hidden, not faded, and appear when the model is turned. Markers are THREE.Sprite objects inside the scene (sizeAttenuation off, depth-tested, lifted `mkLift` 3 mm toward the camera), so they move with the model every frame and the model itself hides far-side ones. Never go back to HTML overlay dots: the owner saw them lag while rotating. HTML is used only for the selected marker's name.
 - Owner prefers dots over text labels: with `BONE.relAsMarkers`, `relLabels` ([key, name, mode, type]) become tap-to-name markers that follow the near-side rule (types art, ven, aus, open, node…). Vessel dots sit on the side the vessel is usually viewed from (`PREF` in heart.py).
 - `BONE.startMode` sets the mode the page opens in (heart opens in `cor`).
 - A landmark's `show` can be an array of modes, e.g. `['lm','joint']`.

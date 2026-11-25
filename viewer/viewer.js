@@ -94,9 +94,25 @@ function highlight(key){
 /* ---------- পিন ও মার্ক ---------- */
 const MK=B.MK||[['elev','উঁচু অংশ: tubercle, crest, angle, head'],['joint','জোড়ার তল: facet, notch যেখানে হাড় জোড়া লাগে'],['groove','খাঁজ বা ছাপ: groove, notch, impression'],['part','অংশ: neck ইত্যাদি'],['surf','পৃষ্ঠ বা বর্ডার'],['num','নম্বর: costal notch']];
 const pins=[];
+/* মার্ক এখন 3D দৃশ্যের ভেতরে sprite: মডেলের সাথে একই ফ্রেমে ঘোরে, পেছনের মার্ক মডেলই ঢেকে দেয় (depth test)। HTML শুধু নামের লেবেল। */
+const MKCOL={elev:['#e8603c','#fff','c'],joint:['rgba(143,211,214,.25)','#8fd3d6','r'],groove:['#4a78e0','#fff','d'],part:['#c77dce','#fff','s'],surf:['#2f8f7d','#fff','c',.8],num:['#e8603c','#fff','c',1.25],
+ open:['#1b2522','#f7c873','r'],node:['#ffd43b','#7a5200','d'],inner:['#f2b8b0','#7a2e2a','c'],art:['#e0443e','#fff','c'],ven:['#4a78e0','#fff','c'],aus:['#f06595','#fff','c',1.1]};
+const texCache={},sprites=new THREE.Group();sprites.renderOrder=10;scene.add(sprites);
+function mkTex(type,num){
+ const k=type+'|'+(num||'');if(texCache[k])return texCache[k];
+ const c=document.createElement('canvas');c.width=c.height=96;const g=c.getContext('2d');const [f,s,sh,sc]=MKCOL[type]||MKCOL.part;const R=30*(sc||1)*(sc>1?0.8:1);
+ g.translate(48,48);g.shadowColor='rgba(0,0,0,.5)';g.shadowBlur=8;g.lineWidth=sh==='r'?11:6;g.fillStyle=f;g.strokeStyle=s;g.beginPath();
+ if(sh==='d'){g.rotate(Math.PI/4);g.rect(-R*.78,-R*.78,R*1.56,R*1.56)}else if(sh==='s'){const a=R*.82;g.roundRect?g.roundRect(-a,-a,2*a,2*a,10):g.rect(-a,-a,2*a,2*a)}else g.arc(0,0,R-(sh==='r'?4:0),0,Math.PI*2);
+ g.fill();g.shadowBlur=0;g.stroke();
+ if(num){g.setTransform(1,0,0,1,48,48);g.fillStyle='#fff';g.font='700 34px "Hind Siliguri",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(num,0,2)}
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return texCache[k]=t;
+}
+let mkScale=.02;
 function makePin(o){
+ if(o.mk){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:mkTex(o.cls.split('mk-')[1],o.num),sizeAttenuation:false,depthTest:true,depthWrite:false,transparent:true}));
+  o.base=o.p.clone().addScaledVector(o.n,o.offs??2);sp.position.copy(o.base);sp.userData.pin=o;sp.visible=false;sp.renderOrder=10;sprites.add(sp);o.spr=sp}
  const el=document.createElement('button');el.type='button';el.className='pin '+(o.cls||'');el.setAttribute('aria-label',o.inf.t);
- if(o.mk){el.innerHTML=`<i class="sh"></i>${o.num?`<b class="no">${esc(o.num)}</b>`:''}<span class="nm">${esc(o.lab)}</span>`}else el.textContent=o.lab;
+ if(o.mk){el.classList.add('mk3d');el.innerHTML=`<span class="nm">${esc(o.lab)}</span>`}else el.textContent=o.lab;
  el.addEventListener('click',e=>{e.stopPropagation();if(mode==='quiz')return;o.onclick?o.onclick():selectLm(o)});
  pinsEl.appendChild(el);o.el=el;o.vis=true;pins.push(o);return o;
 }
@@ -108,7 +124,7 @@ const lms=D.lm.map(o=>{
 function card(k,o){
  info.innerHTML=`<div class="k">${esc(k)}</div><h3>${esc(o.t)}</h3><div class="sub">${esc(o.b)}</div><p style="margin:0 0 6px">${esc(o.d)}</p>${o.l?'<ul>'+o.l.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}`;
 }
-function selectLm(L){sel={lm:L};if(L.cut&&L.cut!==true&&(B.modes[mode]||{}).cuts&&!cutHas(L,curCut)){const c=[].concat(L.cut).find(k=>(B.modes[mode].cuts||[]).includes(k));if(c)setCut(c,false)}pins.forEach(x=>x.el.classList.toggle('on',x===L));card('ল্যান্ডমার্ক',L.inf);}  // শুধু নাম দেখায়, ক্যামেরা ঘোরায় না
+function selectLm(L){sel={lm:L};if(L.cut&&L.cut!==true&&(B.modes[mode]||{}).cuts&&!cutHas(L,curCut)){const c=[].concat(L.cut).find(k=>(B.modes[mode].cuts||[]).includes(k));if(c)setCut(c,false)}pins.forEach(x=>x.el.classList.toggle('on',x===L));card('ল্যান্ডমার্ক',L.inf);dirty=true}  // শুধু নাম দেখায়, ক্যামেরা ঘোরায় না
 
 /* ---------- লেভেল তল ---------- */
 const levelGroup=new THREE.Group();levelGroup.visible=false;scene.add(levelGroup);
@@ -213,6 +229,9 @@ renderer.domElement.addEventListener('pointerup',e=>{
  if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;
  const r=renderer.domElement.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  ray.setFromCamera(ndc,cam);
+ {const vs=sprites.children.filter(s=>s.visible);const sh=ray.intersectObjects(vs,false)[0];
+  if(sh){const bh=ray.intersectObjects(bone.filter(b=>b.visible),false).filter(x=>!clipOn||clipPlane.distanceToPoint(x.point)>=-.5)[0];
+   if(!bh||boneOp<1||sh.distance<bh.distance+3){const L=sh.object.userData.pin;if(mode!=='quiz'){L.onclick?L.onclick():selectLm(L)}dirty=true;return}}}
  const h=ray.intersectObjects(bone.filter(b=>b.visible).concat(pickable.filter(m=>m.visible&&m.userData.group!=='lung'&&m.userData.group!=='mark')),false).filter(x=>!clipOn||!x.object.material.clippingPlanes||clipPlane.distanceToPoint(x.point)>=-.5)[0];if(!h)return;
  const ud=h.object.userData,pa=h.object.geometry.userData.p,part=pa?B.PARTS[pa[h.face.a]]:B.PARTS[h.object.name];
  if(ud.group==='bone'){
@@ -344,25 +363,27 @@ function place(doOcc){
  const W=view.clientWidth,H=view.clientHeight;
  for(const L of pins){
   const show=showIn(L,mode)&&(L.show!=='att'||layerOn.muscle)&&(!['rel','cor','surf','cond','valve'].some(k=>[].concat(L.show).includes(k))||layersReady||L.mk);
+  if(L.mk){L.spr.visible=show;if(show){toCam.subVectors(cam.position,L.base).normalize();L.spr.position.copy(L.base).addScaledVector(toCam,B.mkLift??3)}L.spr.scale.setScalar(mkScale*(L.el.classList.contains('on')?1.4:1));
+   const on=show&&L.el.classList.contains('on');L.el.classList.toggle('hid',!on);if(!on)continue;
+   v.copy(L.spr.position).project(cam);L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;continue}
   if(!show){if(L.vis){L.el.classList.add('hid');L.vis=false}continue}
   v.copy(L.p).project(cam);
   L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;
   let vis=L.vis;
   if(!L.occ)vis=v.z<1;
-  else if(doOcc){toCam.subVectors(cam.position,L.p).normalize();vis=toCam.dot(L.n)>(L.mk?-0.12:-0.3);
+  else if(doOcc){toCam.subVectors(cam.position,L.p).normalize();vis=toCam.dot(L.n)>-0.3;
    if(vis&&boneOp>=1){const dist=cam.position.distanceTo(L.p);occ.set(cam.position,toCam.negate());occ.far=dist-7;vis=occ.intersectObjects(bone,false).filter(x=>!clipOn||clipPlane.distanceToPoint(x.point)>=-.5).length===0}}
-  if(L.mk){if(doOcc){L.el.classList.toggle('hid',!vis);L.el.classList.remove('occ');L.vis=vis}continue}
   if(vis!==L.vis||doOcc){L.el.classList.toggle('hid',!vis);L.vis=vis}
  }
 }
-function size(){const W=view.clientWidth,H=view.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();dirty=occDirty=true}
+function size(){const W=view.clientWidth,H=view.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();mkScale=2*(B.mkPx||26)/(cam.projectionMatrix.elements[5]*H);dirty=occDirty=true}
 const ro=new ResizeObserver(size);ro.observe(view);
 function tick(now){
  if(anim){let k=Math.min(1,(now-anim.s)/700);k=k<.5?2*k*k:1-((-2*k+2)**2)/2;cam.position.lerpVectors(anim.p0,anim.p1,k);ctl.target.lerpVectors(anim.t0,anim.t1,k);if(k>=1)anim=null;dirty=occDirty=true;lastMove=now}
  ctl.update();
  if(rotAnim){let k=reduce?1:Math.min(1,(now-rotAnim.s)/900);rotAnim.g.quaternion.slerpQuaternions(rotAnim.q0,rotAnim.q1,k<.5?2*k*k:1-((-2*k+2)**2)/2);dirty=true;if(k>=1)rotAnim=null}
  if(quizMark.visible&&!reduce){quizMark.scale.setScalar(1+.25*Math.sin(now/220));dirty=true}
- if(dirty){renderer.render(scene,cam);place(false);dirty=false}
+ if(dirty){place(false);renderer.render(scene,cam);dirty=false}
  if(occDirty&&now-lastMove>140){place(true);occDirty=false}
  requestAnimationFrame(tick);
 }
