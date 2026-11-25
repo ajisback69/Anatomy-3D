@@ -44,7 +44,7 @@ function addMesh(g,group,key,name,layer){
 for(const m of D.meshes){
  const g=geo(m);
  if(m.group==='bone'){
-  g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*3),3));g.userData.r=m.r?dec(m.r,Uint8Array):new Uint8Array(g.attributes.position.count);
+  g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*3),3));g.userData.r=m.r?dec(m.r,Uint8Array):new Uint8Array(g.attributes.position.count);g.userData.p=m.p?dec(m.p,Uint8Array):null;
   const mesh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.78,metalness:0}));mesh.name=m.name;mesh.userData={group:'bone'};scene.add(mesh);bone.push(mesh);
  } else addMesh(g,m.group,m.key||m.name,m.name,m.layer);
 }
@@ -65,12 +65,12 @@ function note(t){if(!info.querySelector('.ld'))info.insertAdjacentHTML('beforeen
 function paint(){
  const focus=sel&&sel.reg;
  for(const s of bone){
-  const g=s.geometry,c=g.attributes.color,r=g.userData.r,pc=new THREE.Color(B.PARTS[s.name]?.c||'#ece4d4'),tmp=new THREE.Color();
+  const g=s.geometry,c=g.attributes.color,r=g.userData.r,pa=g.userData.p,pc=new THREE.Color(B.PARTS[s.name]?.c||'#ece4d4'),tmp=new THREE.Color();
   for(let i=0;i<r.length;i++){
    let col=BONE_C;
-   if(mode==='parts')col=pc;
+   if(mode==='parts')col=pa?tmp.set(B.PARTS[pa[i]].c):pc;
    else if(mode==='att'&&r[i]&&B.REG[r[i]]){col=tmp.set(B.REG[r[i]].c);if(focus&&r[i]!==focus)col.lerp(BONE_C,.78)}
-   else if((mode==='lm'||mode==='rel')&&r[i]===8)col=tmp.set(B.REG[8].c);
+   else if(mode!=='att'&&mode!=='parts'&&r[i]&&(r[i]===8||B.REG[r[i]]?.lm))col=tmp.set(B.REG[r[i]].c);
    c.setXYZ(i,col.r,col.g,col.b);
   }
   c.needsUpdate=true;
@@ -95,7 +95,7 @@ function makePin(o){
 }
 const lms=D.lm.map(o=>{
  const x=B.lmInfo(o.id);
- return makePin({id:o.id,p:V3(o.p),n:V3(o.n).normalize(),inf:x.inf,lab:x.lab,kind:x.kind,quiz:x.quiz,quizName:x.quizName,cls:x.kind==='num'?'num':x.kind==='surf'?'surf':'',show:'lm',occ:true});
+ return makePin({id:o.id,p:V3(o.p),n:V3(o.n).normalize(),inf:x.inf,lab:x.lab,kind:x.kind,quiz:x.quiz,quizName:x.quizName,cls:x.kind==='num'?'num':x.kind==='surf'?'surf':'',show:x.show||'lm',occ:true});
 });
 function card(k,o){
  info.innerHTML=`<div class="k">${esc(k)}</div><h3>${esc(o.t)}</h3><div class="sub">${esc(o.b)}</div><p style="margin:0 0 6px">${esc(o.d)}</p>${o.l?'<ul>'+o.l.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}`;
@@ -134,15 +134,17 @@ function setMode(m){
  mode=m;sel=null;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
  pins.forEach(x=>x.el.classList.remove('on'));quizMark.visible=false;highlight(null);
  for(const k in layerOn)layerOn[k]=!!(M.layers||{})[k];
- const names={parts:'অংশ',lm:'ল্যান্ডমার্ক',att:'মাসল',rel:'রিলেশন',level:'লেভেল'};
+ const names={parts:'অংশ',lm:'ল্যান্ডমার্ক',att:'মাসল',rel:'রিলেশন',level:'লেভেল',joint:'জয়েন্ট',side:'ডান না বাম'};
+ bone.forEach(b=>b.visible=m!=='side');sideGroup.visible=m==='side';
  if(M.card)card(names[m]||'',M.card);
  if(m==='parts')legend.innerHTML='<div class="legend">'+Object.entries(B.PARTS).map(([k,o])=>`<button data-part="${k}"><span class="sw" style="background:${o.c}"></span>${o.t}</button>`).join('')+'</div>';
  else if(m==='att')legend.innerHTML='<div class="legend">'+Object.entries(B.REG).map(([k,o])=>`<button data-reg="${k}"><span class="sw" style="background:${o.c}"></span>${o.t}</button>`).join('')+'</div>';
  else if(m==='rel')legend.innerHTML='<div class="legend">'+B.relLegend.map(([k,c])=>`<button data-str="${k}"><span class="sw" style="background:${c}"></span>${B.STR[k].t}</button>`).join('')+'</div>';
- else if(m==='quiz')legend.innerHTML='<div class="quiz" id="qz"></div>';
+ else if(m==='quiz'||m==='side')legend.innerHTML='<div class="quiz" id="qz"></div>';
  else legend.innerHTML='';
  if(M.view)flyView(M.view);
  if(m==='quiz')newQ();
+ if(m==='side')newSide();
  if(['att','rel','level'].includes(m)&&!layersReady)note('লেয়ার লোড হচ্ছে…');
  applyLayers();paint();
 }
@@ -157,6 +159,8 @@ legend.addEventListener('click',e=>{
  if(b.dataset.str)showStr(b.dataset.str);
  if(b.dataset.opt)answer(b);
  if(b.id==='nextQ')newQ();
+ if(b.dataset.side)answerSide(b.dataset.side);
+ if(b.id==='nextSide')newSide();
 });
 $('#holdBtn')?.addEventListener('click',()=>{view.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});setTimeout(()=>fly(...B.holdView),reduce?0:350)});
 
@@ -168,7 +172,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
  const r=renderer.domElement.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  ray.setFromCamera(ndc,cam);
  const h=ray.intersectObjects(bone.concat(pickable.filter(m=>m.visible&&m.userData.group!=='lung')),false)[0];if(!h)return;
- const ud=h.object.userData,part=B.PARTS[h.object.name];
+ const ud=h.object.userData,pa=h.object.geometry.userData.p,part=pa?B.PARTS[pa[h.face.a]]:B.PARTS[h.object.name];
  if(ud.group==='bone'){
   if(mode!=='att'){if(part)card('অংশ',part);return}
   const reg=h.object.geometry.userData.r[h.face.a];
@@ -205,6 +209,31 @@ function answer(b){
  $('#qz').insertAdjacentHTML('beforeend','<div class="bar"><button class="btn" id="nextQ">পরের প্রশ্ন</button></div>');
 }
 
+/* ---------- ডান না বাম (জোড়া হাড়ের side determination) ---------- */
+const sideGroup=new THREE.Group();sideGroup.visible=false;scene.add(sideGroup);
+const sideMesh={};
+if(D.side)for(const s of ['R','L']){const m=new THREE.Mesh(geo(D.side[s]),new THREE.MeshStandardMaterial({color:'#ece4d4',roughness:.78}));sideGroup.add(m);sideMesh[s]=m}
+let sideCur=null,sideStats={ok:0,n:0},rotAnim=null;
+const ZERO=new THREE.Vector3(0,0,0);
+function newSide(){
+ if(!D.side)return;
+ sideCur=Math.random()<.5?'R':'L';for(const s in sideMesh)sideMesh[s].visible=s===sideCur;
+ rotAnim=null;sideGroup.quaternion.setFromEuler(new THREE.Euler(Math.random()*6.28,Math.random()*6.28,Math.random()*6.28));
+ info.innerHTML=`<div class="k">ডান না বাম</div><h3>এই রিবটা কোন পাশের?</h3><p style="margin:6px 0 0">${esc(B.sideHint||'আঙুল দিয়ে ঘুরিয়ে দেখুন, তারপর বলুন।')}</p>`;
+ $('#qz').innerHTML=`<div class="score">স্কোর: ${sideStats.ok} / ${sideStats.n}</div><div class="opts"><button class="opt" data-side="R">ডান (Right)</button><button class="opt" data-side="L">বাম (Left)</button></div>`;
+ fly(B.sideView||[0,0,1],B.sideDist||300,ZERO);dirty=true;
+}
+function answerSide(c){
+ if($('#qz .opt.ok'))return;
+ const ok=c===sideCur;sideStats.n++;if(ok)sideStats.ok++;
+ document.querySelectorAll('#qz .opt').forEach(o=>{if(o.dataset.side===sideCur)o.classList.add('ok');else if(o.dataset.side===c)o.classList.add('no')});
+ card(ok?'সঠিক!':'হলো না',{t:sideCur==='R'?'এটা ডান পাশের':'এটা বাম পাশের',b:'মডেল এখন শরীরে যেভাবে থাকে সেভাবে ঘুরে যাচ্ছে',d:'যেভাবে চিনবেন:',l:B.sideRules||[]});
+ $('#qz .score').textContent=`স্কোর: ${sideStats.ok} / ${sideStats.n}`;
+ $('#qz').insertAdjacentHTML('beforeend','<div class="bar"><button class="btn" id="nextSide">পরেরটা</button></div>');
+ rotAnim={q0:sideGroup.quaternion.clone(),q1:new THREE.Quaternion(),s:performance.now()};
+ fly(B.sideView||[0,0,1],B.sideDist||300,ZERO);
+}
+
 /* ---------- ভারী লেয়ার, পরে লোড ---------- */
 function buildLayers(){
  const LY=window.LAYERS;
@@ -227,7 +256,7 @@ const v=new THREE.Vector3(),toCam=new THREE.Vector3(),occ=new THREE.Raycaster();
 function place(doOcc){
  const W=view.clientWidth,H=view.clientHeight;
  for(const L of pins){
-  const show=L.show===mode&&(L.show!=='att'||layerOn.muscle)&&(L.show!=='rel'||layersReady);
+  const show=(Array.isArray(L.show)?L.show.includes(mode):L.show===mode)&&(L.show!=='att'||layerOn.muscle)&&(L.show!=='rel'||layersReady);
   if(!show){if(L.vis){L.el.classList.add('hid');L.vis=false}continue}
   v.copy(L.p).project(cam);
   L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;
@@ -243,6 +272,7 @@ const ro=new ResizeObserver(size);ro.observe(view);
 function tick(now){
  if(anim){let k=Math.min(1,(now-anim.s)/700);k=k<.5?2*k*k:1-((-2*k+2)**2)/2;cam.position.lerpVectors(anim.p0,anim.p1,k);ctl.target.lerpVectors(anim.t0,anim.t1,k);if(k>=1)anim=null;dirty=occDirty=true;lastMove=now}
  ctl.update();
+ if(rotAnim){let k=reduce?1:Math.min(1,(now-rotAnim.s)/900);sideGroup.quaternion.slerpQuaternions(rotAnim.q0,rotAnim.q1,k<.5?2*k*k:1-((-2*k+2)**2)/2);dirty=true;if(k>=1)rotAnim=null}
  if(quizMark.visible&&!reduce){quizMark.scale.setScalar(1+.25*Math.sin(now/220));dirty=true}
  if(dirty){renderer.render(scene,cam);place(false);dirty=false}
  if(occDirty&&now-lastMove>140){place(true);occDirty=false}

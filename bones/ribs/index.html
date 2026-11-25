@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>রিব 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+html[data-spec=first] .only-typical,html[data-spec=typical] .only-first{display:none}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+<script>
+/* URL-এর #first বা #typical দেখে কোন রিব দেখাবে ঠিক করে, তার ডেটা লোড করে */
+(function(){var s=location.hash==='#typical'?'typical':'first';window.SPEC=s;document.documentElement.dataset.spec=s;
+document.write('<script src="data/'+s+'-core.js"><\/script>');
+addEventListener('hashchange',function(){var h=location.hash;if((h==='#first'||h==='#typical')&&h.slice(1)!==s)location.reload()});})();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+
+<section class="band stage">
+ <div class="wrap">
+  <h1><span class="only-first">প্রথম রিব <span style="font-weight:500;opacity:.8">· First rib</span></span><span class="only-typical">টিপিক্যাল রিব <span style="font-weight:500;opacity:.8">· Typical rib (6th)</span></span></h1>
+  <p class="lead">আসল মানুষের স্ক্যান থেকে নেওয়া রিব, সাথে আশপাশের কশেরুকা, মাসল আর ভেসেল। পিনে ট্যাপ করুন, মাসল আর রিলেশন দেখুন, আর "ডান না বাম" দিয়ে side determination প্র্যাকটিস করুন।</p>
+  <nav class="spec" aria-label="কোন রিব"><a href="#first" data-spec-link="first">1st rib</a><a href="#typical" data-spec-link="typical">Typical rib (6th)</a></nav>
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="false">অংশ</button>
+     <button class="btn" data-mode="lm" aria-pressed="true">ল্যান্ডমার্ক</button>
+     <button class="btn" data-mode="att" aria-pressed="false">মাসল</button>
+     <button class="btn" data-mode="rel" aria-pressed="false">রিলেশন</button>
+     <button class="btn" data-mode="joint" aria-pressed="false">জয়েন্ট</button>
+     <button class="btn" data-mode="side" aria-pressed="false">ডান না বাম?</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="lat">বাইরে থেকে</button>
+     <button class="btn" data-view="med">ভেতর থেকে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="obl">তির্যক</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="rib"> পাশের রিব, কার্টিলেজ, স্টার্নাম</label>
+     <label class="tog only-first"><input type="checkbox" data-layer="clav"> ক্ল্যাভিকল</label>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#d1495b"></i>মাসল</label>
+     <label class="tog"><input type="checkbox" data-layer="artery"><i class="dot" style="background:#e0443e"></i>আর্টারি</label>
+     <label class="tog"><input type="checkbox" data-layer="vein"><i class="dot" style="background:#4a78e0"></i>ভেইন</label>
+     <label class="tog"><input type="checkbox" data-layer="nerve"><i class="dot" style="background:#f2c230"></i>নার্ভ</label>
+     <label class="tog"><input type="checkbox" data-layer="organ"><i class="dot" style="background:#f0b8b2"></i>ফুসফুস</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>কশেরুকা</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+ <a href="#s-types">রিবের ধরন</a><a href="#s-hold">চেনা ও ধরা</a><a href="#s-feat">ফিচার</a><a href="#s-att">অ্যাটাচমেন্ট</a><a href="#s-rel">রিলেশন</a><a href="#s-joint">জয়েন্ট</a><a href="#s-clin">ক্লিনিক্যাল</a><a href="#s-ossi">অসিফিকেশন</a><a href="#s-viva">ভাইভা</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+
+<section class="band sec" id="s-types"><div class="wrap two">
+ <div>
+  <h2>রিব কয় ধরনের</h2>
+  <p>প্রতি পাশে ১২টা, মোট ২৪টা রিব। দুইভাবে ভাগ করা হয়:</p>
+  <ul>
+   <li><b>সামনের জোড়া দেখে:</b>
+    <ul>
+     <li><b>True (vertebrosternal)</b>, 1st–7th: নিজের costal cartilage দিয়ে সরাসরি স্টার্নামে জোড়া লাগে।</li>
+     <li><b>False (vertebrochondral)</b>, 8th–10th: cartilage উপরের cartilage-এর সাথে জোড়া লাগে।</li>
+     <li><b>Floating (vertebral)</b>, 11th–12th: সামনে মুক্ত থাকে।</li>
+    </ul></li>
+   <li><b>গঠন দেখে:</b>
+    <ul>
+     <li><b>Typical</b>, 3rd–9th: সবার ফিচার একই রকম।</li>
+     <li><b>Atypical</b>: 1st, 2nd, 10th, 11th, 12th।</li>
+    </ul></li>
+  </ul>
+ </div>
+ <div class="card"><h3 style="margin-top:0">এই পেজে কোনগুলো আছে</h3>
+  <p><b>1st rib:</b> সবচেয়ে atypical, ভাইভায় সবচেয়ে বেশি আসে।</p>
+  <p><b>Typical rib:</b> উদাহরণ হিসেবে ডান 6th rib। 3rd থেকে 9th সবারই একই ফিচার।</p>
+  <p class="note">উপরের বোতাম দিয়ে দুটোর মধ্যে বদলান। মডেল ডান পাশের রিবের; "ডান না বাম?" মোডে আসল বাম রিবও আসে।</p></div>
+</div></section>
+
+<!-- ===================== 1st rib ===================== -->
+<div class="only-first">
+<section class="band sec" id="s-hold"><div class="wrap two">
+ <div>
+  <h2>1st rib চেনা ও ধরা</h2>
+  <p><b>কীভাবে বুঝবেন এটা 1st rib:</b></p>
+  <ul>
+   <li>সবচেয়ে ছোট, সবচেয়ে চওড়া আর সবচেয়ে বেশি বাঁকানো।</li>
+   <li>চ্যাপ্টা পৃষ্ঠ উপরে-নিচে (typical রিবে পৃষ্ঠ বাইরে-ভেতরে)।</li>
+   <li>Head ছোট, একটাই facet।</li>
+   <li>Costal groove নেই।</li>
+   <li>আলাদা angle নেই, tubercle-এর জায়গাতেই angle।</li>
+   <li>উপরের পৃষ্ঠে দুটো খাঁজ আর তার মাঝে scalene tubercle।</li>
+  </ul>
+  <h3>Side determination</h3>
+  <ol class="steps">
+   <li>খাঁজওয়ালা চ্যাপ্টা পৃষ্ঠ (superior surface) উপরে রাখুন।</li>
+   <li>বড়, মোটা প্রান্ত (anterior end) সামনে রাখুন।</li>
+   <li>তখন head নিচে-পেছনে-ভেতরে থাকবে। উত্তল outer border যেদিকে মুখ করে থাকবে, রিবটা সেই পাশের।</li>
+  </ol>
+  <div class="bar"><button class="btn" id="holdBtn" style="color:var(--ink);border-color:var(--line);background:var(--card)">মডেলে উপর থেকে দেখুন</button></div>
+ </div>
+ <div class="card"><h3 style="margin-top:0">মনে রাখার কৌশল</h3>
+  <p>উপরের পৃষ্ঠে সামনে থেকে পেছনে যা যা আছে:</p>
+  <ol class="steps"><li>Subclavian <b>vein</b>-এর খাঁজ</li><li><b>Scalenus anterior</b> (scalene tubercle)</li><li>Subclavian <b>artery</b> + lower trunk-এর খাঁজ</li><li><b>Scalenus medius</b></li></ol>
+  <p class="note">অর্থাৎ vein সামনে, artery পেছনে, আর scalenus anterior দুজনকে আলাদা করে রাখে। মডেলেও আসল ভেসেলগুলো ঠিক এই ক্রমে রিবকে ছুঁয়েছে।</p></div>
+</div></section>
+
+<section class="band sec" id="s-feat"><div class="wrap">
+ <h2>ফিচার</h2>
+ <div class="two">
+  <div class="card"><h3 style="margin-top:0">Head, neck, tubercle</h3><ul>
+   <li><b>Head:</b> ছোট, গোল, একটা facet; শুধু T1-এর body-র সাথে জোড়া।</li>
+   <li><b>Neck:</b> গোল, উপরে-পেছনে-বাইরে মুখ করা।</li>
+   <li><b>Tubercle:</b> বড়, উঁচু; T1-এর transverse process-এর সাথে জোড়া। Angle এখানেই।</li></ul></div>
+  <div class="card"><h3 style="margin-top:0">Shaft</h3><ul>
+   <li><b>Superior surface:</b> দুটো খাঁজ, মাঝে scalene tubercle; artery-র খাঁজের পেছনে scalenus medius-এর খসখসে জায়গা।</li>
+   <li><b>Inferior surface:</b> মসৃণ, কোনো costal groove নেই, pleura দিয়ে ঢাকা।</li>
+   <li><b>Outer border:</b> উত্তল; পেছনে মোটা, সামনে পাতলা।</li>
+   <li><b>Inner border:</b> অবতল; scalene tubercle এখানে।</li>
+   <li><b>Anterior end:</b> সবচেয়ে বড় ও মোটা, 1st costal cartilage-এর সাথে জোড়া।</li></ul></div>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-att"><div class="wrap">
+ <h2>অ্যাটাচমেন্ট</h2>
+ <table class="stack"><thead><tr><th>মাসল / খাঁজ</th><th>কোথায়</th></tr></thead><tbody id="tbl-first"></tbody></table>
+ <ul style="margin-top:12px">
+  <li><b>Suprapleural membrane (Sibson's fascia):</b> inner border-এ লাগে।</li>
+  <li><b>Costoclavicular ligament:</b> সামনের প্রান্তের উপরে লাগে।</li>
+  <li><b>Lateral costotransverse ligament:</b> tubercle-এ লাগে।</li>
+ </ul>
+ <p class="note">রঙিন জায়গাগুলো হাতে আঁকা নয়: একই স্ক্যানের আসল মাসল আর ভেসেল রিবের যেখানে ২.৫ মিমি-র মধ্যে আসে, সেখানে রং করা।</p>
+</div></section>
+
+<section class="band sec" id="s-rel"><div class="wrap two">
+ <div class="card"><h3 style="margin-top:0">Neck-এর সামনে (ভেতর থেকে বাইরে)</h3><ol class="steps">
+  <li>Sympathetic trunk (cervicothoracic ganglion)</li><li>First posterior intercostal vein</li><li>Superior intercostal artery</li><li>Ventral ramus of T1</li></ol>
+  <p class="note">মুখস্থ করার জন্য অনেকে বলেন "SVAN": Sympathetic, Vein, Artery, Nerve। মডেলে এগুলো স্কিম্যাটিক: আসল neck-এর অবস্থান মেপে এই ক্রমে বসানো।</p></div>
+ <div class="card"><h3 style="margin-top:0">অন্যান্য রিলেশন</h3><ul>
+  <li><b>Neck-এর উপরে:</b> deep cervical vessels, C8 ventral ramus।</li>
+  <li><b>Superior surface-এ:</b> subclavian vein আর artery, brachial plexus-এর lower trunk।</li>
+  <li><b>Inferior surface-এর নিচে:</b> costal pleura আর ফুসফুস।</li>
+  <li><b>Inner border-এর ভেতরে:</b> ফুসফুসের apex আর cervical pleura, যা গলায় উঠে থাকে।</li>
+  <li><b>থোরাসিক ইনলেট:</b> দুপাশের 1st রিব, পেছনে T1, সামনে manubrium-এর উপরের বর্ডার দিয়ে তৈরি।</li></ul></div>
+</div></section>
+
+<section class="band sec" id="s-joint"><div class="wrap">
+ <h2>জয়েন্ট</h2>
+ <table class="stack"><thead><tr><th>জয়েন্ট</th><th>যাদের মধ্যে</th><th>ধরন</th></tr></thead><tbody>
+  <tr><td>Costovertebral</td><td>Head ও T1-এর body</td><td>Synovial plane, একটাই cavity</td></tr>
+  <tr><td>Costotransverse</td><td>Tubercle ও T1-এর transverse process</td><td>Synovial plane</td></tr>
+  <tr><td>Costochondral</td><td>Anterior end ও 1st costal cartilage</td><td>Primary cartilaginous</td></tr>
+  <tr><td>1st sternocostal</td><td>1st costal cartilage ও manubrium</td><td>Primary cartilaginous (synchondrosis)</td></tr>
+ </tbody></table>
+</div></section>
+
+<section class="band sec" id="s-clin"><div class="wrap two">
+ <div class="card"><h3 style="margin-top:0">Thoracic outlet syndrome ও cervical rib</h3>
+  <p>C7-এর সাথে বাড়তি একটা রিব (cervical rib) বা ফাইব্রাস ব্যান্ড থাকলে lower trunk (C8, T1) আর subclavian artery চাপ খায়।</p>
+  <p><b>লক্ষণ:</b> হাতের ভেতরের দিকে ঝিনঝিন আর ব্যথা, হাতের ছোট মাসল দুর্বল, radial pulse কমে যাওয়া।</p></div>
+ <div class="card"><h3 style="margin-top:0">অন্যান্য</h3><ul>
+  <li><b>1st রিব ফ্র্যাকচার:</b> খুব কম হয়, কারণ clavicle আর মাসল দিয়ে সুরক্ষিত থাকে। হলে বুঝতে হবে আঘাত খুব জোরালো ছিল, তাই subclavian vessels বা brachial plexus-এর ক্ষতি খুঁজতে হয়।</li>
+  <li><b>Pancoast tumour:</b> ফুসফুসের apex-এর ক্যান্সার। T1 নার্ভ আর sympathetic trunk-এ চাপ দেয়, ফলে হাতের ছোট মাসল দুর্বল হয় আর Horner syndrome হয়।</li>
+  <li><b>Scalenus anterior syndrome:</b> মাসল শক্ত হয়ে artery আর lower trunk-এ চাপ দেয়।</li></ul></div>
+</div></section>
+
+<section class="band sec" id="s-ossi"><div class="wrap">
+ <h2>অসিফিকেশন</h2>
+ <ul>
+  <li><b>Primary center:</b> একটা, shaft-এ, গর্ভাবস্থার প্রায় 8ম সপ্তাহে।</li>
+  <li><b>Secondary center:</b> দুটো, head আর tubercle-এ, puberty-তে দেখা দেয়।</li>
+  <li><b>জোড়া লাগা:</b> প্রায় ২০–২৫ বছরে।</li>
+ </ul>
+ <p class="note">Typical রিবে tubercle-এ দুটো secondary center থাকে (articular আর non-articular অংশে), 1st রিবে tubercle-এ একটা। বইয়ের সংস্করণভেদে সময়ে পার্থক্য থাকতে পারে, নিজের রেফারেন্স বইয়ের সাথে মিলিয়ে নিন।</p>
+</div></section>
+
+<section class="band sec" id="s-viva"><div class="wrap">
+ <h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>1st rib কীভাবে চিনবেন?</summary><p>সবচেয়ে ছোট, চওড়া, বাঁকানো। পৃষ্ঠ উপরে-নিচে, head-এ একটাই facet, costal groove নেই, উপরে দুটো খাঁজ আর scalene tubercle।</p></details>
+ <details><summary>Side determination কীভাবে করবেন?</summary><p>খাঁজওয়ালা পৃষ্ঠ উপরে, মোটা anterior end সামনে রাখলে উত্তল outer border যেদিকে মুখ করে, রিবটা সেই পাশের।</p></details>
+ <details><summary>Scalene tubercle-এ কী লাগে, এর সামনে-পেছনে কী থাকে?</summary><p>Scalenus anterior লাগে। সামনে subclavian vein-এর খাঁজ, পেছনে subclavian artery আর lower trunk-এর খাঁজ।</p></details>
+ <details><summary>Neck-এর সামনে কী কী আছে?</summary><p>ভেতর থেকে বাইরে: sympathetic trunk, first posterior intercostal vein, superior intercostal artery, T1 ventral ramus।</p></details>
+ <details><summary>1st রিবে কোন কোন মাসল লাগে?</summary><p>Scalenus anterior, scalenus medius, serratus anterior (প্রথম digitation), subclavius, 1st space-এর intercostal, levator costae। Scalenus posterior লাগে না, ওটা 2nd রিবে।</p></details>
+ <details><summary>Head-এ একটাই facet কেন?</summary><p>1st রিব শুধু T1-এর সাথে জোড়া লাগে। C7-এর কোনো costal facet নেই, তাই উপরের facet দরকার হয় না।</p></details>
+ <details><summary>Cervical rib থাকলে কী হয়?</summary><p>Lower trunk (C8, T1) আর subclavian artery চাপ খায়: হাতের ভেতরের দিকে ঝিনঝিন, ছোট মাসল দুর্বল, pulse কমে (thoracic outlet syndrome)।</p></details>
+ <details><summary>Thoracic inlet-এর সীমানা কী?</summary><p>পেছনে T1-এর body, দুপাশে 1st রিব আর তাদের cartilage, সামনে manubrium-এর উপরের বর্ডার।</p></details>
+ <details><summary>Sibson's fascia কোথায় লাগে?</summary><p>1st রিবের inner border-এ; উপরে C7-এর transverse process-এ। Cervical pleura ঢেকে রাখে।</p></details>
+</div></section>
+</div>
+
+<!-- ===================== typical rib ===================== -->
+<div class="only-typical">
+<section class="band sec" id="s-hold"><div class="wrap two">
+ <div>
+  <h2>Typical rib চেনা ও ধরা</h2>
+  <p><b>কীভাবে বুঝবেন এটা typical rib:</b></p>
+  <ul>
+   <li>Head-এ দুটো facet, মাঝে crest।</li>
+   <li>Neck আর tubercle আছে।</li>
+   <li>Tubercle থেকে কয়েক সেন্টিমিটার বাইরে আলাদা angle আছে।</li>
+   <li>লম্বা, চ্যাপ্টা, বাঁকানো shaft-এর ভেতরে নিচের দিকে costal groove।</li>
+   <li>সামনে কাপের মতো প্রান্ত।</li>
+  </ul>
+  <h3>Side determination</h3>
+  <ol class="steps">
+   <li>Head আর tubercle পেছনে, কাপের মতো anterior end সামনে রাখুন।</li>
+   <li>Costal groove-ওয়ালা ধারালো নিচের বর্ডার নিচে রাখুন, groove থাকবে ভেতরের দিকে।</li>
+   <li>তখন উত্তল external surface যেদিকে মুখ করে থাকবে, রিবটা সেই পাশের।</li>
+  </ol>
+  <div class="bar"><button class="btn" id="holdBtn" style="color:var(--ink);border-color:var(--line);background:var(--card)">মডেলে উপর থেকে দেখুন</button></div>
+ </div>
+ <div class="card"><h3 style="margin-top:0">কোন নম্বরের রিব, বুঝবেন কীভাবে</h3>
+  <p>সব typical রিব (3rd–9th) প্রায় একই রকম, আলাদা করে চেনা কঠিন। পরীক্ষায় সাধারণত "typical rib" হিসেবেই চিনতে হয়।</p>
+  <p class="note">এই মডেলটা ডান 6th রিবের। মাপা হিসেবে head-এর নিচের facet T6-এর সাথে, উপরের facet T5-এর সাথে, আর tubercle T6-এর transverse process-এর সাথে জোড়া লেগেছে, যা বইয়ের নিয়মের সাথে মেলে।</p></div>
+</div></section>
+
+<section class="band sec" id="s-feat"><div class="wrap">
+ <h2>ফিচার</h2>
+ <div class="two">
+  <div class="card"><h3 style="margin-top:0">পেছনের প্রান্ত</h3><ul>
+   <li><b>Head:</b> দুটো facet, মাঝে crest। নিচের বড় facet নিজের কশেরুকার সাথে, উপরের ছোট facet উপরের কশেরুকার সাথে। Crest থেকে intra-articular ligament disc-এ যায়।</li>
+   <li><b>Neck:</b> প্রায় 2.5 cm; সামনে মসৃণ, পেছনে খসখসে; উপরে ধারালো crest of neck।</li>
+   <li><b>Tubercle:</b> ভেতরে-নিচে articular অংশ (নিজের transverse process-এর সাথে), বাইরে খসখসে non-articular অংশ।</li></ul></div>
+  <div class="card"><h3 style="margin-top:0">Shaft ও সামনের প্রান্ত</h3><ul>
+   <li><b>Angle:</b> tubercle থেকে প্রায় 5–6 cm বাইরে, যেখানে shaft সামনে বাঁক নেয়।</li>
+   <li><b>External surface:</b> উত্তল। <b>Internal surface:</b> অবতল, pleura দিয়ে ঢাকা।</li>
+   <li><b>Upper border:</b> গোল। <b>Lower border:</b> ধারালো।</li>
+   <li><b>Costal groove:</b> ভেতরের পৃষ্ঠে নিচের বর্ডার ঘেঁষে; angle-এ সবচেয়ে গভীর।</li>
+   <li><b>Anterior end:</b> কাপের মতো গর্ত, costal cartilage বসে।</li></ul></div>
+ </div>
+</div></section>
+
+<section class="band sec" id="s-att"><div class="wrap">
+ <h2>অ্যাটাচমেন্ট</h2>
+ <table class="stack"><thead><tr><th>মাসল</th><th>কোথায়</th></tr></thead><tbody id="tbl-typ"></tbody></table>
+ <ul style="margin-top:12px">
+  <li><b>Crest of head:</b> intra-articular ligament।</li>
+  <li><b>Crest of neck:</b> superior costotransverse ligament।</li>
+  <li><b>Tubercle-এর non-articular অংশ:</b> lateral costotransverse ligament।</li>
+  <li><b>Internal surface:</b> costal pleura।</li>
+ </ul>
+ <p class="note">রঙিন জায়গাগুলো একই স্ক্যানের আসল মাসল রিবের যেখানে ২.৫ মিমি-র মধ্যে আসে সেখান থেকে মাপা। Intercostal মাসল তিন স্তরেই রিবের প্রায় পুরো বর্ডার জুড়ে লাগে, তাই একটা একটা করে বেছে দেখুন।</p>
+</div></section>
+
+<section class="band sec" id="s-rel"><div class="wrap two">
+ <div class="card"><h3 style="margin-top:0">Costal groove-এ VAN</h3>
+  <ol class="steps"><li>Posterior intercostal <b>V</b>ein (সবচেয়ে উপরে)</li><li>Posterior intercostal <b>A</b>rtery</li><li>Intercostal <b>N</b>erve (সবচেয়ে নিচে, বর্ডারের নিচে বেরিয়ে থাকে)</li></ol>
+  <p>এরা innermost আর internal intercostal-এর মাঝের স্তরে চলে। Angle-এর কাছে ছোট collateral শাখা বের হয়ে নিচের রিবের উপরের বর্ডার ধরে চলে।</p>
+  <p class="note">মডেলে VAN, azygos আর collateral শাখা স্কিম্যাটিক: আসল রিবের groove মেপে বসানো। Aorta আর ফুসফুস স্ক্যান থেকে নেওয়া।</p></div>
+ <div class="card"><h3 style="margin-top:0">অন্যান্য রিলেশন</h3><ul>
+  <li><b>Head-এর সামনে:</b> sympathetic trunk।</li>
+  <li><b>Neck-এর সামনে:</b> costal pleura।</li>
+  <li><b>Internal surface:</b> pleura আর ফুসফুস।</li>
+  <li><b>রক্ত কোথা থেকে আসে:</b> 3rd–11th posterior intercostal artery descending aorta থেকে।</li>
+  <li><b>রক্ত কোথায় যায়:</b> ডান পাশের vein azygos-এ, বাম পাশেরটা hemiazygos বা accessory hemiazygos-এ।</li></ul></div>
+</div></section>
+
+<section class="band sec" id="s-joint"><div class="wrap">
+ <h2>জয়েন্ট</h2>
+ <table class="stack"><thead><tr><th>জয়েন্ট</th><th>যাদের মধ্যে</th><th>ধরন</th></tr></thead><tbody>
+  <tr><td>Costovertebral (joint of head)</td><td>Head-এর দুই facet ও T5, T6-এর body, মাঝে disc</td><td>Synovial plane; intra-articular ligament দিয়ে দুই cavity</td></tr>
+  <tr><td>Costotransverse</td><td>Tubercle-এর articular অংশ ও T6-এর transverse process</td><td>Synovial plane</td></tr>
+  <tr><td>Costochondral</td><td>Anterior end ও costal cartilage</td><td>Primary cartilaginous</td></tr>
+ </tbody></table>
+ <p class="note" style="margin-top:10px">শ্বাস নেওয়ার সময় রিবের নড়াচড়া (pump-handle আর bucket-handle) এই জয়েন্টগুলোর অক্ষ ধরে হয়।</p>
+</div></section>
+
+<section class="band sec" id="s-clin"><div class="wrap two">
+ <div class="card"><h3 style="margin-top:0">Chest tube ও needle কোথায় ঢোকে</h3>
+  <p>VAN থাকে রিবের নিচের বর্ডারে, তাই সুই বা tube সবসময় <b>নিচের রিবের উপরের বর্ডার ঘেঁষে</b> ঢোকানো হয়।</p>
+  <p>Chest tube সাধারণত "safe triangle"-এ, 5th intercostal space-এ mid-axillary line বরাবর, অর্থাৎ 6th রিবের উপরের বর্ডার ঘেঁষে।</p></div>
+ <div class="card"><h3 style="margin-top:0">অন্যান্য</h3><ul>
+  <li><b>রিব ফ্র্যাকচার:</b> সাধারণত angle-এ, কারণ এটা সবচেয়ে দুর্বল জায়গা। মাঝের রিবগুলো (5th–9th) বেশি ভাঙে।</li>
+  <li><b>Flail chest:</b> পরপর কয়েকটা রিব দুই জায়গায় ভাঙলে ওই অংশ শ্বাসের সাথে উল্টো দিকে নড়ে।</li>
+  <li><b>Intercostal nerve block:</b> angle-এর কাছে, নিচের বর্ডারের নিচে।</li>
+  <li><b>Herpes zoster:</b> একটা intercostal nerve-এর পথ ধরে বেল্টের মতো ব্যথা আর ফুসকুড়ি।</li></ul></div>
+</div></section>
+
+<section class="band sec" id="s-ossi"><div class="wrap">
+ <h2>অসিফিকেশন</h2>
+ <ul>
+  <li><b>Primary center:</b> একটা, shaft-এ angle-এর কাছে, গর্ভাবস্থার প্রায় 8ম সপ্তাহে।</li>
+  <li><b>Secondary center:</b> তিনটা, puberty-তে: head-এ একটা, tubercle-এর articular অংশে একটা, non-articular অংশে একটা।</li>
+  <li><b>জোড়া লাগা:</b> প্রায় ২০–২৫ বছরে।</li>
+ </ul>
+ <p class="note">বইয়ের সংস্করণভেদে সময়ে পার্থক্য থাকতে পারে, নিজের রেফারেন্স বইয়ের সাথে মিলিয়ে নিন।</p>
+</div></section>
+
+<section class="band sec" id="s-viva"><div class="wrap">
+ <h2>ভাইভায় যা জিজ্ঞেস করে</h2>
+ <details><summary>Typical rib কোনগুলো?</summary><p>3rd থেকে 9th। 1st, 2nd, 10th, 11th, 12th atypical।</p></details>
+ <details><summary>Typical rib-এর side কীভাবে বের করবেন?</summary><p>Head পেছনে, anterior end সামনে, costal groove-ওয়ালা ধারালো বর্ডার নিচে আর groove ভেতরে রাখলে উত্তল external surface যেদিকে মুখ করে, রিবটা সেই পাশের।</p></details>
+ <details><summary>Head-এর দুই facet কার সাথে জোড়া লাগে?</summary><p>নিচের বড় facet নিজের কশেরুকার body-র সাথে, উপরের ছোট facet উপরের কশেরুকার body-র সাথে। যেমন 6th রিব: T6 আর T5।</p></details>
+ <details><summary>Costal groove-এ কী থাকে, কোন ক্রমে?</summary><p>উপর থেকে নিচে: posterior intercostal vein, artery, intercostal nerve (VAN)।</p></details>
+ <details><summary>Chest tube নিচের রিবের উপরের বর্ডার ঘেঁষে কেন ঢোকানো হয়?</summary><p>উপরের রিবের নিচের বর্ডারে costal groove-এ VAN থাকে; উপরের বর্ডার ঘেঁষে ঢোকালে সেগুলো এড়ানো যায়।</p></details>
+ <details><summary>রিব সবচেয়ে বেশি কোথায় ভাঙে?</summary><p>Angle-এর ঠিক সামনে, কারণ এটা সবচেয়ে দুর্বল জায়গা।</p></details>
+ <details><summary>Angle-এ কী লাগে?</summary><p>Iliocostalis; তার ভেতরের দিকে longissimus thoracis আর levator costae।</p></details>
+ <details><summary>Tubercle-এর দুই অংশে কী থাকে?</summary><p>Articular অংশ transverse process-এর সাথে জোড়া; non-articular অংশে lateral costotransverse ligament লাগে।</p></details>
+ <details><summary>Costovertebral joint কয়টা cavity?</summary><p>Typical রিবে দুটো, intra-articular ligament দিয়ে ভাগ করা। 1st, 10th, 11th, 12th রিবে একটা।</p></details>
+</div></section>
+</div>
+
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে তৈরি। ল্যান্ডমার্ক আর অ্যাটাচমেন্ট মেশ থেকে মাপা।</p>
+ <p><b>লেখার রেফারেন্স:</b> BD Chaurasia's Human Anatomy (Vol. 1, Thorax), Snell's Clinical Anatomy by Regions, Gray's Anatomy।</p>
+ <p class="note">এটি একটি প্রথম খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+<script>document.querySelectorAll(window.SPEC==='typical'?'.only-first':'.only-typical').forEach(function(e){e.remove()})</script>
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>
