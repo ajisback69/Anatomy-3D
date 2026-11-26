@@ -21,7 +21,7 @@ const cam=new THREE.PerspectiveCamera(32,1,1,4000);scene.add(cam);
 scene.add(new THREE.HemisphereLight(0xfff8ee,0x30403c,1.1));
 const keyL=new THREE.DirectionalLight(0xffffff,1.6);keyL.position.set(120,180,300);cam.add(keyL);
 const rim=new THREE.DirectionalLight(0x9fd8cc,.6);rim.position.set(-200,-80,-200);scene.add(rim);
-const ctl=new OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;ctl.dampingFactor=.12;ctl.minDistance=90;ctl.maxDistance=1300;
+const ctl=new OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;ctl.dampingFactor=.12;ctl.minDistance=B.minDist??90;ctl.maxDistance=B.maxDist??1300;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function dec(s,T){const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new T(u.buffer)}
@@ -53,6 +53,18 @@ for(const m of D.meshes){
  } else {const mm=addMesh(g,m.group,m.key||m.name,m.name,m.layer);if(m.stage!=null)mm.userData.stage=m.stage}
 }
 $('#load')?.remove();
+
+/* ---------- ধাপ-ভিত্তিক আলাদা ডেটা ফাইল: B.stageSrc(k) = সেই ধাপের মেশের ফাইল; লাগলে তবেই লোড ---------- */
+const stLoaded={},stWait={};
+function loadStage(k,then){
+ if(!B.stageSrc||k==null||k<0||(B.stages&&k>=B.stages.length)||stLoaded[k]===true){then&&then();return}
+ (stWait[k]=stWait[k]||[]).push(then);if(stLoaded[k]==='busy')return;stLoaded[k]='busy';
+ const sc=document.createElement('script');sc.src=B.stageSrc(k);
+ sc.onload=()=>{const SD=window.STAGEDATA||{},S=SD[k];if(S)for(const m of S.meshes){const mm=addMesh(geo(m),m.group,m.key||m.name,m.name,m.layer);mm.userData.stage=k}delete SD[k];
+  stLoaded[k]=true;applyLayers();applyClip();const w=stWait[k]||[];stWait[k]=[];w.forEach(f=>f&&f());dirty=occDirty=true};
+ sc.onerror=()=>{stLoaded[k]=false;stWait[k]=[];note('এই ধাপের মডেল লোড হয়নি, ইন্টারনেট দেখে আবার চেষ্টা করুন।')};
+ document.head.appendChild(sc);
+}
 
 /* ---------- অবস্থা ---------- */
 let curStage=B.stages?(B.startStage??0):null;
@@ -395,12 +407,13 @@ function tick(now){
  requestAnimationFrame(tick);
 }
 function setStage(k,doFly=true){
- curStage=k;document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.stage===k));
+ curStage=k;if(B.stageSrc&&stLoaded[k]!==true){const lb=$('#stageLbl');loadStage(k,()=>{if(lb&&curStage===k)lb.textContent=B.stages[k].t;loadStage(k+1)});}
+ document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.stage===k));
  pins.forEach(x=>x.el.classList.remove('on'));const S=B.stages[k];
  applyLayers();applyClip();
  if(S&&S.card&&mode!=='quiz')card(S.k||'',S.card);
  if(S&&S.view&&doFly)fly(S.view[0],S.view[1],S.view[2]||[0,0,0]);
- const sl=$('#stageSl');if(sl)sl.value=k;const lb=$('#stageLbl');if(lb)lb.textContent=S.t;dirty=occDirty=true;
+ const sl=$('#stageSl');if(sl)sl.value=k;const lb=$('#stageLbl');if(lb)lb.textContent=S.t+(B.stageSrc&&stLoaded[k]!==true?' (লোড হচ্ছে…)':'');dirty=occDirty=true;
 }
 document.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click',()=>setStage(+b.dataset.stage)));
 $('#stageSl')?.addEventListener('input',e=>setStage(+e.target.value));

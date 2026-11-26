@@ -15,6 +15,7 @@ from common import write_js, SCALE
 OUT = os.path.join(os.path.dirname(__file__), '..', 'bones', 'embryo-w1', 'data')
 rng = np.random.default_rng(7)
 MESHES, LM = [], []
+RAW = []   # (stage, key, group, trimesh): Langman ডিটেইল ধাপ এগুলো থেকে অবস্থান পড়ে
 
 
 # ---------------------------------------------------------------- জ্যামিতি সাহায্যকারী
@@ -89,6 +90,7 @@ def tube(pts, r, sides=12):
 def add(stage, key, group, mesh, name=None):
     v = np.asarray(mesh.vertices); f = np.asarray(mesh.faces)
     assert len(v) < 65535, (key, len(v))
+    RAW.append((stage, key, group, mesh))
     q = np.round(v / SCALE).astype(np.int16)
     MESHES.append(dict(name=name or key, group=group, key=key, stage=stage, layer='organ',
                        v=base64.b64encode(q.tobytes()).decode(), f=base64.b64encode(f.astype(np.uint16).tobytes()).decode()))
@@ -137,7 +139,7 @@ def s0():
     zona(st)
     add(st, 'oocyte', 'cell', blob([0, 0, 0], OOC, 4, .01, 1))
     polar(st, [([0, 57.5, 6], 9.5)])
-    add(st, 'spindle', 'chrom', blob([0, 48, 4], 6, 2, 0, 0, scale=(1.6, .6, .6)))
+    add(st, 'spindle', 'spindle', blob([0, 48, 4], 6, 2, 0, 0, scale=(1.6, .6, .6)))
     # corona radiata: zona-র বাইরে follicular কোষ
     for i, d in enumerate(rng.normal(size=(70, 3))):
         d /= np.linalg.norm(d)
@@ -339,6 +341,8 @@ STAGES = [s0, s1, s2, s3, s4, s5, s6, s7, s8, s9]
 if __name__ == '__main__':
     for f in STAGES:
         f()
+    import embryo_w1_langman as LD   # Langman 14th অনুযায়ী বাড়তি ডিটেইল আর নতুন ধাপ (পুরোনো সব থাকে)
+    LD.run(sys.modules[__name__])
     write_js(os.path.join(OUT, 'core.js'), 'window.DATA', dict(scale=SCALE, meshes=MESHES, lm=LM, meta={}))
     write_js(os.path.join(OUT, 'layers.js'), 'window.LAYERS', dict(meshes=[], tubes=[], spheres=[], anchors={}))
     print(len(MESHES), 'মেশ,', len(LM), 'ল্যান্ডমার্ক')
