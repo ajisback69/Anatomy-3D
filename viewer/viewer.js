@@ -80,10 +80,33 @@ function geo(m){
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
  g.setIndex(new THREE.BufferAttribute(dec(m.f,m.i32?Uint32Array:Uint16Array),1));g.computeVertexNormals();g.computeBoundingSphere();return g;
 }
+/* ---------- মাসলের আসল রং (owner): গাঢ় লালচে-বাদামি, প্রতিটা muscle-এ সামান্য আলাদা আভা, ফাইবার বরাবর দাগ আর ভেজা চকচকে ভাব।
+   B.muscleReal:false দিলে আগের মতো অ্যাটাচমেন্টের রঙে। ---------- */
+function hashK(k){let h=2166136261;for(const c of String(k))h=Math.imul(h^c.charCodeAt(0),16777619);return ((h>>>0)%1000)/1000}
+function muscleTone(k){const r=hashK(k),r2=hashK(k+'x');const c=new THREE.Color(B.muscleColor||'#8e2a23');const hsl={};c.getHSL(hsl);c.setHSL(hsl.h+(r-.5)*.035,Math.min(1,hsl.s*(.85+r2*.3)),hsl.l*(.82+r*.36));return c}
+function pcaAxis(g){const a=g.attributes.position,n=a.count,st=Math.max(1,Math.floor(n/3000));let mx=0,my=0,mz=0,c=0;for(let i=0;i<n;i+=st){mx+=a.getX(i);my+=a.getY(i);mz+=a.getZ(i);c++}mx/=c;my/=c;mz/=c;
+ let xx=0,xy=0,xz=0,yy=0,yz=0,zz=0;for(let i=0;i<n;i+=st){const x=a.getX(i)-mx,y=a.getY(i)-my,z=a.getZ(i)-mz;xx+=x*x;xy+=x*y;xz+=x*z;yy+=y*y;yz+=y*z;zz+=z*z}
+ let v=new THREE.Vector3(1,1,1).normalize();for(let k=0;k<30;k++){v.set(xx*v.x+xy*v.y+xz*v.z,xy*v.x+yy*v.y+yz*v.z,xz*v.x+yz*v.y+zz*v.z).normalize()}return v}
+function muscleMat(g,key,op){
+ const col=muscleTone(key),ax=pcaAxis(g),fpm=B.muscleFibre??1.1;
+ const m=new THREE.MeshPhysicalMaterial({color:col,roughness:.48,metalness:0,clearcoat:.4,clearcoatRoughness:.3,sheen:.35,sheenRoughness:.5,sheenColor:new THREE.Color('#e9a59a'),transparent:op<1,opacity:op,depthWrite:op>=.6});
+ m.customProgramCacheKey=()=>'musc';
+ m.onBeforeCompile=sh=>{
+  sh.uniforms.uAx={value:ax};sh.uniforms.uF={value:fpm};
+  sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWP;').replace('#include <project_vertex>','#include <project_vertex>\nvWP=(modelMatrix*vec4(transformed,1.0)).xyz;');
+  let f=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vWP;uniform vec3 uAx;uniform float uF;'+GLSL_N+'\nvec3 mq(vec3 p){float al=dot(p,uAx);vec3 pe=p-al*uAx;return (pe+uAx*al*.07)*uF;}\nfloat mf(vec3 p){vec3 q=mq(p);return fb(q)*.7+gn(q*3.1)*.3;}');
+  f=f.replace('#include <color_fragment>','#include <color_fragment>\n{float s=mf(vWP);diffuseColor.rgb*=.8+.42*(s*.5+.5);float tend=smoothstep(.55,.8,fb(vWP*.05+3.));diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.86,.8,.72),tend*.0);}');
+  f=f.replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>\n{float e=.08,n0=mf(vWP);vec3 gr=vec3(mf(vWP+vec3(e,0,0))-n0,mf(vWP+vec3(0,e,0))-n0,mf(vWP+vec3(0,0,e))-n0)/e;vec3 gv=(viewMatrix*vec4(gr,0.)).xyz;normal=normalize(normal-.06*(gv-dot(gv,normal)*normal));}');
+  f=f.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n{float fr=1.0-abs(dot(normalize(vViewPosition),normal));totalEmissiveRadiance+=vec3(.55,.18,.15)*.25*pow(fr,2.5);}');
+  sh.fragmentShader=f;
+ };
+ return m;
+}
+const MUS_REAL=B.muscleReal!==false;
 function addMesh(g,group,key,name,layer){
  const st=STYLE[group]||['#ccc',1];let col=st[0];layer=layer||G2L[group]||'organ';
  if(group==='muscle')col=B.MUS_REG&&B.MUS_REG[key]!=null?B.REG[B.MUS_REG[key]].c:'#5b86c9';
- const op=st[1],mat=LOOK?organicMat(col,op,group):new THREE.MeshStandardMaterial({color:col,roughness:group==='artery'||group==='vein'?.45:.75,transparent:op<1,opacity:op,depthWrite:op>=.6});
+ const op=group==='muscle'&&MUS_REAL?(B.muscleOp??.86):st[1],mat=group==='muscle'&&MUS_REAL?muscleMat(g,key,op):LOOK?organicMat(col,op,group):new THREE.MeshStandardMaterial({color:col,roughness:group==='artery'||group==='vein'?.45:.75,transparent:op<1,opacity:op,depthWrite:op>=.6});
  const mesh=new THREE.Mesh(g,mat);mesh.name=name;mesh.userData={group,key,op};mesh.visible=false;
  if(group==='lung')mesh.renderOrder=2;
  if(group==='mark'){mesh.renderOrder=3;mat.depthTest=false;mat.transparent=true}
@@ -145,7 +168,7 @@ function highlight(key){
  for(const m of pickable){
   const on=key&&(m.userData.key===key||m.name===key);
   m.material.emissive.set(on?0x552211:0x000000);
-  if(m.userData.group==='muscle')m.material.opacity=key?(on?.9:.18):m.userData.op;
+  if(m.userData.group==='muscle')m.material.opacity=key?(on?.95:.16):m.userData.op;
  }
  dirty=true;
 }
