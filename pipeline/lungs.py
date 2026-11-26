@@ -314,15 +314,21 @@ def main():
     def tube(key, pts, col, r=1.6, closed=False):
         if pts is None or len(pts) < 3:
             return
+        # মসৃণ spline: অল্প কয়েকটা নিয়ন্ত্রণ-বিন্দু (রক্তনালীর মতো সোজা-মসৃণ রেখা), শুধু সেগুলো পৃষ্ঠে বসানো
+        from scipy.interpolate import splprep, splev
+        P_ = np.asarray(pts, float)
+        keep_ = np.r_[True, np.linalg.norm(np.diff(P_, axis=0), axis=1) > 1e-3]
+        P_ = P_[keep_]
+        nctl = 18 if closed else max(6, min(11, int(np.linalg.norm(np.diff(P_, axis=0), axis=1).sum() / 22)))
+        try:
+            tck, _ = splprep(P_.T, s=len(P_) * 25.0, per=1 if closed else 0, k=3)
+            ctl = np.array(splev(np.linspace(0, 1, nctl, endpoint=not closed), tck)).T
+        except Exception:
+            ctl = P_[np.linspace(0, len(P_) - 1, nctl).astype(int)]
+        ctl = snap(ctl, KEYS_NOW[0], FIS_OFF[0] + .8)
         if closed:
-            pts = np.vstack([pts, pts[:1]])
-        # ঘন করে আবার পৃষ্ঠে বসানো, যাতে রেখা পৃষ্ঠের ভেতরে ডুবে না যায়
-        dense = []
-        for a_, b_ in zip(pts[:-1], pts[1:]):
-            for t_ in np.linspace(0, 1, 4, endpoint=False):
-                dense.append(a_ * (1 - t_) + b_ * t_)
-        dense.append(pts[-1])
-        pts = snap(smooth(np.array(dense), 2, False), KEYS_NOW[0], FIS_OFF[0])
+            ctl = np.vstack([ctl, ctl[:1]])
+        pts = ctl
         lay['tubes'].append(dict(key=key, layer='border', group='border', col=col, r=r, pts=F.tf(pts).round(2).tolist()))
         lay['anchors'][key] = F.tf(pts[len(pts) // 2]).round(2).tolist()
     KEYS_NOW = [None]
