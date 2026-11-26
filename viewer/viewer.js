@@ -29,7 +29,7 @@ const S=D.scale,bone=[],byLayer={rib:[],clav:[],muscle:[],artery:[],vein:[],nerv
 const BONE_C=new THREE.Color(B.baseColor||'#ece4d4'),INNER_C=new THREE.Color(B.innerColor||B.baseColor||'#ece4d4');
 renderer.localClippingEnabled=true;
 const clipPlane=new THREE.Plane(new THREE.Vector3(0,0,-1),0);let curCut=null,clipOn=false,boneOp=1;
-const STYLE={rib:['#e9e1cf',.45],cart:['#9fd6cf',.7],clav:['#e9e1cf',.8],muscle:[null,.38],artery:['#e0443e',1],vein:['#4a78e0',1],heart:['#c9706a',.45],lung:['#f0b8b2',.16],thymus:['#e7a8c9',.75],trachea:['#cfd6dc',.7],vert:['#d9d0bd',.95],disc:['#9fd6cf',.9],valve:['#f3e3b0',1],pap:['#c96b62',1],cond:['#ffd43b',1],pa:['#6c63d9',1],pvein:['#e8738a',1],mark:['#ff8a3d',1]};
+const STYLE={rib:['#e9e1cf',.45],cart:['#9fd6cf',.7],clav:['#e9e1cf',.8],muscle:[null,.38],artery:['#e0443e',1],vein:['#4a78e0',1],heart:['#c9706a',.45],lung:['#f0b8b2',.16],thymus:['#e7a8c9',.75],trachea:['#cfd6dc',.7],vert:['#d9d0bd',.95],disc:['#9fd6cf',.9],valve:['#f3e3b0',1],pap:['#c96b62',1],cond:['#ffd43b',1],pa:['#6c63d9',1],pvein:['#e8738a',1],mark:['#ff8a3d',1],...(B.STYLE||{})};
 const G2L={rib:'rib',cart:'rib',clav:'clav',muscle:'muscle',artery:'artery',vein:'vein',heart:'organ',lung:'organ',thymus:'organ',trachea:'organ',vert:'vert',disc:'vert',valve:'valve',pap:'valve',cond:'cond',pa:'great',pvein:'great',mark:'mark'};
 function geo(m){
  const q=dec(m.v,Int16Array),p=new Float32Array(q.length);for(let i=0;i<q.length;i++)p[i]=q[i]*S;
@@ -37,7 +37,7 @@ function geo(m){
  g.setIndex(new THREE.BufferAttribute(dec(m.f,m.i32?Uint32Array:Uint16Array),1));g.computeVertexNormals();g.computeBoundingSphere();return g;
 }
 function addMesh(g,group,key,name,layer){
- const st=STYLE[group]||['#ccc',1];let col=st[0];
+ const st=STYLE[group]||['#ccc',1];let col=st[0];layer=layer||G2L[group]||'organ';
  if(group==='muscle')col=B.MUS_REG&&B.MUS_REG[key]!=null?B.REG[B.MUS_REG[key]].c:'#5b86c9';
  const op=st[1],mat=new THREE.MeshStandardMaterial({color:col,roughness:group==='artery'||group==='vein'?.45:.75,transparent:op<1,opacity:op,depthWrite:op>=.6});
  const mesh=new THREE.Mesh(g,mat);mesh.name=name;mesh.userData={group,key,op};mesh.visible=false;
@@ -50,16 +50,17 @@ for(const m of D.meshes){
  if(m.group==='bone'){
   g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*3),3));g.userData.r=m.r?dec(m.r,Uint8Array):new Uint8Array(g.attributes.position.count);g.userData.p=m.p?dec(m.p,Uint8Array):null;g.userData.t=m.t?dec(m.t,Uint8Array):null;
   const mesh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:B.boneRough||.78,metalness:0}));mesh.name=m.name;mesh.userData={group:'bone'};scene.add(mesh);bone.push(mesh);
- } else addMesh(g,m.group,m.key||m.name,m.name,m.layer);
+ } else {const mm=addMesh(g,m.group,m.key||m.name,m.name,m.layer);if(m.stage!=null)mm.userData.stage=m.stage}
 }
 $('#load')?.remove();
 
 /* ---------- অবস্থা ---------- */
+let curStage=B.stages?(B.startStage??0):null;
 let mode='lm',sel=null,layersReady=false,dirty=true,occDirty=true,lastMove=0;
 const layerOn=Object.fromEntries(Object.keys(byLayer).map(k=>[k,false]));
 const boxes=[...document.querySelectorAll('[data-layer]')];
 function applyLayers(){
- for(const k in byLayer)for(const m of byLayer[k])m.visible=layerOn[k];
+ for(const k in byLayer)for(const m of byLayer[k])m.visible=layerOn[k]&&(m.userData.stage==null||m.userData.stage===curStage);
  levelGroup.visible=layerOn.vert&&mode==='level';
  boxes.forEach(b=>b.checked=layerOn[b.dataset.layer]);dirty=occDirty=true;
 }
@@ -120,7 +121,7 @@ function makePin(o){
 const lms=D.lm.map(o=>{
  const x=B.lmInfo(o.id);
  const type=x.type||(x.kind==='num'?'num':x.kind==='surf'?'surf':'elev');
- return makePin({id:o.id,p:V3(o.p),n:V3(o.n).normalize(),inf:x.inf,lab:x.kind==='num'?(x.inf.t):x.lab,num:x.kind==='num'?x.lab:null,kind:x.kind,quiz:x.quiz,quizName:x.quizName,cls:'mk mk-'+type,mk:true,show:x.show||'lm',occ:true,cut:x.cut||o.cut||null});
+ return makePin({id:o.id,p:V3(o.p),n:V3(o.n).normalize(),inf:x.inf,lab:x.kind==='num'?(x.inf.t):x.lab,num:x.kind==='num'?x.lab:null,kind:x.kind,quiz:x.quiz,quizName:x.quizName,cls:'mk mk-'+type,mk:true,show:x.show||'lm',occ:true,cut:x.cut||o.cut||null,stage:o.stage??null});
 });
 function card(k,o){
  info.innerHTML=`<div class="k">${esc(k)}</div><h3>${esc(o.t)}</h3><div class="sub">${esc(o.b)}</div><p style="margin:0 0 6px">${esc(o.d)}</p>${o.l?'<ul>'+o.l.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}`;
@@ -148,6 +149,7 @@ function applyClip(){
  for(const m of all){m.material.clippingPlanes=null;m.material.needsUpdate=true}
  if(clipOn)for(const m of clipTargets()){m.material.clippingPlanes=[clipPlane];m.material.side=THREE.DoubleSide;m.material.needsUpdate=true}
  for(const b of bone){b.material.side=clipOn&&!B.cutCap?THREE.DoubleSide:THREE.FrontSide}
+ if(B.capAll){for(const m of bone.concat(...Object.values(byLayer))){const on=clipOn&&!!m.material.clippingPlanes&&m.visible;if(on&&!m.userData.cap){const c=m.material.color.clone().multiplyScalar(.62);const ghost=m.material.opacity<.35;const cm=new THREE.MeshStandardMaterial({color:c,roughness:.95,side:THREE.BackSide,transparent:ghost,opacity:ghost?m.material.opacity:1,depthWrite:!ghost});const t=new THREE.Mesh(m.geometry,cm);t.raycast=()=>{};m.add(t);m.userData.cap=t}if(m.userData.cap){m.userData.cap.visible=on;m.userData.cap.material.clippingPlanes=on?[clipPlane]:null;m.userData.cap.material.needsUpdate=true;if(on){m.material.side=THREE.FrontSide;if(m.material.opacity>=.35&&m.material.transparent){m.userData.op0=m.material.opacity;m.material.opacity=1;m.material.transparent=false;m.material.depthWrite=true;m.material.needsUpdate=true}}else if(m.userData.op0){m.material.opacity=m.userData.op0;m.material.transparent=true;m.material.depthWrite=m.userData.op0>=.6;m.userData.op0=null;m.material.needsUpdate=true}}}}
  if(B.cutCap){for(const b of bone){if(!b.userData.cap){const cm=new THREE.MeshStandardMaterial({color:B.cutCap,roughness:.9,side:THREE.BackSide});const t=new THREE.Mesh(b.geometry,cm);b.add(t);b.userData.cap=t}const t=b.userData.cap;t.visible=clipOn;t.material.clippingPlanes=clipOn?[clipPlane]:null;t.material.needsUpdate=true}}
  dirty=occDirty=true;
 }
@@ -262,6 +264,7 @@ function newQ(){
  const pool=QPOOL.filter(x=>x!==qCur);qCur=pool[Math.floor(Math.random()*pool.length)];
  const names=[...new Set(QPOOL.map(nameOf))].filter(n=>n!==nameOf(qCur)).sort(()=>Math.random()-.5).slice(0,3);
  const opts=[nameOf(qCur),...names].sort(()=>Math.random()-.5);
+ if(B.stages&&qCur.stage!=null&&qCur.stage!==curStage)setStage(qCur.stage,false);
  quizMark.position.copy(qCur.p);quizMark.visible=true;
  if(B.cuts){const c=qCur.cut?[].concat(qCur.cut).find(k=>B.cuts[k]&&B.cuts[k].n):null;setCut(c||null,false);setBoneOp(c&&B.cuts[c].op?B.cuts[c].op:1)}
  info.innerHTML=`<div class="k">কুইজ</div><h3>কমলা বিন্দুটা কী?</h3><p style="margin:6px 0 0">মডেল ঘুরিয়ে দেখে নিন, তারপর সঠিক নামটা বেছে নিন।</p>`;
@@ -356,6 +359,7 @@ function buildLayers(){
 ctl.addEventListener('change',()=>{dirty=true;occDirty=true;lastMove=performance.now()});
 const v=new THREE.Vector3(),toCam=new THREE.Vector3(),occ=new THREE.Raycaster();
 function showIn(L,m){
+ if(L.stage!=null&&L.stage!==curStage)return false;
  if(!(Array.isArray(L.show)?L.show.includes(m):L.show===m))return false;
  const M=B.modes[m]||{};
  if(L.cut&&(M.cuts||M.cut))return cutHas(L,curCut);
@@ -390,6 +394,16 @@ function tick(now){
  if(occDirty&&now-lastMove>140){place(true);occDirty=false}
  requestAnimationFrame(tick);
 }
-setMode(B.startMode||'lm');size();requestAnimationFrame(tick);
+function setStage(k,doFly=true){
+ curStage=k;document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.stage===k));
+ pins.forEach(x=>x.el.classList.remove('on'));const S=B.stages[k];
+ applyLayers();applyClip();
+ if(S&&S.card&&mode!=='quiz')card(S.k||'',S.card);
+ if(S&&S.view&&doFly)fly(S.view[0],S.view[1],S.view[2]||[0,0,0]);
+ const sl=$('#stageSl');if(sl)sl.value=k;const lb=$('#stageLbl');if(lb)lb.textContent=S.t;dirty=occDirty=true;
+}
+document.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click',()=>setStage(+b.dataset.stage)));
+$('#stageSl')?.addEventListener('input',e=>setStage(+e.target.value));
+setMode(B.startMode||'lm');size();if(B.stages)setStage(curStage);requestAnimationFrame(tick);
 const sc=document.createElement('script');sc.src=B.layersSrc||'data/layers.js';sc.onload=buildLayers;sc.onerror=()=>note('লেয়ার লোড হয়নি, পেজ রিফ্রেশ করুন।');
 setTimeout(()=>document.body.appendChild(sc),300);
