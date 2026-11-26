@@ -3,12 +3,12 @@ import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import limbpage
 from limbpage import page, sec, viva, credit
-limbpage.MODE_NAMES.update({'parts': 'Lobes', 'lm': 'Borders', 'faceR': 'Right medial surface', 'faceL': 'Left medial surface', 'seg': 'Segments',
+limbpage.MODE_NAMES.update({'parts': 'Lobes', 'lm': 'Borders', 'surfs': 'Surfaces', 'faceR': 'Right medial surface', 'faceL': 'Left medial surface', 'seg': 'Segments',
                             'root': 'Root', 'rel': 'Relations', 'surf': 'Surface marking', 'cut': 'Cut section', 'quiz': 'Quiz'})
 limbpage.VIEW_NAMES.update({'ant': 'সামনে', 'post': 'পেছনে', 'rlat': 'ডান পাশ', 'llat': 'বাঁ পাশ', 'sup': 'উপর থেকে', 'inf': 'নিচ থেকে'})
 limbpage.LAYER_ROWS.update({'rib': ('#e9e1cf', 'Ribs ও sternum'), 'organ': ('#c97a6d', 'Heart, oesophagus'), 'great': ('#e0443e', 'Great vessels'),
                             'root': ('#6c63d9', 'Root: bronchus, pulmonary vessels'), 'muscle': ('#8e2a23', 'Diaphragm'), 'vert': ('#d9d0bd', 'Vertebrae'),
-                            'pleura': ('#9fd0e8', 'Pleura (স্কিম্যাটিক)')})
+                            'pleura': ('#9fd0e8', 'Pleura (স্কিম্যাটিক)'), 'border': ('#ffd43b', 'Borders ও fissures')})
 D = 'Datta I, পৃ. '
 s = sec('s-sum', '''  <h2>এক নজরে: right বনাম left lung</h2>
   <table class="cmp"><thead><tr><th></th><th>Right lung</th><th>Left lung</th></tr></thead><tbody>
@@ -69,8 +69,8 @@ s += sec('s-lung', '''  <h2>Lung: গুরুত্বপূর্ণ তথ্
 page(os.path.join(os.path.dirname(__file__), '..', 'bones', 'lungs', 'index.html'), 'Lungs ও Pleura 3D অ্যাটলাস',
      'Lungs ও Pleura <span style="font-weight:500;opacity:.8">· 3D অ্যাটলাস</span>',
      'দুই lung-এর lobe, fissure, surface, impression, hilum, segment, root আর pleura-র surface marking; সব স্ক্যান থেকে মাপা। Lobe সরিয়ে ভেতর দেখুন, কেটে দেখুন।',
-     ['parts', 'lm', 'faceR', 'faceL', 'seg', 'root', 'rel', 'surf', 'cut', 'quiz'], ['ant', 'post', 'rlat', 'llat', 'sup', 'inf'],
-     ['rib', 'organ', 'great', 'root', 'muscle', 'vert', 'pleura'],
+     ['parts', 'lm', 'surfs', 'faceR', 'faceL', 'seg', 'root', 'rel', 'surf', 'cut', 'quiz'], ['ant', 'post', 'rlat', 'llat', 'sup', 'inf'],
+     ['border', 'rib', 'organ', 'great', 'root', 'muscle', 'vert', 'pleura'],
      [('s-sum', 'এক নজরে'), ('s-pleura', 'Pleura'), ('s-lung', 'Lung ও viva'), ('s-credit', 'সূত্র')], s, start='parts',
      credit=credit('A.K. Datta, <i>Essentials of Human Anatomy</i>, Part I (Thorax &amp; Abdomen), Chapter 2: The Pleura ও The Lungs, পৃ. 28–42। নিজের ভাষায় লেখা।',
                    'Lobe, heart, vessel, trachea, bronchus আর rib স্ক্যানের। Broncho-pulmonary segment আর parietal pleura স্কিম্যাটিক।'))

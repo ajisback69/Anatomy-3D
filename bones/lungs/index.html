@@ -31,6 +31,7 @@ table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
     <div class="bar" role="group" aria-label="মোড">
      <button class="btn" data-mode="parts" aria-pressed="true">Lobes</button>
      <button class="btn" data-mode="lm" aria-pressed="false">Borders</button>
+     <button class="btn" data-mode="surfs" aria-pressed="false">Surfaces</button>
      <button class="btn" data-mode="faceR" aria-pressed="false">Right medial surface</button>
      <button class="btn" data-mode="faceL" aria-pressed="false">Left medial surface</button>
      <button class="btn" data-mode="seg" aria-pressed="false">Segments</button>
@@ -49,6 +50,7 @@ table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
      <button class="btn" data-view="inf">নিচ থেকে</button>
     </div>
     <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="border"><i class="dot" style="background:#ffd43b"></i>Borders ও fissures</label>
      <label class="tog"><input type="checkbox" data-layer="rib"><i class="dot" style="background:#e9e1cf"></i>Ribs ও sternum</label>
      <label class="tog"><input type="checkbox" data-layer="organ"><i class="dot" style="background:#c97a6d"></i>Heart, oesophagus</label>
      <label class="tog"><input type="checkbox" data-layer="great"><i class="dot" style="background:#e0443e"></i>Great vessels</label>

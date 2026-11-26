@@ -149,6 +149,7 @@ boxes.forEach(b=>b.addEventListener('change',()=>{layerOn[b.dataset.layer]=b.che
 function note(t){if(!info.querySelector('.ld'))info.insertAdjacentHTML('beforeend',`<p class="ld" style="margin:8px 0 0;color:#7a4a35">${esc(t)}</p>`)}
 
 const paintKind=()=>(B.modes[mode]||{}).paint||(mode==='parts'?'parts':mode==='att'?'reg':null);
+function RM(x){const m=(B.modes[mode]||{}).regMap;return m&&m[x]!=null?m[x]:x}
 function paint(){
  const focus=sel&&sel.reg,pk=paintKind();
  for(const s of bone){
@@ -157,7 +158,7 @@ function paint(){
    const inner=pa&&pa[i]>=10;let col=inner?INNER_C:BONE_C;
    if(pk==='parts')col=pa?tmp.set(B.PARTS[pa[i]]?.c||'#ccc'):pc;
    else if(pk==='terr'&&tt&&B.TERR[tt[i]]){col=tmp.set(B.TERR[tt[i]].c);if(inner)col.lerp(INNER_C,.5);if(focus&&tt[i]!==focus)col.lerp(BONE_C,.75)}
-   else if(pk==='reg'&&r[i]&&B.REG[r[i]]){col=tmp.set(B.REG[r[i]].c);if(focus&&r[i]!==focus)col.lerp(BONE_C,.78)}
+   else if(pk==='reg'&&r[i]&&B.REG[RM(r[i])]){const q=RM(r[i]);col=tmp.set(B.REG[q].c);if(focus&&q!==focus)col.lerp(BONE_C,.78)}
    else if(pk!=='reg'&&pk!=='parts'&&r[i]&&(r[i]===8||B.REG[r[i]]?.lm))col=tmp.set(B.REG[r[i]].c);
    c.setXYZ(i,col.r,col.g,col.b);
   }
@@ -350,7 +351,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
  const ud=h.object.userData,pa=h.object.geometry.userData.p,part=pa?B.PARTS[pa[h.face.a]]:B.PARTS[h.object.name];
  if(ud.group==='bone'){
   const pk=paintKind();
-  if(pk==='reg'&&mode!=='att'){const reg=h.object.geometry.userData.r[h.face.a];if(reg&&B.REG[reg]){sel={reg};card(B.regLabel||'Part',B.REG[reg]);paint();tapShow(h.point,B.REG[reg].t)}else if(part){card('Part',part);tapShow(h.point,part.t)}return}
+  if(pk==='reg'&&mode!=='att'){const reg=RM(h.object.geometry.userData.r[h.face.a]);if(reg&&B.REG[reg]){sel={reg};card(B.regLabel||'Part',B.REG[reg]);paint();tapShow(h.point,B.REG[reg].t)}else if(part){card('Part',part);tapShow(h.point,part.t)}return}
   if(pk==='terr'){const t=h.object.geometry.userData.t[h.face.a];if(B.TERR[t]){sel={reg:t};card(B.terrLabel||'Blood supply',B.TERR[t]);paint();highlight(B.TERR[t].k);tapShow(h.point,B.TERR[t].t)}return}
   if(mode!=='att'){if(part){card(B.partLabel||'Part',part);tapShow(h.point,part.t)}return}
   const reg=h.object.geometry.userData.r[h.face.a];

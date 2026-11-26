@@ -71,6 +71,7 @@ def main():
     lobe_t = {k: cKDTree(m.vertices) for k, m in raw.items()}
 
     core_meshes, LM, meas = [], [], {}
+    KEEP = {}
     regcount = {}
 
     def lm(id_, p, n, **kw):
@@ -89,15 +90,20 @@ def main():
         dr = ribt.query(v)[0]
         zt = allv[(allv[:, 0] < 0) if side == 'R' else (allv[:, 0] > 0)][:, 2].max()
         r = np.full(len(v), R_COSTAL, np.uint8)
+        # পৃষ্ঠ ভাগের জন্য ১৪ মিমি জুড়ে গড় normal: ছোট উঁচু-নিচুতে পৃষ্ঠ ছেঁড়া-ছেঁড়া হয় না
+        vtree = cKDTree(v)
+        ns = np.array([vn[ix].mean(0) for ix in vtree.query_ball_point(v, 14)])
+        ns /= np.linalg.norm(ns, axis=1)[:, None]
         nmed = vn @ med
-        isme = (nmed > .3) & (dr > 6)
+        nsm = ns @ med
+        isme = nsm > .32
         r[isme] = R_MED
-        r[isme & (dv < 9)] = R_VERT
-        r[(d['dia'] < 4) & (vn[:, 2] < -.15)] = R_BASE
+        r[isme & ((dv < 14) | (ns[:, 1] > .55))] = R_VERT
+        r[(d['dia'] < 10) & ((ns[:, 2] < -.45) | ((ns[:, 2] < -.12) & (nsm > 0)))] = R_BASE
         r[v[:, 2] > zt - 28] = R_APEX
         # মৌলিক পৃষ্ঠগুলো মসৃণ করা (পাশের বিন্দুর সংখ্যাগরিষ্ঠ মত), যাতে ছোপ ছোপ না দেখায়
         nbrs = mm.vertex_neighbors
-        for _ in range(4):
+        for _ in range(10):
             r2 = r.copy()
             for i, nb_ in enumerate(nbrs):
                 if r[i] == R_APEX or not nb_:
@@ -145,6 +151,7 @@ def main():
         seeds = np.array([s for _, s in SEG[key]]); ids = np.array([i for i, _ in SEG[key]])
         W = np.array([1.0, 1.0, 1.25])
         t = ids[np.argmin(((U[:, None, :] - seeds[None]) * W) ** 2 @ np.ones(3), axis=1)].astype(np.uint8)
+        KEEP[key] = dict(v=v, vn=vn, r=r.copy(), nbrs=mm.vertex_neighbors, side=side)
         e = pack(F, key, 'bone', v, f, regions=r, key=key)
         e['p'] = b64(np.full(len(v), pid), np.uint8)
         e['t'] = b64(t, np.uint8)
@@ -256,6 +263,154 @@ def main():
 
     # ================================================= লেয়ার: প্রসঙ্গ
     lay = dict(meshes=[], tubes=[], spheres=[], anchors={})
+    # ---- border আর fissure-এর ট্রেসিং (দুই পৃষ্ঠ যেখানে মেলে সেই রেখা, স্ক্যান থেকে)
+    MEDSET = {R_MED, R_VERT, R_HILUM, R_CARD, R_SVC, R_RBCV, R_BCT, R_TRACH, R_ESO, R_IVC, R_ARCH, R_DAO, R_LSCA, R_LBCV, R_PT, R_RSCA}
+    def edge_pts(keys, cond):
+        P, N = [], []
+        for k in keys:
+            K = KEEP[k]
+            for i, nb_ in enumerate(K['nbrs']):
+                if nb_ and cond(K['r'][i], K['r'][nb_]):
+                    P.append(K['v'][i]); N.append(K['vn'][i])
+        return np.array(P), np.array(N)
+    def snap(P, keys, off=2.4):
+        allv = np.vstack([KEEP[k]['v'] for k in keys]); alln = np.vstack([KEEP[k]['vn'] for k in keys])
+        t = cKDTree(allv); _, ix = t.query(P)
+        c = allv.mean(0); out = unit_rows(allv[ix] - c)
+        return allv[ix] + (alln[ix] * .5 + out * .5) * off
+    def unit_rows(X):
+        return X / np.linalg.norm(X, axis=1)[:, None]
+    def smooth(P, it=3, closed=False):
+        P = P.copy()
+        for _ in range(it):
+            Q = P.copy()
+            if closed:
+                P = (np.roll(Q, 1, 0) + 2 * Q + np.roll(Q, -1, 0)) / 4
+            else:
+                P[1:-1] = (Q[:-2] + 2 * Q[1:-1] + Q[2:]) / 4
+        return P
+    def by_z(P, step=7):
+        if len(P) < 4:
+            return None
+        zs = np.arange(P[:, 2].min(), P[:, 2].max() + step, step)
+        out = [P[(P[:, 2] >= a) & (P[:, 2] < a + step)].mean(0) for a in zs if ((P[:, 2] >= a) & (P[:, 2] < a + step)).sum() >= 2]
+        return np.array(out) if len(out) >= 3 else None
+    def by_angle(P, c, step=8, closed=True):
+        a = np.degrees(np.arctan2(P[:, 1] - c[1], P[:, 0] - c[0]))
+        out = []
+        for a0 in np.arange(-180, 180, step):
+            m = (a >= a0) & (a < a0 + step)
+            if m.sum() >= 2:
+                out.append(P[m].mean(0))
+        return np.array(out)
+    def plane_order(P):
+        c = P.mean(0); _, _, vt = np.linalg.svd(P - c, full_matrices=False)
+        x, y = (P - c) @ vt[0], (P - c) @ vt[1]
+        a = np.degrees(np.arctan2(y, x)); o = np.argsort(a); a = a[o]; P = P[o]
+        gaps = np.diff(np.r_[a, a[0] + 360]); g = np.argmax(gaps)
+        P = np.roll(P, -(g + 1), 0)
+        out = [P[i:i + 10].mean(0) for i in range(0, len(P), 10)]
+        return np.array(out)
+    def tube(key, pts, col, r=1.6, closed=False):
+        if pts is None or len(pts) < 3:
+            return
+        if closed:
+            pts = np.vstack([pts, pts[:1]])
+        # ঘন করে আবার পৃষ্ঠে বসানো, যাতে রেখা পৃষ্ঠের ভেতরে ডুবে না যায়
+        dense = []
+        for a_, b_ in zip(pts[:-1], pts[1:]):
+            for t_ in np.linspace(0, 1, 4, endpoint=False):
+                dense.append(a_ * (1 - t_) + b_ * t_)
+        dense.append(pts[-1])
+        pts = snap(smooth(np.array(dense), 2, False), KEYS_NOW[0], FIS_OFF[0])
+        lay['tubes'].append(dict(key=key, layer='border', group='border', col=col, r=r, pts=F.tf(pts).round(2).tolist()))
+        lay['anchors'][key] = F.tf(pts[len(pts) // 2]).round(2).tolist()
+    KEYS_NOW = [None]
+    FIS_OFF = [2.4]
+    for side, keys, cx in (('R', ['RU', 'RM', 'RL'], -1), ('L', ['LU', 'LL'], 1)):
+        KEYS_NOW[0] = keys
+        allv = np.vstack([KEEP[k]['v'] for k in keys]); c = allv.mean(0)
+        # border: জ্যামিতি থেকে। প্রতিটা উচ্চতার আড়াআড়ি টুকরায় সবচেয়ে সামনে-মধ্যের (anterior) আর পেছন-মধ্যের (posterior) কিনারা
+        md = np.array([1., 0, 0]) if side == 'R' else np.array([-1., 0, 0])
+        zlo, zhi = allv[:, 2].min(), allv[:, 2].max()
+        def slice_edge(u, z0, z1, step=5):
+            out = []
+            for z in np.arange(z0, z1, step):
+                b = allv[np.abs(allv[:, 2] - z) < 2.5]
+                if len(b) < 8:
+                    continue
+                out.append(b[np.argmax(b @ u)])
+            return np.array(out)
+        ant = slice_edge(unit(np.array([0, -1., 0]) + .75 * md), zlo + 0.24 * (zhi - zlo), zhi - 12)
+        post = slice_edge(unit(np.array([0, 1., 0]) + .55 * md), zlo + 0.12 * (zhi - zlo), zhi - 12)
+        tube('bdAnt' + side, snap(smooth(ant, 3), keys), '#ffd43b')
+        tube('bdPost' + side, snap(smooth(post, 3), keys), '#ffb703')
+        # inferior border: নিচের ধারালো কিনারা; প্রতিটা কোণে নিচের অংশের সবচেয়ে বাইরের বিন্দু
+        H = zhi - zlo
+        low = allv[allv[:, 2] < zlo + .45 * H]
+        cc_ = low.mean(0); a = np.degrees(np.arctan2(low[:, 1] - cc_[1], low[:, 0] - cc_[0])); rr = np.hypot(low[:, 0] - cc_[0], low[:, 1] - cc_[1])
+        score = rr - .55 * (low[:, 2] - zlo)
+        out, rimA, rimZ = [], [], []
+        for a0 in np.arange(-180, 180, 5):
+            m_ = (a >= a0) & (a < a0 + 5)
+            if m_.sum() >= 3:
+                sel = np.where(m_)[0]; q = low[sel[np.argmax(score[sel])]]; out.append(q); rimA.append(a0 + 2.5); rimZ.append(q[2])
+        rim = smooth(np.array(out), 5, True)
+        tube('bdInf' + side, snap(rim, keys), '#fb8500', closed=True)
+        # base-এর আস্তরণ inferior border পর্যন্ত: কিনারার নিচে (আর নিচের দিকে মুখ করা) সব base, উপরে base নয়
+        rimA = np.array(rimA); rimZs = smooth(np.array(rimZ)[:, None], 5, True)[:, 0]
+        for k in keys:
+            K = KEEP[k]; vv = K['v']; aa = np.degrees(np.arctan2(vv[:, 1] - cc_[1], vv[:, 0] - cc_[0]))
+            zr = np.interp(aa, np.r_[rimA - 360, rimA, rimA + 360], np.r_[rimZs, rimZs, rimZs])
+            below = (vv[:, 2] < zr - 1.5) & (K['vn'][:, 2] < .2)
+            rr_ = K['r']
+            chg = below & np.isin(rr_, [R_COSTAL, R_MED, R_VERT])
+            rr_[chg] = R_BASE
+            up = (vv[:, 2] > zr + 4) & (rr_ == R_BASE)
+            rr_[up] = R_COSTAL
+            lat_ = ((K['vn'] @ md) < -.2) & np.isin(rr_, list(MEDSET)) & ~np.isin(rr_, [R_HILUM])
+            rr_[lat_] = R_COSTAL
+            K['r'] = rr_
+            for e_ in core_meshes:
+                if e_['name'] == k:
+                    e_['r'] = b64(rr_, np.uint8)
+        # fissure রেখা বাইরের পৃষ্ঠে: শুধু উপরের lobe থেকে (দুই দিকে একই রেখা)
+        for fk, rid, lobe in (('fisObl', R_OBL, 'RL' if side == 'R' else 'LU'), ('fisHor', R_HOR, 'RU')):
+            if side == 'L' and fk == 'fisHor':
+                continue
+            # fissure vertex যেগুলো অন্য lobe-এর বাইরের (fissure নয় এমন) পৃষ্ঠের কাছে: বাইরে দেখা রেখা
+            others = [k for k in keys if k != lobe]
+            ov = np.vstack([KEEP[k]['v'][~np.isin(KEEP[k]['r'], [R_OBL, R_HOR])] for k in others])
+            fm = KEEP[lobe]['r'] == rid
+            fv = KEEP[lobe]['v'][fm]; fn = KEEP[lobe]['vn'][fm]
+            if len(fv) < 10:
+                continue
+            near = cKDTree(ov).query(fv)[0] < 3.0
+            # costal পৃষ্ঠে দেখা অংশ: বাইরের দিকে মুখ করা কিনারা (যেখানে দাগ পড়ানো হয়)
+            costal = near & (np.vstack([KEEP[k]['v'] for k in keys]).mean(0) is not None)
+            cpts = fv[near]
+            lat = cpts[((cpts - allv.mean(0)) @ (-md)) > -5]
+            if len(lat) < 8:
+                continue
+            if fk == 'fisObl':
+                out = []
+                for z0 in np.arange(lat[:, 2].min(), lat[:, 2].max() + 5, 5):
+                    mm_ = np.abs(lat[:, 2] - z0) < 3
+                    if mm_.sum() >= 2:
+                        b_ = lat[mm_]; out.append(b_[np.argmax(b_ @ (-md))])
+                q = np.array(out) if len(out) >= 3 else None
+            else:
+                yy = lat[:, 1]; out = []
+                for y0 in np.arange(yy.min(), yy.max() + 6, 6):
+                    mm_ = (yy >= y0) & (yy < y0 + 6)
+                    if mm_.sum() >= 2:
+                        out.append(lat[mm_].mean(0))
+                q = np.array(out) if len(out) >= 3 else None
+            if q is None:
+                continue
+            FIS_OFF[0] = 4.0
+            tube(fk + side, snap(smooth(q, 9), keys, 4.0), '#ffffff', r=1.2)
+            FIS_OFF[0] = 2.4
     def addl(k, m, group, layer, nfaces, key=None):
         vv, ff = decimate(m, nfaces)
         e = pack(F, k, group, vv, ff, key=key or k); e['layer'] = layer
