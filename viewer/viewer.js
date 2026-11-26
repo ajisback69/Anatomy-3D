@@ -34,7 +34,7 @@ const G2L={rib:'rib',cart:'rib',clav:'clav',muscle:'muscle',artery:'artery',vein
 function geo(m){
  const q=dec(m.v,Int16Array),p=new Float32Array(q.length);for(let i=0;i<q.length;i++)p[i]=q[i]*S;
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
- g.setIndex(new THREE.BufferAttribute(dec(m.f,Uint16Array),1));g.computeVertexNormals();g.computeBoundingSphere();return g;
+ g.setIndex(new THREE.BufferAttribute(dec(m.f,m.i32?Uint32Array:Uint16Array),1));g.computeVertexNormals();g.computeBoundingSphere();return g;
 }
 function addMesh(g,group,key,name,layer){
  const st=STYLE[group]||['#ccc',1];let col=st[0];
@@ -147,7 +147,8 @@ function applyClip(){
  const all=bone.concat(...Object.values(byLayer));
  for(const m of all){m.material.clippingPlanes=null;m.material.needsUpdate=true}
  if(clipOn)for(const m of clipTargets()){m.material.clippingPlanes=[clipPlane];m.material.side=THREE.DoubleSide;m.material.needsUpdate=true}
- for(const b of bone){b.material.side=clipOn?THREE.DoubleSide:THREE.FrontSide}
+ for(const b of bone){b.material.side=clipOn&&!B.cutCap?THREE.DoubleSide:THREE.FrontSide}
+ if(B.cutCap){for(const b of bone){if(!b.userData.cap){const cm=new THREE.MeshStandardMaterial({color:B.cutCap,roughness:.9,side:THREE.BackSide});const t=new THREE.Mesh(b.geometry,cm);b.add(t);b.userData.cap=t}const t=b.userData.cap;t.visible=clipOn;t.material.clippingPlanes=clipOn?[clipPlane]:null;t.material.needsUpdate=true}}
  dirty=occDirty=true;
 }
 function setCut(k,doFly=true){

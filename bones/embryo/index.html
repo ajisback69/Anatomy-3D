@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ভ্রূণ 3D: Carnegie stage 18 (ডেমো)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+table.cmp{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.1);vertical-align:top}
+table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+<script src="data/core.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+<section class="band stage">
+ <div class="wrap">
+  <h1>ভ্রূণ 3D <span style="font-weight:500;opacity:.8">· Carnegie stage 18 (ডেমো)</span></h1>
+  <p class="lead">আসল মানব ভ্রূণের স্ক্যান থেকে তৈরি মডেল, প্রায় ৪৪ দিন বয়স। ঘুরিয়ে দেখুন, মার্কে ট্যাপ করুন, কেটে দেখুন।</p>
+  
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="lm" aria-pressed="true">ল্যান্ডমার্ক</button>
+     <button class="btn" data-mode="cut" aria-pressed="false">কেটে দেখা</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">কুইজ</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="left">এক পাশ</button>
+     <button class="btn" data-view="right">অন্য পাশ</button>
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+<a href="#s-gen">এক নজরে</a><a href="#s-how">মডেল</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+<section class="band sec" id="s-gen"><div class="wrap two">
+ <div>
+  <h2>Carnegie stage 18: এক নজরে</h2>
+  <ul>
+   <li><b>বয়স:</b> নিষেকের পর প্রায় ৪৪ দিন।</li>
+   <li><b>দৈর্ঘ্য:</b> প্রায় ১৩–১৭ মিমি।</li>
+   <li><b>শরীর:</b> আগের চেয়ে বেশি চৌকো; মাথা বড়, সামনে বাঁকা।</li>
+   <li><b>উপরের অঙ্গ:</b> কনুই বোঝা যায়, হাতের পাতায় আঙুলের রশ্মি।</li>
+   <li><b>নিচের অঙ্গ:</b> পায়ের পাতায় আঙুলের রশ্মি শুরু।</li>
+   <li><b>মুখ:</b> চোখের পাতার ভাঁজ শুরু; কানের ঢিবিগুলো জুড়ছে।</li>
+  </ul>
+  <p class="note">এই লেখা সাধারণ embryology তথ্য। কোন বই অনুসরণ করব জানালে সেই বই অনুযায়ী পৃষ্ঠা নম্বরসহ লিখব।</p>
+ </div>
+ <div>
+  <h2>সপ্তাহ ধরে (পরিকল্পনা)</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0"><span style="padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.15);opacity:.55">সপ্তাহ ১: নিষেক → blastocyst</span><span style="padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.15);opacity:.55">সপ্তাহ ২: bilaminar disc</span><span style="padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.15);opacity:.55">সপ্তাহ ৩: gastrulation</span><span style="padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.15);opacity:.55">সপ্তাহ ৪: folding, stage 12</span><span style="padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.15);opacity:.55">stage 13–17</span><span style="padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.15);background:#2f8f7d;color:#fff;font-weight:600">stage 18 (এই ডেমো)</span><span style="padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.15);opacity:.55">stage 19–23</span><span style="padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.15);opacity:.55">fetal period</span></div>
+  <p class="note">ডেমোতে শুধু stage 18 আছে। পছন্দ হলে বাকি stage-গুলো একই ধাঁচে আসবে, সাথে সপ্তাহ বদলানোর স্লাইডার। সপ্তাহ ১–৩-এর জন্য আসল স্ক্যান নেই, ওগুলো স্কিম্যাটিক 3D হবে।</p>
+ </div>
+</div></section>
+<section class="band sec" id="s-how"><div class="wrap two">
+ <div>
+  <h2>এই মডেল কী, কী না</h2>
+  <ul>
+   <li>আসল মানব ভ্রূণের স্ক্যান থেকে তৈরি বাইরের আকার, হুবহু (প্রায় ৪.৩ লাখ ত্রিভুজ, কোনো পরিবর্তন নেই)।</li>
+   <li>ভেতরের অঙ্গ নেই, তাই কাটলে ফাঁপা দেখায়।</li>
+   <li>মার্কগুলো মডেলের উপরে আলাদা স্তর; মডেল বদলানো হয়নি।</li>
+   <li>বাম-ডান নিশ্চিত না, তাই দৃশ্যের নাম "এক পাশ" আর "অন্য পাশ"।</li>
+  </ul>
+ </div>
+ <div>
+  <h2>মতামত দিন</h2>
+  <p>দেখুন কেমন লাগছে: ঘোরানো, মার্ক, কাটা। কী বদলাতে চান, কী যোগ করতে চান জানান। তারপর বাকি ১১টা stage আর ভেতরের অঙ্গের কাজ শুরু হবে।</p>
+ </div>
+</div></section>
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>3D মডেল:</b> Azkue, J.J. (2021) External surface anatomy of the postfolding human embryo: computer-aided, three-dimensional reconstruction of printable digital specimens. <i>Journal of Anatomy</i> 239, 1438–1451. doi:10.1111/joa.13514. Supplementary file 19 (stage 18)। লাইসেন্স <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>: মডেল পরিবর্তন করা হয়নি, শুধু ব্রাউজারে দেখানোর ফরম্যাটে নেওয়া। বাণিজ্যিক ব্যবহার নিষেধ। মূল ডেটা: Human Embryo Atlas (University of Pittsburgh)/DMDD/HDBR, প্রবন্ধ অনুযায়ী।</p>
+ <p><b>মার্ক:</b> আকার দেখে আনুমানিক বসানো। <b>লেখা:</b> সাধারণ embryology তথ্য; বই ঠিক হলে মেলানো হবে।</p>
+ <p class="note">এটি একটি ডেমো খসড়া।</p>
+</div></section>
+
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>

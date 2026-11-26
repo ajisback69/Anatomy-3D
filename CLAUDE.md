@@ -44,6 +44,7 @@ Ribs artifact: https://claude.ai/artifact/SRsCNGFiPpn9oT47duJaNU (slug cded4058-
 Thoracic vertebrae artifact: https://claude.ai/artifact/JZzGKA4ncTSYL6WYPtWCqD (slug 8e4672b4-5ef1-4821-9513-3a4454223130).
 Heart artifact: https://claude.ai/artifact/Ud6Pob99Wuam16tt4UbXM4 (slug dfb0d7db-7429-46c9-b24f-4f92cdba1ce3). Text from Datta pp. 58–86 and 342–343.
 Upper limb artifacts: clavicle https://claude.ai/artifact/QdTbyAETqT612AgMumMVE4 (bf595c09-8150-4b19-8c54-8fe1218022c5), scapula https://claude.ai/artifact/GAE9C17N3JmyYzSaiBvbPv (7ac2df54-7e4c-49c8-9b56-1bcd06e46b41), humerus https://claude.ai/artifact/MK6RSkSBgjV9DKKgr1VB6M (a47d808c-9a23-48fe-be37-3c2f75297f5e), radius https://claude.ai/artifact/TL1rpAerdnj6F5ywDHE5SY (d535441d-6bae-4bdb-b16c-6c4a854ba461), ulna https://claude.ai/artifact/G6pBUu9upjy9Vk84VD2b4Z (7a48dff9-09df-409e-a45a-e562a5fe133e), hand https://claude.ai/artifact/B9eS8p6ADs9LB2vfzX8GWH (523067e8-1e81-4898-898d-cbe636ba0656).
+Embryo demo (Carnegie stage 18, Azkue 2021 STL s018 = Supplementary file 19, CC BY-NC-ND 4.0; never modify/decimate/recolour the mesh): https://claude.ai/artifact/SQsWkszGL3ZiCXeSQKzpRM (cdc9b3f6-6e3e-452e-b5a0-56744c5c1f48). `pipeline/embryo.py` reads STL from ../emb_src (not in repo). STL axes: +x ventral, +z cranial; viewer X=y, Y=z, Z=x. Supplementary files 13–24 = stages 12–23 (assumed). Viewer: `m.i32` for Uint32 indices; `BONE.cutCap` colours back faces when clipped.
 After changing viewer.js, republish viewer/viewer.js to every bone artifact.
 
 ## Local test
