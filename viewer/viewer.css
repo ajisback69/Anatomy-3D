@@ -114,3 +114,8 @@ pre,.scroll{overflow-x:auto}.scroll a{flex:none}html{scroll-padding-top:72px}
 /* 3D মার্ক: আকারটা 3D দৃশ্যে আঁকা হয়, এখানে শুধু নির্বাচিত মার্কের নাম */
 .pin.mk.mk3d{width:2px;height:2px;pointer-events:none}
 .pin.mk.mk3d .nm{left:16px}
+
+.pin.tapnm{pointer-events:none}.pin.tapnm::after{content:'';position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #b8431f,0 1px 4px rgba(0,0,0,.5)}
+.pin.tapnm.hid{display:none}
+.pin.mk.mk3d.flip .nm{left:auto;right:16px}
+.pin.mk.mk3d .nm{white-space:normal;width:max-content;max-width:min(58vw,260px);line-height:1.25}

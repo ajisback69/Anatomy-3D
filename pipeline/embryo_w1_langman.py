@@ -772,6 +772,49 @@ def d14():
     E.lm(st, 'cl_stroma', np.array([-330, 0, 350]), [0, 0, 1])
 
 
+# ================================================================ প্রতিটা গঠনে একটা বিন্দু (যেগুলোর আগে থেকে বিন্দু নেই)
+VIEWDIR = {10: [.25, .4, 1], 12: [.2, .3, 1], 14: [.25, .4, 1], 0: [.35, .3, 1], 1: [.2, .2, 1], 2: [.2, .3, 1], 3: [.3, .35, 1], 4: [.3, .35, 1],
+           11: [.3, .35, 1], 5: [.3, .3, 1], 6: [.3, .25, 1], 7: [.7, .2, .7], 13: [.35, .2, 1], 8: [.45, .35, 1], 9: [0, .1, 1]}
+SURF_G = {'zona', 'troph', 'epith', 'stroma', 'ostroma', 'osurf', 'thex', 'thin', 'gran', 'uterus', 'endo', 'luteal', 'tline', 'stigma'}
+OPEN_G = {'cavity', 'antrum', 'glum'}
+
+
+def auto_markers():
+    """যে গঠনের কোনো বিন্দু নেই তার সামনের দিকের (ক্যামেরামুখী) মাঝামাঝি পৃষ্ঠে একটা বিন্দু। নাম content.js-এর STR থেকে।"""
+    from scipy.spatial import cKDTree
+    stages = sorted({s for s, *_ in E.RAW})
+    added = 0
+    for st in stages:
+        bykey = {}
+        for s, k, gr, m in E.RAW:
+            if s == st:
+                bykey.setdefault(k, [gr, []])[1].append(m)
+        V = {k: np.vstack([np.asarray(m.vertices) for m in ms]) for k, (gr, ms) in bykey.items()}
+        trees = {k: cKDTree(v) for k, v in V.items()}
+        covered = set()
+        for l in E.LM:
+            if l['stage'] != st:
+                continue
+            p = np.array(l['p'])
+            dk = min(trees, key=lambda k: trees[k].query(p)[0])
+            covered.add(dk)
+        d = unit(VIEWDIR.get(st, [0, 0, 1]))
+        for k, (gr, ms) in bykey.items():
+            if k in covered:
+                continue
+            m = trimesh.util.concatenate(ms) if len(ms) > 1 else ms[0]
+            v = np.asarray(m.vertices); n = np.asarray(m.vertex_normals)
+            c = v.mean(0); rel = v - c
+            along = rel @ d; perp = np.linalg.norm(rel - np.outer(along, d), axis=1)
+            ext = max(np.ptp(v, 0).max(), 1e-3)
+            score = along / ext - .7 * perp / ext + .3 * (n @ d)
+            i = int(np.argmax(score))
+            ty = 'surf' if gr in SURF_G else 'open' if gr in OPEN_G else 'part'
+            E.lm(st, f'a~{ty}~{k}~{st}', v[i].copy(), n[i].copy() if np.linalg.norm(n[i]) > 0 else d)
+            added += 1
+    print('স্বয়ংক্রিয় বিন্দু:', added)
+
+
 # ================================================================ চালানো
 def run(mod):
     global E
@@ -784,6 +827,7 @@ def run(mod):
     hd = unit([1, -.25, .3])
     d_blast(7, hd * 38, 70, 63, 72, 71)
     d13(); d8(); d9(); d10(); d12(); d14()
+    auto_markers()
     remap = {old: i for i, old in enumerate(ORDER)}
     for m in E.MESHES:
         m['stage'] = remap[m['stage']]

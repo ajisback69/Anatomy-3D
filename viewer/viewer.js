@@ -174,6 +174,9 @@ function makePin(o){
  el.addEventListener('click',e=>{e.stopPropagation();if(mode==='quiz')return;o.onclick?o.onclick():selectLm(o)});
  pinsEl.appendChild(el);o.el=el;o.vis=true;pins.push(o);return o;
 }
+/* গঠনে সরাসরি ট্যাপ: ট্যাপের জায়গাতেই নাম ভেসে ওঠে (বিন্দুর নামের মতো), ক্যামেরা নড়ে না */
+const tapL={p:null,el:Object.assign(document.createElement('div'),{className:'pin mk mk3d on tapnm hid',innerHTML:'<span class="nm"></span>'})};pinsEl.appendChild(tapL.el);
+function tapShow(p,t){tapL.p=p?p.clone():null;tapL.el.querySelector('.nm').textContent=t||'';tapL.el.classList.toggle('hid',!p);if(p)pins.forEach(x=>x.el.classList.remove('on'));dirty=true}
 const lms=D.lm.map(o=>{
  const x=B.lmInfo(o.id);
  const type=x.type||(x.kind==='num'?'num':x.kind==='surf'?'surf':'elev');
@@ -182,7 +185,7 @@ const lms=D.lm.map(o=>{
 function card(k,o){
  info.innerHTML=`<div class="k">${esc(k)}</div><h3>${esc(o.t)}</h3><div class="sub">${esc(o.b)}</div><p style="margin:0 0 6px">${esc(o.d)}</p>${o.l?'<ul>'+o.l.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}`;
 }
-function selectLm(L){sel={lm:L};if(L.cut&&L.cut!==true&&(B.modes[mode]||{}).cuts&&!cutHas(L,curCut)){const c=[].concat(L.cut).find(k=>(B.modes[mode].cuts||[]).includes(k));if(c)setCut(c,false)}pins.forEach(x=>x.el.classList.toggle('on',x===L));card('ল্যান্ডমার্ক',L.inf);dirty=true}  // শুধু নাম দেখায়, ক্যামেরা ঘোরায় না
+function selectLm(L){sel={lm:L};tapShow(null);if(L.cut&&L.cut!==true&&(B.modes[mode]||{}).cuts&&!cutHas(L,curCut)){const c=[].concat(L.cut).find(k=>(B.modes[mode].cuts||[]).includes(k));if(c)setCut(c,false)}pins.forEach(x=>x.el.classList.toggle('on',x===L));card('Landmark',L.inf);dirty=true}  // শুধু নাম দেখায়, ক্যামেরা ঘোরায় না
 
 /* ---------- লেভেল তল ---------- */
 const levelGroup=new THREE.Group();levelGroup.visible=false;scene.add(levelGroup);
@@ -234,7 +237,7 @@ const flyView=v=>fly(Array.isArray(v[0])?v[0]:VIEWS[v[0]],v[1],v[2]);
 cam.position.copy(TGT.clone().add(new THREE.Vector3(0,0,B.dist||420)));ctl.target.copy(TGT);
 
 /* ---------- মোড ---------- */
-function setMode(m){
+function setMode(m){tapShow(null);
  const M=B.modes[m]||{};
  mode=m;sel=null;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
  pins.forEach(x=>x.el.classList.remove('on'));quizMark.visible=false;highlight(null);
@@ -266,7 +269,7 @@ legend.addEventListener('input',e=>{if(e.target.id==='cutSl'&&curCut&&B.cuts[cur
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>fly(VIEWS[b.dataset.view],(B.modes[mode]||{}).viewDist||B.dist||420)));
 function showMuscle(r){const o=B.REG[r];sel={reg:r};card('মাসল',{t:o.t,b:o.b,d:o.d,l:['হাড়ে কোথায় লাগে: '+o.w]});paint();highlight(o.k)}
-function showStr(k){sel=null;card('রিলেশন',B.STR[k]);highlight(k)}
+function showStr(k){sel=null;card('Relation',B.STR[k]);highlight(k)}
 legend.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.part)card('অংশ',B.PARTS[b.dataset.part]);
@@ -293,7 +296,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
  {const vs=sprites.children.filter(s=>s.visible);const sh=ray.intersectObjects(vs,false)[0];
   if(sh){const bh=ray.intersectObjects(bone.filter(b=>b.visible),false).filter(x=>!clipOn||clipPlane.distanceToPoint(x.point)>=-.5)[0];
    if(!bh||boneOp<1||sh.distance<bh.distance+3){const L=sh.object.userData.pin;if(mode!=='quiz'){L.onclick?L.onclick():selectLm(L)}dirty=true;return}}}
- const h=ray.intersectObjects(bone.filter(b=>b.visible).concat(pickable.filter(m=>m.visible&&m.userData.group!=='lung'&&m.userData.group!=='mark')),false).filter(x=>!clipOn||!x.object.material.clippingPlanes||clipPlane.distanceToPoint(x.point)>=-.5)[0];if(!h)return;
+ const h=ray.intersectObjects(bone.filter(b=>b.visible).concat(pickable.filter(m=>m.visible&&m.userData.group!=='lung'&&m.userData.group!=='mark')),false).filter(x=>!clipOn||!x.object.material.clippingPlanes||clipPlane.distanceToPoint(x.point)>=-.5)[0];tapShow(null);if(!h)return;
  const ud=h.object.userData,pa=h.object.geometry.userData.p,part=pa?B.PARTS[pa[h.face.a]]:B.PARTS[h.object.name];
  if(ud.group==='bone'){
   const pk=paintKind();
@@ -309,7 +312,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
  if(ud.group==='muscle'&&B.MUS_REG&&B.MUS_REG[ud.key]!=null)showMuscle(B.MUS_REG[ud.key]);
  else if((ud.group==='vert'||ud.group==='disc')&&B.STR[ud.key])showStr(ud.key);
  else if(ud.group==='vert'||ud.group==='disc')card('লেভেল',{...B.STR.vert,t:ud.group==='disc'?'Intervertebral disc':'Thoracic vertebra '+ud.key,b:ud.group==='disc'?'ইন্টারভার্টিব্রাল ডিস্ক':'থোরাসিক কশেরুকা '+ud.key});
- else{const k=ud.group==='lung'?'lung':ud.key;if(B.STR[k])showStr(k)}
+ else{const k=ud.group==='lung'?'lung':ud.key;if(B.STR[k]){showStr(k);if(B.tapName!==false)tapShow(h.point,B.STR[k].t)}}
 });
 
 /* ---------- কুইজ ---------- */
@@ -425,11 +428,12 @@ function showIn(L,m){
 }
 function place(doOcc){
  const W=view.clientWidth,H=view.clientHeight;
+ if(tapL.p){const ok=!clipOn||clipPlane.distanceToPoint(tapL.p)>=-1;v.copy(tapL.p).project(cam);tapL.el.classList.toggle('hid',!ok||v.z>1);tapL.el.classList.toggle('flip',v.x>0);tapL.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`}
  for(const L of pins){
   const show=showIn(L,mode)&&(L.show!=='att'||layerOn.muscle)&&(!['rel','cor','surf','cond','valve'].some(k=>[].concat(L.show).includes(k))||layersReady||L.mk);
   if(L.mk){L.spr.visible=show;if(show){toCam.subVectors(cam.position,L.base).normalize();L.spr.position.copy(L.base).addScaledVector(toCam,B.mkLift??3)}L.spr.scale.setScalar(mkScale*(L.el.classList.contains('on')?1.4:1));
    const on=show&&L.el.classList.contains('on');L.el.classList.toggle('hid',!on);if(!on)continue;
-   v.copy(L.spr.position).project(cam);L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;continue}
+   v.copy(L.spr.position).project(cam);L.el.classList.toggle('flip',v.x>0);L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;continue}
   if(!show){if(L.vis){L.el.classList.add('hid');L.vis=false}continue}
   v.copy(L.p).project(cam);
   L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;
@@ -454,7 +458,7 @@ function tick(now){
 function setStage(k,doFly=true){
  curStage=k;if(B.stageSrc&&stLoaded[k]!==true){const lb=$('#stageLbl');loadStage(k,()=>{if(lb&&curStage===k)lb.textContent=B.stages[k].t;loadStage(k+1)});}
  document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.stage===k));
- pins.forEach(x=>x.el.classList.remove('on'));const S=B.stages[k];
+ pins.forEach(x=>x.el.classList.remove('on'));tapShow(null);const S=B.stages[k];
  applyLayers();applyClip();
  if(S&&S.card&&mode!=='quiz')card(S.k||'',S.card);
  if(S&&S.view&&doFly)fly(S.view[0],S.view[1],S.view[2]||[0,0,0]);
