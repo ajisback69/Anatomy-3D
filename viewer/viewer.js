@@ -110,13 +110,14 @@ function addMesh(g,group,key,name,layer){
  const mesh=new THREE.Mesh(g,mat);mesh.name=name;mesh.userData={group,key,op};mesh.visible=false;
  if(group==='lung')mesh.renderOrder=2;
  if(group==='mark'){mesh.renderOrder=3;mat.depthTest=false;mat.transparent=true}
- scene.add(mesh);byLayer[layer||G2L[group]].push(mesh);if(group!=='rib'&&group!=='cart')pickable.push(mesh);return mesh;
+ scene.add(mesh);{const L=layer||G2L[group]||'organ';(byLayer[L]||(byLayer[L]=[])).push(mesh);try{if(!(L in layerOn))layerOn[L]=!!((B.modes[mode]||{}).layers||{})[L]}catch(e){}}if(group!=='rib'&&group!=='cart')pickable.push(mesh);return mesh;
 }
 for(const m of D.meshes){
  const g=geo(m);
  if(m.group==='bone'){
   g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*3),3));g.userData.r=m.r?dec(m.r,Uint8Array):new Uint8Array(g.attributes.position.count);g.userData.p=m.p?dec(m.p,Uint8Array):null;g.userData.t=m.t?dec(m.t,Uint8Array):null;
-  const mesh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:B.boneRough||.78,metalness:0}));mesh.name=m.name;mesh.userData={group:'bone'};scene.add(mesh);bone.push(mesh);
+  const bmat=B.boneLook?organic(new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:B.boneRough||.6,metalness:0,clearcoat:B.boneLook.cc??.3,clearcoatRoughness:.4,sheen:B.boneLook.sh??.3,sheenRoughness:.6,sheenColor:new THREE.Color('#ffffff')}),{f:.3,b:.3,m:.15,tr:.2,...B.boneLook},false):new THREE.MeshStandardMaterial({vertexColors:true,roughness:B.boneRough||.78,metalness:0});
+  const mesh=new THREE.Mesh(g,bmat);mesh.name=m.name;mesh.userData={group:'bone'};scene.add(mesh);bone.push(mesh);
  } else {const mm=addMesh(g,m.group,m.key||m.name,m.name,m.layer);if(m.stage!=null)mm.userData.stage=m.stage}
 }
 $('#load')?.remove();
@@ -267,8 +268,8 @@ function setMode(m){tapShow(null);
  pins.forEach(x=>x.el.classList.remove('on'));quizMark.visible=false;highlight(null);
  for(const k in layerOn)layerOn[k]=!!(M.layers||{})[k];
  curCut=M.cut||(M.cuts&&M.cuts[0])||null;
- const names={parts:'অংশ',lm:'ল্যান্ডমার্ক',att:'মাসল',rel:'রিলেশন',level:'লেভেল',joint:'জয়েন্ট',side:'ডান না বাম',which:'কোন নম্বর?'};
- bone.forEach(b=>b.visible=m!=='side'&&m!=='which'&&!M.hideBone);sideGroup.visible=m==='side';whichGroup.visible=m==='which';
+ const names={parts:'Part',lm:'Landmark',att:'Muscle',rel:'Relation',level:'Level',joint:'Joint',side:'ডান না বাম',which:'কোন নম্বর?'};
+ bone.forEach(b=>b.visible=m!=='side'&&m!=='which'&&!(Array.isArray(M.hideBone)?M.hideBone.includes(b.name):M.hideBone)&&!b.userData.peeled);sideGroup.visible=m==='side';whichGroup.visible=m==='which';
  setBoneOp(M.boneOp??1);
  if(M.card)card(names[m]||'',M.card);
  if(m==='parts')legend.innerHTML='<div class="legend">'+Object.entries(B.PARTS).map(([k,o])=>`<button data-part="${k}"><span class="sw" style="background:${o.c}"></span>${o.t}</button>`).join('')+'</div>';
@@ -292,12 +293,12 @@ function cutBar(M){return '<div class="legend cutbar">'+M.cuts.map(k=>`<button d
 legend.addEventListener('input',e=>{if(e.target.id==='cutSl'&&curCut&&B.cuts[curCut].n){clipPlane.constant=-(B.cuts[curCut].o||0)-(+e.target.value);dirty=occDirty=true}});
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>fly(VIEWS[b.dataset.view],(B.modes[mode]||{}).viewDist||B.dist||420)));
-function showMuscle(r){const o=B.REG[r];sel={reg:r};card('মাসল',{t:o.t,b:o.b,d:o.d,l:['হাড়ে কোথায় লাগে: '+o.w]});paint();highlight(o.k)}
+function showMuscle(r){const o=B.REG[r];sel={reg:r};card('Muscle',{t:o.t,b:o.b,d:o.d,l:['হাড়ে কোথায় লাগে: '+o.w]});paint();highlight(o.k)}
 function showStr(k){sel=null;card('Relation',B.STR[k]);highlight(k)}
 legend.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
- if(b.dataset.part)card('অংশ',B.PARTS[b.dataset.part]);
- if(b.dataset.reg){const k=+b.dataset.reg;if(B.REG[k].k||mode==='att'){showMuscle(k);if(B.muscleView)flyView(B.muscleView(k))}else{sel={reg:k};card(B.regLabel||'অংশ',B.REG[k]);paint();if(B.REG[k].view)flyView(B.REG[k].view)}}
+ if(b.dataset.part)card('Part',B.PARTS[b.dataset.part]);
+ if(b.dataset.reg){const k=+b.dataset.reg;if(B.REG[k].k||mode==='att'){showMuscle(k);if(B.muscleView)flyView(B.muscleView(k))}else{sel={reg:k};card(B.regLabel||'Part',B.REG[k]);paint();if(B.REG[k].view)flyView(B.REG[k].view)}}
  if(b.dataset.terr){const k=+b.dataset.terr;sel={reg:k};card(B.terrLabel||'রক্ত সরবরাহ',B.TERR[k]);paint();highlight(B.TERR[k].k)}
  if(b.dataset.cut)setCut(b.dataset.cut);
  if(b.dataset.str)showStr(b.dataset.str);
@@ -320,9 +321,9 @@ peelBar.addEventListener('pointerup',e=>e.stopPropagation());peelBar.addEventLis
 peelBar.addEventListener('click',e=>{const b=e.target.closest('[data-peel]');if(!b)return;if(b.dataset.peel==='undo')unpeel(1);else unpeel(peelStack.length)});
 function peelUI(msg){peelBar.classList.toggle('hid',!peelStack.length);peelBar.querySelector('.pl-msg').textContent=msg||(peelStack.length?peelStack.length+'টা স্তর সরানো':'');peelBar.querySelector('[data-peel=all]').style.display=peelStack.length>1?'':'none'}
 function peel(obj){
- const k=obj.userData.key,stg=obj.userData.stage;
- const ms=pickable.filter(m=>m.visible&&m.userData.key===k&&m.userData.stage===stg&&m.userData.group!=='bone');if(!ms.length)return;
- ms.forEach(m=>m.userData.peeled=true);
+ const isB=obj.userData.group==='bone',k=isB?obj.name:obj.userData.key,stg=obj.userData.stage;
+ const ms=isB?[obj]:pickable.filter(m=>m.visible&&m.userData.key===k&&m.userData.stage===stg&&m.userData.group!=='bone');if(!ms.length)return;
+ ms.forEach(m=>{m.userData.peeled=true;if(isB)m.visible=false});
  const pts=[];for(const m of ms){const a=m.geometry.attributes.position;const st=Math.max(1,Math.floor(a.count/4000));for(let i=0;i<a.count;i+=st)pts.push(a.getX(i),a.getY(i),a.getZ(i))}
  const thr=Math.max(2.5,(B.mkLift??3)*2.2),hid=[];
  for(const L of pins){if(!L.mk||L.peelHide||(L.stage!=null&&L.stage!==curStage))continue;
@@ -330,9 +331,9 @@ function peel(obj){
   const p=L.p;let near=false;for(let i=0;i<pts.length;i+=3){if(Math.abs(pts[i]-p.x)<thr&&Math.abs(pts[i+1]-p.y)<thr&&Math.abs(pts[i+2]-p.z)<thr){near=true;break}}
   if(near){L.peelHide=true;hid.push(L)}}
  peelStack.push({ms,hid});tapShow(null);pins.forEach(x=>x.el.classList.remove('on'));applyLayers();if(clipOn)applyClip();
- const nm=(B.STR&&B.STR[k]&&B.STR[k].t)||obj.name||k;peelUI('সরানো: '+nm);dirty=occDirty=true;
+ const nm=(isB&&B.PARTS&&B.PARTS[k]&&B.PARTS[k].t)||(B.STR&&B.STR[k]&&B.STR[k].t)||obj.name||k;peelUI('সরানো: '+nm);dirty=occDirty=true;
 }
-function unpeel(n){for(let i=0;i<n&&peelStack.length;i++){const e=peelStack.pop();e.ms.forEach(m=>m.userData.peeled=false);e.hid.forEach(L=>L.peelHide=false)}applyLayers();if(clipOn)applyClip();peelUI();dirty=occDirty=true}
+function unpeel(n){for(let i=0;i<n&&peelStack.length;i++){const e=peelStack.pop();e.ms.forEach(m=>{m.userData.peeled=false;if(m.userData.group==='bone')m.visible=true});e.hid.forEach(L=>L.peelHide=false)}applyLayers();if(clipOn)applyClip();peelUI();dirty=occDirty=true}
 
 renderer.domElement.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY,e.timeStamp]);
 renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
@@ -341,7 +342,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
  const r=renderer.domElement.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  ray.setFromCamera(ndc,cam);
  {const now=e.timeStamp,dbl=(lastTap&&now-lastTap.t<420&&Math.hypot(e.clientX-lastTap.x,e.clientY-lastTap.y)<32)||(down[2]!=null&&now-down[2]>600);lastTap={t:now,x:e.clientX,y:e.clientY};
-  if(dbl&&B.peel!==false){lastTap=null;const ph=ray.intersectObjects(pickable.filter(m=>m.visible&&m.userData.group!=='mark'),false).filter(x=>!clipOn||!x.object.material.clippingPlanes||clipPlane.distanceToPoint(x.point)>=-.5)[0];if(ph){peel(ph.object);return}}}
+  if(dbl&&B.peel!==false){lastTap=null;const ph=ray.intersectObjects(pickable.filter(m=>m.visible&&m.userData.group!=='mark').concat(B.peelBone?bone.filter(b=>b.visible):[]),false).filter(x=>!clipOn||!x.object.material.clippingPlanes||clipPlane.distanceToPoint(x.point)>=-.5)[0];if(ph){peel(ph.object);return}}}
  {const vs=sprites.children.filter(s=>s.visible);const sh=ray.intersectObjects(vs,false)[0];
   if(sh){const bh=ray.intersectObjects(bone.filter(b=>b.visible),false).filter(x=>!clipOn||clipPlane.distanceToPoint(x.point)>=-.5)[0];
    if(!bh||boneOp<1||sh.distance<bh.distance+3){const L=sh.object.userData.pin;if(mode!=='quiz'){L.onclick?L.onclick():selectLm(L)}dirty=true;return}}}
@@ -349,18 +350,18 @@ renderer.domElement.addEventListener('pointerup',e=>{
  const ud=h.object.userData,pa=h.object.geometry.userData.p,part=pa?B.PARTS[pa[h.face.a]]:B.PARTS[h.object.name];
  if(ud.group==='bone'){
   const pk=paintKind();
-  if(pk==='reg'&&mode!=='att'){const reg=h.object.geometry.userData.r[h.face.a];if(reg&&B.REG[reg]){sel={reg};card(B.regLabel||'অংশ',B.REG[reg]);paint()}else if(part)card('অংশ',part);return}
-  if(pk==='terr'){const t=h.object.geometry.userData.t[h.face.a];if(B.TERR[t]){sel={reg:t};card(B.terrLabel||'রক্ত সরবরাহ',B.TERR[t]);paint();highlight(B.TERR[t].k)}return}
-  if(mode!=='att'){if(part)card(B.partLabel||'অংশ',part);return}
+  if(pk==='reg'&&mode!=='att'){const reg=h.object.geometry.userData.r[h.face.a];if(reg&&B.REG[reg]){sel={reg};card(B.regLabel||'Part',B.REG[reg]);paint();tapShow(h.point,B.REG[reg].t)}else if(part){card('Part',part);tapShow(h.point,part.t)}return}
+  if(pk==='terr'){const t=h.object.geometry.userData.t[h.face.a];if(B.TERR[t]){sel={reg:t};card(B.terrLabel||'Blood supply',B.TERR[t]);paint();highlight(B.TERR[t].k);tapShow(h.point,B.TERR[t].t)}return}
+  if(mode!=='att'){if(part){card(B.partLabel||'Part',part);tapShow(h.point,part.t)}return}
   const reg=h.object.geometry.userData.r[h.face.a];
   if(reg&&B.REG[reg]&&B.REG[reg].k)showMuscle(reg);
-  else if(reg&&B.REG[reg]){sel={reg};card('মাসল',B.REG[reg]);paint();highlight(null)}
-  else{sel=null;paint();highlight(null);card('মাসল',{t:'এখানে কোনো মাসল লাগে না',b:part?part.t:'',d:'রঙিন জায়গায় ট্যাপ করুন।'})}
+  else if(reg&&B.REG[reg]){sel={reg};card('Muscle',B.REG[reg]);paint();highlight(null)}
+  else{sel=null;paint();highlight(null);card('Muscle',{t:'এখানে কোনো মাসল লাগে না',b:part?part.t:'',d:'রঙিন জায়গায় ট্যাপ করুন।'})}
   return;
  }
  if(ud.group==='muscle'&&B.MUS_REG&&B.MUS_REG[ud.key]!=null)showMuscle(B.MUS_REG[ud.key]);
  else if((ud.group==='vert'||ud.group==='disc')&&B.STR[ud.key])showStr(ud.key);
- else if(ud.group==='vert'||ud.group==='disc')card('লেভেল',{...B.STR.vert,t:ud.group==='disc'?'Intervertebral disc':'Thoracic vertebra '+ud.key,b:ud.group==='disc'?'ইন্টারভার্টিব্রাল ডিস্ক':'থোরাসিক কশেরুকা '+ud.key});
+ else if(ud.group==='vert'||ud.group==='disc')card('Level',{...B.STR.vert,t:ud.group==='disc'?'Intervertebral disc':'Thoracic vertebra '+ud.key,b:ud.group==='disc'?'ইন্টারভার্টিব্রাল ডিস্ক':'থোরাসিক কশেরুকা '+ud.key});
  else{const k=ud.group==='lung'?'lung':ud.key;if(B.STR[k]){showStr(k);if(B.tapName!==false)tapShow(h.point,B.STR[k].t)}}
 });
 
