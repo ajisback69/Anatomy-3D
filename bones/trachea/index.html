@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trachea ও Bronchi 3D অ্যাটলাস</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../viewer/viewer.css">
+<style>
+.ref{font-size:13px;color:var(--mute);margin-top:6px}
+table.cmp{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.1);vertical-align:top}
+table.cmp th{font-size:13px;color:var(--mute);font-weight:600}
+.spec{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spec a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.3);color:#eef5f2;text-decoration:none;font-weight:600}
+.spec a[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+</style>
+<script src="data/core.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+<section class="band stage">
+ <div class="wrap">
+  <h1>Trachea ও Bronchi <span style="font-weight:500;opacity:.8">· 3D অ্যাটলাস</span></h1>
+  <p class="lead">Trachea থেকে segmental bronchus পর্যন্ত পুরো bronchial tree, vertebra-র লেভেল, চারপাশের great vessel; স্ক্যান থেকে মাপা।</p>
+  
+  <div class="grid">
+   <div>
+    <div class="view" id="view"><div class="load" id="load">মডেল লোড হচ্ছে…</div><div id="pins"></div><div class="hint">এক আঙুলে ঘোরান · দুই আঙুলে জুম/সরান</div></div>
+    <div class="bar" role="group" aria-label="মোড">
+     <button class="btn" data-mode="parts" aria-pressed="true">Parts</button>
+     <button class="btn" data-mode="lm" aria-pressed="false">Levels</button>
+     <button class="btn" data-mode="seg" aria-pressed="false">Segmental bronchi</button>
+     <button class="btn" data-mode="rel" aria-pressed="false">Relations</button>
+     <button class="btn" data-mode="lungs" aria-pressed="false">In the lungs</button>
+     <button class="btn" data-mode="cut" aria-pressed="false">Cut section</button>
+     <button class="btn" data-mode="quiz" aria-pressed="false">Quiz</button>
+    </div>
+    <div class="bar" role="group" aria-label="দৃশ্য">
+     <button class="btn" data-view="ant">সামনে</button>
+     <button class="btn" data-view="post">পেছনে</button>
+     <button class="btn" data-view="rlat">ডান পাশ</button>
+     <button class="btn" data-view="llat">বাঁ পাশ</button>
+     <button class="btn" data-view="sup">উপর থেকে</button>
+     <button class="btn" data-view="inf">নিচ থেকে</button>
+    </div>
+    <div class="layers" role="group" aria-label="লেয়ার"><span class="lt">লেয়ার:</span>
+     <label class="tog"><input type="checkbox" data-layer="ring"><i class="dot" style="background:#e8f1f4"></i>Cartilage rings (স্কিম্যাটিক)</label>
+     <label class="tog"><input type="checkbox" data-layer="organ"><i class="dot" style="background:#d79a8e"></i>Oesophagus, heart, larynx</label>
+     <label class="tog"><input type="checkbox" data-layer="great"><i class="dot" style="background:#e0443e"></i>Great vessels</label>
+     <label class="tog"><input type="checkbox" data-layer="muscle"><i class="dot" style="background:#8e2a23"></i>Sternothyroid</label>
+     <label class="tog"><input type="checkbox" data-layer="vert"><i class="dot" style="background:#d9d0bd"></i>Vertebrae ও sternum</label>
+     <label class="tog"><input type="checkbox" data-layer="lung"><i class="dot" style="background:#f0b8b2"></i>Lungs</label>
+    </div>
+   </div>
+   <div class="side">
+    <div class="info" id="info" aria-live="polite"></div>
+    <div id="legend"></div>
+   </div>
+  </div>
+ </div>
+</section>
+<nav class="nav" aria-label="বিভাগ"><div class="scroll">
+<a href="#s-sum">এক নজরে</a><a href="#s-app">Applied ও viva</a><a href="#s-credit">সূত্র</a>
+</div></nav>
+<section class="band sec" id="s-sum"><div class="wrap two">
+ <div>
+  <h2>এক নজরে: right বনাম left principal bronchus</h2>
+  <table class="cmp"><thead><tr><th></th><th>Right</th><th>Left</th></tr></thead><tbody>
+   <tr><td>আকার</td><td>চওড়া, ছোট (~২.৫ সেমি), বেশি খাড়া (২৫°)</td><td>সরু, লম্বা (~৫ সেমি), বেশি তির্যক (৪৫°)</td></tr>
+   <tr><td>উপরে বাঁকে</td><td>Arch of azygos vein</td><td>Arch of aorta</td></tr>
+   <tr><td>Hilum-এর লেভেল</td><td>T5</td><td>T6</td></tr>
+   <tr><td>Eparterial শাখা</td><td>আছে (upper lobe bronchus)</td><td>নেই</td></tr>
+   <tr><td>Lobar bronchus</td><td>৩টা</td><td>২টা</td></tr>
+   <tr><td>Foreign body</td><td>বেশি যায়</td><td>কম</td></tr>
+  </tbody></table>
+  <p class="ref">Datta I, পৃ. 48–49, 51</p>
+ </div>
+ <div>
+  <h2>Trachea: মূল তথ্য</h2>
+  <ul>
+   <li><b>বিস্তার:</b> cricoid-এর নিচের কিনারা (C6) থেকে sternal angle পর্যন্ত; bifurcation cadaver-এ T4-এর নিচের কিনারা, জীবিত দাঁড়ানো অবস্থায় T6, newborn-এ T3। (পৃ. 46)</li>
+   <li><b>ভেতরের ব্যাস:</b> adult-এ ১২ মিমি; newborn-এ ৩ মিমি, ৩ বছর পর্যন্ত একই, তারপর ১২ বছর পর্যন্ত প্রতি বছর ১ মিমি বাড়ে। Intubation-এর tube বাছাইয়ে দরকার। (পৃ. 46)</li>
+   <li><b>Cartilage:</b> ১৬–২০টা C-আকৃতির hyaline ring, পেছনে trachealis। (পৃ. 47)</li>
+   <li><b>Lining:</b> ciliated pseudostratified columnar, goblet cell-সহ; mucociliary escalator। (পৃ. 47)</li>
+   <li><b>রক্ত:</b> প্রধানত inferior thyroid artery; bifurcation-এ bronchial artery। শিরা inferior thyroid vein-এ। Lymph: pretracheal ও paratracheal node। (পৃ. 47–48)</li>
+   <li><b>Nerve:</b> vagus ও recurrent laryngeal (motor, secretomotor, sensory); sympathetic T1–T5। (পৃ. 48)</li>
+   <li><b>Development:</b> laryngotracheal tube, foregut-এর ventral diverticulum। (পৃ. 48)</li>
+  </ul>
+ </div>
+</div></section>
+<section class="band sec" id="s-app"><div class="wrap two">
+ <div>
+  <h2>Applied</h2>
+  <ul>
+   <li><b>Low tracheostomy শিশুদের ঝুঁকিপূর্ণ:</b> trachea গভীরে আর নড়াচড়া বেশি, left brachiocephalic vein আর arch of aorta suprasternal notch-এর উপরে উঠতে পারে। (পৃ. 46–47)</li>
+   <li><b>Foreign body:</b> right bronchus খাড়া ও চওড়া বলে right lung-এ যায়। (পৃ. 51)</li>
+   <li><b>Sub-carinal angle ৯০°-এর বেশি:</b> sub-carinal node বড়, metastasis সন্দেহ। (পৃ. 51)</li>
+   <li><b>Middle lobe syndrome:</b> middle lobe bronchus-এর চারপাশের node বড় হলে collapse। (পৃ. 49)</li>
+   <li><b>Aspiration:</b> lower lobe-এর apical (segment 6) আর upper lobe-এর posterior (segment 2) segment; prone অবস্থায় drainage। (পৃ. 51)</li>
+   <li><b>Posterior segment of right upper lobe:</b> tuberculosis-এর জায়গা; anterior segment-এ cancer বেশি। (পৃ. 51)</li>
+  </ul>
+ </div>
+ <div>
+  <h2>Viva</h2>
+ <details><summary>Trachea কোথা থেকে কোথা পর্যন্ত?</summary><p>Cricoid-এর নিচের কিনারা (C6) থেকে sternal angle-এ bifurcation পর্যন্ত।</p></details>
+ <details><summary>Bifurcation-এর লেভেল কেন বদলায়?</summary><p>Cadaver/supine-এ T4-এর নিচের কিনারা, জীবিত দাঁড়ানো অবস্থায় শ্বাসের সাথে T6 পর্যন্ত নামে।</p></details>
+ <details><summary>Ring পেছনে অসম্পূর্ণ কেন?</summary><p>গেলার সময় oesophagus যাতে ফুলতে পারে; পেছনে trachealis।</p></details>
+ <details><summary>Eparterial bronchus কী?</summary><p>Right upper lobe bronchus, pulmonary artery-র উপরে থাকে; left-এ নেই।</p></details>
+ <details><summary>Carina-র গুরুত্ব?</summary><p>Bronchoscopy-র গাইড, সবচেয়ে সংবেদনশীল mucosa (cough reflex); চওড়া হলে sub-carinal node বড়।</p></details>
+ </div>
+</div></section>
+<section class="band" id="s-credit"><div class="wrap">
+ <h2>সূত্র ও লাইসেন্স</h2>
+ <p><b>লেখার রেফারেন্স:</b> A.K. Datta, <i>Essentials of Human Anatomy</i>, Part I, Chapter 4: The Trachea; Right and Left Bronchi, পৃ. 46–51। নিজের ভাষায় লেখা।</p>
+ <p><b>3D মেশ:</b> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en">CC BY-SA 2.1 Japan</a>। একজন প্রাপ্তবয়স্ক পুরুষের MRI থেকে তৈরি। Trachea, bronchial tree, vessel, oesophagus স্ক্যানের। Cartilage ring আর segment-ভাগ স্কিম্যাটিক।</p>
+ <p class="note">এটি একটি খসড়া। ছাত্রদের দেওয়ার আগে অ্যানাটমি বিভাগের একজন শিক্ষককে দিয়ে রিভিউ করিয়ে নিন।</p>
+</div></section>
+
+
+<script src="content.js"></script>
+<script type="module" src="../../viewer/viewer.js"></script>
+</body>
+</html>
