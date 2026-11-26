@@ -31,6 +31,50 @@ renderer.localClippingEnabled=true;
 const clipPlane=new THREE.Plane(new THREE.Vector3(0,0,-1),0);let curCut=null,clipOn=false,boneOp=1;
 const STYLE={rib:['#e9e1cf',.45],cart:['#9fd6cf',.7],clav:['#e9e1cf',.8],muscle:[null,.38],artery:['#e0443e',1],vein:['#4a78e0',1],heart:['#c9706a',.45],lung:['#f0b8b2',.16],thymus:['#e7a8c9',.75],trachea:['#cfd6dc',.7],vert:['#d9d0bd',.95],disc:['#9fd6cf',.9],valve:['#f3e3b0',1],pap:['#c96b62',1],cond:['#ffd43b',1],pa:['#6c63d9',1],pvein:['#e8738a',1],mark:['#ff8a3d',1],...(B.STYLE||{})};
 const G2L={rib:'rib',cart:'rib',clav:'clav',muscle:'muscle',artery:'artery',vein:'vein',heart:'organ',lung:'organ',thymus:'organ',trachea:'organ',vert:'vert',disc:'vert',valve:'valve',pap:'valve',cond:'cond',pa:'great',pvein:'great',mark:'mark'};
+/* ---------- বাস্তবধর্মী চেহারা (B.look): টিস্যুর মতো দানাদার পৃষ্ঠ, রঙের ছোপ, ভেজা চকচকে ভাব, আলোর আভা;
+   কাটা মুখ সমতল আর হিস্টোলজি স্লাইডের মতো দাগযুক্ত। শুধু যে পেজে B.look আছে সেখানে চালু। ---------- */
+const LOOK=B.look?{f:.25,b:.35,m:.14,cc:.3,sh:.5,tr:.28,r:.55,...(B.look.def||{})}:null;
+const capU={uPN:{value:new THREE.Vector3(0,0,-1)}};
+const GLSL_N=`
+vec3 h3(vec3 p){p=vec3(dot(p,vec3(127.1,311.7,74.7)),dot(p,vec3(269.5,183.3,246.1)),dot(p,vec3(113.5,271.9,124.6)));return -1.+2.*fract(sin(p)*43758.5453);}
+float gn(vec3 p){vec3 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
+ return mix(mix(mix(dot(h3(i),f),dot(h3(i+vec3(1,0,0)),f-vec3(1,0,0)),u.x),mix(dot(h3(i+vec3(0,1,0)),f-vec3(0,1,0)),dot(h3(i+vec3(1,1,0)),f-vec3(1,1,0)),u.x),u.y),
+  mix(mix(dot(h3(i+vec3(0,0,1)),f-vec3(0,0,1)),dot(h3(i+vec3(1,0,1)),f-vec3(1,0,1)),u.x),mix(dot(h3(i+vec3(0,1,1)),f-vec3(0,1,1)),dot(h3(i+vec3(1,1,1)),f-vec3(1,1,1)),u.x),u.y),u.z);}
+float fb(vec3 p){return gn(p)*.62+gn(p*2.07)*.28+gn(p*4.13)*.1;}
+`;
+function lookOf(group){return {...LOOK,...((B.look.groups||{})[group]||{})}}
+function organic(mat,L,cap){
+ mat.userData.L=L;
+ mat.customProgramCacheKey=()=>'org'+(cap?'c':'s');
+ mat.onBeforeCompile=sh=>{
+  sh.uniforms.uF={value:L.f};sh.uniforms.uB={value:L.b};sh.uniforms.uM={value:L.m};sh.uniforms.uT={value:L.tr};sh.uniforms.uPN=capU.uPN;
+  sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWP;').replace('#include <project_vertex>','#include <project_vertex>\nvWP=(modelMatrix*vec4(transformed,1.0)).xyz;');
+  let f=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vWP;uniform float uF,uB,uM,uT;uniform vec3 uPN;'+GLSL_N);
+  f=f.replace('#include <color_fragment>','#include <color_fragment>\n{float nz=fb(vWP*uF);diffuseColor.rgb*=1.0+uM*nz*2.2;'+(cap?'float g2=fb(vWP*uF*3.1+7.);float sp=smoothstep(.18,.42,fb(vWP*uF*7.3+3.));diffuseColor.rgb*=.86+.3*g2-.16*sp;':'')+'}');
+  f=f.replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>\n'+(cap?
+   '{vec3 pn=normalize((viewMatrix*vec4(uPN,0.)).xyz);if(dot(pn,vViewPosition)<0.)pn=-pn;normal=pn;}':
+   '{vec3 q=vWP*uF;float e=.12,n0=fb(q);vec3 gr=vec3(fb(q+vec3(e,0,0))-n0,fb(q+vec3(0,e,0))-n0,fb(q+vec3(0,0,e))-n0)/e;vec3 gv=(viewMatrix*vec4(gr,0.)).xyz;normal=normalize(normal-uB*(gv-dot(gv,normal)*normal));}'));
+  if(!cap)f=f.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n{float fr=1.0-abs(dot(normalize(vViewPosition),normal));totalEmissiveRadiance+=diffuseColor.rgb*uT*pow(fr,2.2);}');
+  sh.fragmentShader=f;
+ };
+ return mat;
+}
+function organicMat(col,op,group){
+ const L=lookOf(group);
+ const m=new THREE.MeshPhysicalMaterial({color:col,roughness:L.r,metalness:0,clearcoat:L.cc,clearcoatRoughness:.35,sheen:L.sh,sheenRoughness:.6,sheenColor:new THREE.Color(col).lerp(new THREE.Color('#ffffff'),.5),
+  transparent:op<1,opacity:op,depthWrite:op>=.6});
+ return organic(m,L,false);
+}
+function organicCap(src,ghost,op){
+ const L=lookOf(src.userData.group);
+ const c=src.material.color.clone().multiplyScalar(L.cap??.8);
+ const m=new THREE.MeshStandardMaterial({color:c,roughness:.92,metalness:0,side:THREE.BackSide,transparent:ghost,opacity:ghost?op:1,depthWrite:!ghost});
+ return organic(m,L,true);
+}
+if(LOOK){
+ renderer.toneMapping=THREE.NeutralToneMapping;renderer.toneMappingExposure=B.look.exposure??1;
+ import('three/addons/environments/RoomEnvironment.js').then(({RoomEnvironment})=>{const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),.04).texture;scene.environmentIntensity=B.look.env??.55;dirty=true}).catch(()=>{});
+}
 function geo(m){
  const q=dec(m.v,Int16Array),p=new Float32Array(q.length);for(let i=0;i<q.length;i++)p[i]=q[i]*S;
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
@@ -39,7 +83,7 @@ function geo(m){
 function addMesh(g,group,key,name,layer){
  const st=STYLE[group]||['#ccc',1];let col=st[0];layer=layer||G2L[group]||'organ';
  if(group==='muscle')col=B.MUS_REG&&B.MUS_REG[key]!=null?B.REG[B.MUS_REG[key]].c:'#5b86c9';
- const op=st[1],mat=new THREE.MeshStandardMaterial({color:col,roughness:group==='artery'||group==='vein'?.45:.75,transparent:op<1,opacity:op,depthWrite:op>=.6});
+ const op=st[1],mat=LOOK?organicMat(col,op,group):new THREE.MeshStandardMaterial({color:col,roughness:group==='artery'||group==='vein'?.45:.75,transparent:op<1,opacity:op,depthWrite:op>=.6});
  const mesh=new THREE.Mesh(g,mat);mesh.name=name;mesh.userData={group,key,op};mesh.visible=false;
  if(group==='lung')mesh.renderOrder=2;
  if(group==='mark'){mesh.renderOrder=3;mat.depthTest=false;mat.transparent=true}
@@ -157,11 +201,12 @@ if(B.levels&&D.levels){
 const cutHas=(L,c)=>!!c&&[].concat(L.cut).includes(c);
 function clipTargets(){const M=B.modes[mode]||{};const L=M.clipLayers||[];return bone.concat(...L.map(k=>byLayer[k]||[]))}
 function applyClip(){
+ capU.uPN.value.copy(clipPlane.normal);
  const all=bone.concat(...Object.values(byLayer));
  for(const m of all){m.material.clippingPlanes=null;m.material.needsUpdate=true}
  if(clipOn)for(const m of clipTargets()){m.material.clippingPlanes=[clipPlane];m.material.side=THREE.DoubleSide;m.material.needsUpdate=true}
  for(const b of bone){b.material.side=clipOn&&!B.cutCap?THREE.DoubleSide:THREE.FrontSide}
- if(B.capAll){for(const m of bone.concat(...Object.values(byLayer))){const on=clipOn&&!!m.material.clippingPlanes&&m.visible;if(on&&!m.userData.cap){const c=m.material.color.clone().multiplyScalar(.62);const ghost=m.material.opacity<.35;const cm=new THREE.MeshStandardMaterial({color:c,roughness:.95,side:THREE.BackSide,transparent:ghost,opacity:ghost?m.material.opacity:1,depthWrite:!ghost});const t=new THREE.Mesh(m.geometry,cm);t.raycast=()=>{};m.add(t);m.userData.cap=t}if(m.userData.cap){m.userData.cap.visible=on;m.userData.cap.material.clippingPlanes=on?[clipPlane]:null;m.userData.cap.material.needsUpdate=true;if(on){m.material.side=THREE.FrontSide;if(m.material.opacity>=.35&&m.material.transparent){m.userData.op0=m.material.opacity;m.material.opacity=1;m.material.transparent=false;m.material.depthWrite=true;m.material.needsUpdate=true}}else if(m.userData.op0){m.material.opacity=m.userData.op0;m.material.transparent=true;m.material.depthWrite=m.userData.op0>=.6;m.userData.op0=null;m.material.needsUpdate=true}}}}
+ if(B.capAll){for(const m of bone.concat(...Object.values(byLayer))){const on=clipOn&&!!m.material.clippingPlanes&&m.visible;if(on&&!m.userData.cap){const ghost=LOOK?(B.look.ghost||[]).includes(m.userData.group):m.material.opacity<.35;const cm=LOOK?organicCap(m,ghost,m.userData.op):new THREE.MeshStandardMaterial({color:m.material.color.clone().multiplyScalar(.62),roughness:.95,side:THREE.BackSide,transparent:ghost,opacity:ghost?m.material.opacity:1,depthWrite:!ghost});const t=new THREE.Mesh(m.geometry,cm);t.raycast=()=>{};m.add(t);m.userData.cap=t}if(m.userData.cap){m.userData.cap.visible=on;m.userData.cap.material.clippingPlanes=on?[clipPlane]:null;m.userData.cap.material.needsUpdate=true;if(on){m.material.side=THREE.FrontSide;if((LOOK?!(B.look.ghost||[]).includes(m.userData.group):m.material.opacity>=.35)&&m.material.transparent){m.userData.op0=m.material.opacity;m.material.opacity=1;m.material.transparent=false;m.material.depthWrite=true;m.material.needsUpdate=true}}else if(m.userData.op0){m.material.opacity=m.userData.op0;m.material.transparent=true;m.material.depthWrite=m.userData.op0>=.6;m.userData.op0=null;m.material.needsUpdate=true}}}}
  if(B.cutCap){for(const b of bone){if(!b.userData.cap){const cm=new THREE.MeshStandardMaterial({color:B.cutCap,roughness:.9,side:THREE.BackSide});const t=new THREE.Mesh(b.geometry,cm);b.add(t);b.userData.cap=t}const t=b.userData.cap;t.visible=clipOn;t.material.clippingPlanes=clipOn?[clipPlane]:null;t.material.needsUpdate=true}}
  dirty=occDirty=true;
 }
@@ -170,7 +215,7 @@ function setCut(k,doFly=true){
  if(C&&C.n){clipPlane.normal.copy(V3(C.n).normalize());clipPlane.constant=-(C.o||0);const sl=$('#cutSl');if(sl){sl.value=0;}}
  document.querySelectorAll('[data-cut]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cut===k));
  if(C&&C.card&&mode!=='quiz')card(C.t||'',C.card);
- if(C&&C.view&&doFly)flyView(C.view);
+ if(C&&C.view&&doFly)flyView(C.view.length===1&&B.stages?[C.view[0],B.stages[curStage].view[1],B.stages[curStage].view[2]]:C.view);
  applyClip();
 }
 function setBoneOp(op){boneOp=op;for(const b of bone){b.material.transparent=op<1;b.material.opacity=op;b.material.depthWrite=op>=1;b.material.needsUpdate=true}dirty=occDirty=true}
