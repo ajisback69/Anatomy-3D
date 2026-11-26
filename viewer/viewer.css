@@ -119,3 +119,6 @@ pre,.scroll{overflow-x:auto}.scroll a{flex:none}html{scroll-padding-top:72px}
 .pin.tapnm.hid{display:none}
 .pin.mk.mk3d.flip .nm{left:auto;right:16px}
 .pin.mk.mk3d .nm{white-space:normal;width:max-content;max-width:min(58vw,260px);line-height:1.25}
+.peelbar{position:absolute;left:10px;top:10px;z-index:5;display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 20px);background:rgba(15,32,28,.82);backdrop-filter:blur(4px);padding:6px 8px;border-radius:12px;color:#eef5f2;font:600 13px/1.2 "Hind Siliguri",sans-serif}
+.peelbar.hid{display:none}.peelbar .pl-msg{padding:0 4px}
+.peelbar button{min-height:36px;padding:6px 12px;border-radius:9px;border:1px solid #6fb3a1;background:#f7f3ea;color:#1b2522;font:600 14px "Hind Siliguri",sans-serif;cursor:pointer}

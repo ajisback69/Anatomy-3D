@@ -97,6 +97,7 @@ for(const m of D.meshes){
  } else {const mm=addMesh(g,m.group,m.key||m.name,m.name,m.layer);if(m.stage!=null)mm.userData.stage=m.stage}
 }
 $('#load')?.remove();
+{const h=$('.hint');if(h&&B.peel!==false&&!h.dataset.peel){h.dataset.peel=1;h.textContent+=' · দুইবার ট্যাপ বা চেপে ধরলে স্তর সরে'}}
 
 /* ---------- ধাপ-ভিত্তিক আলাদা ডেটা ফাইল: B.stageSrc(k) = সেই ধাপের মেশের ফাইল; লাগলে তবেই লোড ---------- */
 const stLoaded={},stWait={};
@@ -116,7 +117,7 @@ let mode='lm',sel=null,layersReady=false,dirty=true,occDirty=true,lastMove=0;
 const layerOn=Object.fromEntries(Object.keys(byLayer).map(k=>[k,false]));
 const boxes=[...document.querySelectorAll('[data-layer]')];
 function applyLayers(){
- for(const k in byLayer)for(const m of byLayer[k])m.visible=layerOn[k]&&(m.userData.stage==null||m.userData.stage===curStage);
+ for(const k in byLayer)for(const m of byLayer[k])m.visible=layerOn[k]&&(m.userData.stage==null||m.userData.stage===curStage)&&!m.userData.peeled;
  levelGroup.visible=layerOn.vert&&mode==='level';
  boxes.forEach(b=>b.checked=layerOn[b.dataset.layer]);dirty=occDirty=true;
 }
@@ -287,12 +288,37 @@ legend.addEventListener('click',e=>{
 $('#holdBtn')?.addEventListener('click',()=>{view.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});setTimeout(()=>fly(...B.holdView),reduce?0:350)});
 
 /* ---------- ট্যাপ করে চেনা ---------- */
-const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();let down=null;
-renderer.domElement.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY]);
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();let down=null,lastTap=null;
+/* ---------- স্তর সরানো (peel): কোনো structure-এ দুইবার ট্যাপ করলে সেটা সরে যায়, ভেতরেরটা দেখা যায়; "ফেরত" দিয়ে ফেরানো ---------- */
+const peelStack=[];
+const peelBar=Object.assign(document.createElement('div'),{className:'peelbar hid'});view.appendChild(peelBar);
+peelBar.innerHTML='<span class="pl-msg"></span><button type="button" data-peel="undo">↶ ফেরত</button><button type="button" data-peel="all">সব ফেরত</button>';
+peelBar.addEventListener('pointerup',e=>e.stopPropagation());peelBar.addEventListener('pointerdown',e=>e.stopPropagation());
+peelBar.addEventListener('click',e=>{const b=e.target.closest('[data-peel]');if(!b)return;if(b.dataset.peel==='undo')unpeel(1);else unpeel(peelStack.length)});
+function peelUI(msg){peelBar.classList.toggle('hid',!peelStack.length);peelBar.querySelector('.pl-msg').textContent=msg||(peelStack.length?peelStack.length+'টা স্তর সরানো':'');peelBar.querySelector('[data-peel=all]').style.display=peelStack.length>1?'':'none'}
+function peel(obj){
+ const k=obj.userData.key,stg=obj.userData.stage;
+ const ms=pickable.filter(m=>m.visible&&m.userData.key===k&&m.userData.stage===stg&&m.userData.group!=='bone');if(!ms.length)return;
+ ms.forEach(m=>m.userData.peeled=true);
+ const pts=[];for(const m of ms){const a=m.geometry.attributes.position;const st=Math.max(1,Math.floor(a.count/4000));for(let i=0;i<a.count;i+=st)pts.push(a.getX(i),a.getY(i),a.getZ(i))}
+ const thr=Math.max(2.5,(B.mkLift??3)*2.2),hid=[];
+ for(const L of pins){if(!L.mk||L.peelHide||(L.stage!=null&&L.stage!==curStage))continue;
+  if(L.id&&L.id.startsWith('a~')&&L.id.split('~')[2]===k){L.peelHide=true;hid.push(L);continue}
+  const p=L.p;let near=false;for(let i=0;i<pts.length;i+=3){if(Math.abs(pts[i]-p.x)<thr&&Math.abs(pts[i+1]-p.y)<thr&&Math.abs(pts[i+2]-p.z)<thr){near=true;break}}
+  if(near){L.peelHide=true;hid.push(L)}}
+ peelStack.push({ms,hid});tapShow(null);pins.forEach(x=>x.el.classList.remove('on'));applyLayers();if(clipOn)applyClip();
+ const nm=(B.STR&&B.STR[k]&&B.STR[k].t)||obj.name||k;peelUI('সরানো: '+nm);dirty=occDirty=true;
+}
+function unpeel(n){for(let i=0;i<n&&peelStack.length;i++){const e=peelStack.pop();e.ms.forEach(m=>m.userData.peeled=false);e.hid.forEach(L=>L.peelHide=false)}applyLayers();if(clipOn)applyClip();peelUI();dirty=occDirty=true}
+
+renderer.domElement.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY,e.timeStamp]);
+renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
 renderer.domElement.addEventListener('pointerup',e=>{
  if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;
  const r=renderer.domElement.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  ray.setFromCamera(ndc,cam);
+ {const now=e.timeStamp,dbl=(lastTap&&now-lastTap.t<420&&Math.hypot(e.clientX-lastTap.x,e.clientY-lastTap.y)<32)||(down[2]!=null&&now-down[2]>600);lastTap={t:now,x:e.clientX,y:e.clientY};
+  if(dbl&&B.peel!==false){lastTap=null;const ph=ray.intersectObjects(pickable.filter(m=>m.visible&&m.userData.group!=='mark'),false).filter(x=>!clipOn||!x.object.material.clippingPlanes||clipPlane.distanceToPoint(x.point)>=-.5)[0];if(ph){peel(ph.object);return}}}
  {const vs=sprites.children.filter(s=>s.visible);const sh=ray.intersectObjects(vs,false)[0];
   if(sh){const bh=ray.intersectObjects(bone.filter(b=>b.visible),false).filter(x=>!clipOn||clipPlane.distanceToPoint(x.point)>=-.5)[0];
    if(!bh||boneOp<1||sh.distance<bh.distance+3){const L=sh.object.userData.pin;if(mode!=='quiz'){L.onclick?L.onclick():selectLm(L)}dirty=true;return}}}
@@ -419,6 +445,7 @@ function buildLayers(){
 ctl.addEventListener('change',()=>{dirty=true;occDirty=true;lastMove=performance.now()});
 const v=new THREE.Vector3(),toCam=new THREE.Vector3(),occ=new THREE.Raycaster();
 function showIn(L,m){
+ if(L.peelHide)return false;
  if(L.stage!=null&&L.stage!==curStage)return false;
  if(!(Array.isArray(L.show)?L.show.includes(m):L.show===m))return false;
  const M=B.modes[m]||{};
@@ -426,14 +453,15 @@ function showIn(L,m){
  if((M.cuts||M.cut)&&L.mk&&M.cutOnly)return false;
  return true;
 }
+function fitLab(el,vx,W){const x=(vx+1)/2*W,fl=x>W*.5;el.classList.toggle('flip',fl);const n=el.firstElementChild;if(n){const mw=Math.max(110,Math.min(280,(fl?x:W-x)-26));if(n._mw!==mw){n.style.maxWidth=mw+'px';n._mw=mw}}}
 function place(doOcc){
  const W=view.clientWidth,H=view.clientHeight;
- if(tapL.p){const ok=!clipOn||clipPlane.distanceToPoint(tapL.p)>=-1;v.copy(tapL.p).project(cam);tapL.el.classList.toggle('hid',!ok||v.z>1);tapL.el.classList.toggle('flip',v.x>0);tapL.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`}
+ if(tapL.p){const ok=!clipOn||clipPlane.distanceToPoint(tapL.p)>=-1;v.copy(tapL.p).project(cam);tapL.el.classList.toggle('hid',!ok||v.z>1);fitLab(tapL.el,v.x,W);tapL.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`}
  for(const L of pins){
   const show=showIn(L,mode)&&(L.show!=='att'||layerOn.muscle)&&(!['rel','cor','surf','cond','valve'].some(k=>[].concat(L.show).includes(k))||layersReady||L.mk);
   if(L.mk){L.spr.visible=show;if(show){toCam.subVectors(cam.position,L.base).normalize();L.spr.position.copy(L.base).addScaledVector(toCam,B.mkLift??3)}L.spr.scale.setScalar(mkScale*(L.el.classList.contains('on')?1.4:1));
    const on=show&&L.el.classList.contains('on');L.el.classList.toggle('hid',!on);if(!on)continue;
-   v.copy(L.spr.position).project(cam);L.el.classList.toggle('flip',v.x>0);L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;continue}
+   v.copy(L.spr.position).project(cam);fitLab(L.el,v.x,W);L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;continue}
   if(!show){if(L.vis){L.el.classList.add('hid');L.vis=false}continue}
   v.copy(L.p).project(cam);
   L.el.style.transform=`translate(${((v.x+1)/2*W).toFixed(1)}px,${((1-v.y)/2*H).toFixed(1)}px) translate(-50%,-50%)`;
@@ -458,7 +486,7 @@ function tick(now){
 function setStage(k,doFly=true){
  curStage=k;if(B.stageSrc&&stLoaded[k]!==true){const lb=$('#stageLbl');loadStage(k,()=>{if(lb&&curStage===k)lb.textContent=B.stages[k].t;loadStage(k+1)});}
  document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.stage===k));
- pins.forEach(x=>x.el.classList.remove('on'));tapShow(null);const S=B.stages[k];
+ pins.forEach(x=>x.el.classList.remove('on'));tapShow(null);if(peelStack.length)unpeel(peelStack.length);const S=B.stages[k];
  applyLayers();applyClip();
  if(S&&S.card&&mode!=='quiz')card(S.k||'',S.card);
  if(S&&S.view&&doFly)fly(S.view[0],S.view[1],S.view[2]||[0,0,0]);
